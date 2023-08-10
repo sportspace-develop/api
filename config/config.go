@@ -57,3 +57,29 @@ func (cfg DBCfg) Password() string {
 func (cfg DBCfg) DBName() string {
 	return os.Getenv("DB_NAME")
 }
+
+type MailCfg struct{}
+
+func (cfg MailCfg) Sender() string {
+	return os.Getenv("MAIL_SENDER")
+}
+func (cfg MailCfg) Password() string {
+	return os.Getenv("MAIL_SENDER_PASSWORD")
+}
+func (cfg MailCfg) Host() string {
+	return os.Getenv("MAIL_SMTP_HOST")
+}
+func (cfg MailCfg) Port() int {
+	port, err := strconv.Atoi(os.Getenv("MAIL_SMTP_PORT"))
+	if err != nil {
+		port = 1025
+	}
+	return port
+}
+func (cfg MailCfg) Secure() bool {
+	secure, err := strconv.ParseBool(os.Getenv("MAIL_SECURE"))
+	if err != nil {
+		secure = false
+	}
+	return secure
+}

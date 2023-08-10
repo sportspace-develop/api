@@ -7,6 +7,7 @@ import (
 	"sport-space-api/config"
 	"sport-space-api/docs"
 	"sport-space-api/model"
+	"sport-space-api/tools/email"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -18,6 +19,7 @@ import (
 func init() {
 	config.Init()
 	model.Init(config.DBCfg{})
+	email.Init(config.MailCfg{})
 }
 
 func initRoute() {

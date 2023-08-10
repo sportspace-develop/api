@@ -14,11 +14,18 @@ services:
       JWT_LONG_TIME: 60
       REFRESH_TOKEN_LONG_TIME: 43200
       COOKIE_SECRET: cookiesecret
+
       DB_HOST: sportspace-db
       DB_PORT: 3306
       DB_NAME: sportspace
       DB_USERNAME: root
       DB_PASSWORD: root
+
+      MAIL_SMTP_HOST: mail
+      MAIL_SMTP_PORT: 1025
+      MAIL_SENDER: no-report@test.ru
+      MAIL_SENDER_PASSWORD: test
+      MAIL_SECURE: 0
     depends_on:
       - database
     ports:

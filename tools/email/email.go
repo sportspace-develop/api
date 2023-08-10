@@ -7,6 +7,22 @@ import (
 	gomail "gopkg.in/mail.v2"
 )
 
+var (
+	cfg config
+)
+
+type config interface {
+	Sender() string
+	Password() string
+	Host() string
+	Port() int
+	Secure() bool
+}
+
+func Init(c config) {
+	cfg = c
+}
+
 type Email string
 
 func (e *Email) IsValid() bool {
@@ -18,11 +34,19 @@ func SendCodeToEmail(email string, code string) (bool, error) {
 
 	m := gomail.NewMessage()
 
+	host := cfg.Host()
+	port := cfg.Port()
+	sender := cfg.Sender()
+	password := cfg.Password()
+	secure := cfg.Secure()
+
+	fmt.Println(host, port, sender, password, secure)
+
 	// Set E-Mail sender
-	m.SetHeader("From", "from@gmail.com")
+	m.SetHeader("From", sender)
 
 	// Set E-Mail receivers
-	m.SetHeader("To", "to@example.com")
+	m.SetHeader("To", email)
 
 	// Set E-Mail subject
 	m.SetHeader("Subject", "Auth code")
@@ -31,11 +55,11 @@ func SendCodeToEmail(email string, code string) (bool, error) {
 	m.SetBody("text/plain", fmt.Sprintf("Code %s", code))
 
 	// Settings for SMTP server
-	d := gomail.NewDialer("mail", 1025, "from@gmail.com", "<email_password>")
+	d := gomail.NewDialer(host, port, sender, password)
 
 	// This is only needed when SSL/TLS certificate is not valid on server.
 	// In production this should be set to false.
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: !secure}
 
 	// Now send E-Mail
 	if err := d.DialAndSend(m); err != nil {
