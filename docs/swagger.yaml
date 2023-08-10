@@ -1,0 +1,190 @@
+definitions:
+  api.authorizeRequest:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      email:
+        example: test@test.ru
+        type: string
+    type: object
+  api.authorizeResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY
+        type: string
+      expires_in:
+        type: string
+      refresh_token:
+        example: 213qwewq32q3q23qqrgrt67b54
+        type: string
+      success:
+        type: boolean
+    type: object
+  api.getUserResponse:
+    type: object
+  api.loginRequest:
+    properties:
+      email:
+        example: test@test.ru
+        type: string
+    type: object
+  api.loginResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  api.refreshRequest:
+    properties:
+      refresh_token:
+        example: qweqwe231e2qeqae
+        type: string
+    type: object
+  api.refreshResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY
+        type: string
+      expires_in:
+        type: string
+      refresh_token:
+        example: 213qwewq32q3q23qqrgrt67b54
+        type: string
+      success:
+        type: boolean
+    type: object
+  api.responseError:
+    properties:
+      error:
+        type: integer
+      errorMessage:
+        type: string
+      message:
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: user authorization
+      parameters:
+      - description: User email
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.authorizeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.authorizeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: authorization
+      tags:
+      - auth
+  /auth/otp:
+    post:
+      consumes:
+      - application/json
+      description: send code to email
+      parameters:
+      - description: User email
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/api.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.loginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: authorization
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.refreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.refreshResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: authorization
+      tags:
+      - auth
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: get user data
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: user data
+      tags:
+      - user
+swagger: "2.0"
