@@ -2,5 +2,63 @@ version: '3'
 
 
 services:
+  api:
+    build: .
+    container_name: sportspace-api
+    restart: always
+    environment: 
+      SOURCE: dev
+      HOST: 0.0.0.0
+      PORT: 8080
+      JWT_SECRET: secretjwt
+      JWT_LONG_TIME: 60
+      REFRESH_TOKEN_LONG_TIME: 43200
+      COOKIE_SECRET: cookiesecret
+      DB_HOST: sportspace-db
+      DB_PORT: 3306
+      DB_NAME: sportspace
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+    networks:
+      - space
+
+  database:
+    image: mysql:5.7
+    container_name: sportspace-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'sportspace'   
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'root'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./mysql-data/db:/var/lib/mysql
+    networks:
+      - space
+
   mail:
-    
+    image: maildev/maildev
+    container_name: mail
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - MAILDEV_WEB_PORT=1080
+      - MAILDEV_SMTP_PORT=1025
+    ports:
+      - '1080:1080'
+      - '1025:1025'
+    networks:
+      - space
+
+
+networks:
+  space:
+    external: false
