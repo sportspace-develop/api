@@ -59,15 +59,13 @@ func Registration(email string) (User, error) {
 }
 
 func FindUserByEmail(email string) (User, error) {
-	user := User{
-		Email: email,
-	}
+	user := User{}
 	db, err := Connect()
 	if err != nil {
 		return user, err
 	}
 
-	result := db.First(&user)
+	result := db.Where("email = ?", email).First(&user)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		return user, result.Error
 	}
