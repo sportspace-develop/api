@@ -7,22 +7,30 @@ import (
 	gJWT "github.com/golang-jwt/jwt/v5"
 )
 
+type Fields string
+
 const (
-	DATE_FORMAT = "02.01.2006 15:04:05"
+	DATE_FORMAT        = "02.01.2006 15:04:05"
+	USER_ID     Fields = "user_id"
 )
 
-func New(jData map[string]interface{}, secret []byte, longTime time.Duration) (string, error) {
+var (
+	Secret              []byte
+	AccessTokenLongTime time.Duration = time.Minute * 30
+)
+
+func New(jData map[Fields]interface{}) (string, error) {
 
 	jwtData := gJWT.MapClaims{
-		"expires_in": time.Now().UTC().Add(time.Minute * longTime).Format(DATE_FORMAT),
+		"expires_in": time.Now().UTC().Add(time.Minute * AccessTokenLongTime).Format(DATE_FORMAT),
 	}
 
 	for k, v := range jData {
-		jwtData[k] = v
+		jwtData[string(k)] = v
 	}
 
 	token := gJWT.NewWithClaims(gJWT.SigningMethodHS256, jwtData)
-	return token.SignedString(secret)
+	return token.SignedString(Secret)
 }
 
 func IsExpired(token *gJWT.Token) (bool, error) {
@@ -45,7 +53,7 @@ func IsExpired(token *gJWT.Token) (bool, error) {
 
 }
 
-func Check(hToken string, secret []byte) (*gJWT.Token, error) {
+func Check(hToken string) (*gJWT.Token, error) {
 
 	token, err := gJWT.Parse(hToken, func(token *gJWT.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
@@ -53,7 +61,7 @@ func Check(hToken string, secret []byte) (*gJWT.Token, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return secret, nil
+		return Secret, nil
 	})
 	if err != nil {
 		return nil, err

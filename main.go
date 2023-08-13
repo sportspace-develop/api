@@ -8,6 +8,8 @@ import (
 	"sport-space-api/docs"
 	"sport-space-api/model"
 	"sport-space-api/tools/email"
+	"sport-space-api/tools/jwt"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -20,10 +22,15 @@ func init() {
 	config.Init()
 	model.Init(config.DBCfg{})
 	email.Init(config.MailCfg{})
+
+	jwt.Secret = []byte(config.App.JWTSecret)
+	jwt.AccessTokenLongTime = time.Duration(config.App.JWTLongTime)
 }
 
 func initRoute() {
 	r := gin.Default()
+	r.Use(api.LoggingMiddleware())
+	r.Use(api.CORSMiddleware())
 	store := cookie.NewStore([]byte(config.App.CookieSecret))
 	r.Use(sessions.Sessions("sport-space", store))
 
@@ -38,7 +45,7 @@ func initRoute() {
 			eg.POST("/refresh", api.Refresh)
 		}
 		authorized := v1.Group("/user")
-		authorized.Use(api.AuthRequired())
+		authorized.Use(api.AuthRequiredMiddleware())
 		{
 			authorized.GET("/", api.GetUser)
 		}

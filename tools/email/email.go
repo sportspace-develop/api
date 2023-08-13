@@ -2,13 +2,17 @@ package email
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"sport-space-api/logger"
+	"time"
 
 	gomail "gopkg.in/mail.v2"
 )
 
 var (
 	cfg config
+	log *logger.Logger = logger.New("mail")
 )
 
 type config interface {
@@ -31,7 +35,7 @@ func (e *Email) IsValid() bool {
 }
 
 func SendCodeToEmail(email string, code string) (bool, error) {
-
+	start := time.Now()
 	m := gomail.NewMessage()
 
 	host := cfg.Host()
@@ -39,8 +43,6 @@ func SendCodeToEmail(email string, code string) (bool, error) {
 	sender := cfg.Sender()
 	password := cfg.Password()
 	secure := cfg.Secure()
-
-	fmt.Println(host, port, sender, password, secure)
 
 	// Set E-Mail sender
 	m.SetHeader("From", sender)
@@ -64,8 +66,17 @@ func SendCodeToEmail(email string, code string) (bool, error) {
 	// Now send E-Mail
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println(err)
+		log.ERROR(err.Error())
 		panic(err)
 	}
 
+	duration := time.Since(start).Seconds()
+	marshaled, _ := json.MarshalIndent(map[string]interface{}{
+		"duration": duration,
+		"to":       email,
+		"subject":  "Auth code",
+		"code":     code,
+	}, "", "  ")
+	log.INFO(string(marshaled))
 	return true, nil
 }

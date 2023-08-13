@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"sport-space-api/config"
 	"sport-space-api/model"
 	"sport-space-api/tools"
 	"sport-space-api/tools/email"
@@ -36,11 +35,11 @@ func GetAuthCode(c *gin.Context) {
 	err := c.ShouldBindJSON(&jsonData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      MessageErr[500],
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: MessageErr[500],
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -56,22 +55,22 @@ func GetAuthCode(c *gin.Context) {
 	user, err := model.FindUserByEmail(jsonData.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 	if user.ID == 0 {
 		user, err = model.Registration(jsonData.Email)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responseError{
-				Success:      false,
-				Error:        500,
-				Message:      GetMessageErr(500),
-				ErrorMessage: err.Error(),
+				Success: false,
+				Error:   500,
+				Message: GetMessageErr(500),
 			})
+			log.ERROR(err.Error())
 			return
 		}
 	}
@@ -81,11 +80,11 @@ func GetAuthCode(c *gin.Context) {
 	mCode, err := model.FindCodeNotActivatedByUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -98,31 +97,31 @@ func GetAuthCode(c *gin.Context) {
 
 		if sendOk, sendErr := email.SendCodeToEmail(jsonData.Email, code); sendErr != nil || !sendOk {
 			c.JSON(http.StatusInternalServerError, responseError{
-				Success:      false,
-				Error:        500,
-				Message:      GetMessageErr(500),
-				ErrorMessage: err.Error(),
+				Success: false,
+				Error:   500,
+				Message: GetMessageErr(500),
 			})
+			log.ERROR(err.Error())
 			return
 		}
 	} else if ok, err := model.CreateUserAuthCode(user, code); err == nil && ok {
 		if sendOk, sendErr := email.SendCodeToEmail(jsonData.Email, code); sendErr != nil || !sendOk {
 			c.JSON(http.StatusInternalServerError, responseError{
-				Success:      false,
-				Error:        500,
-				Message:      GetMessageErr(500),
-				ErrorMessage: err.Error(),
+				Success: false,
+				Error:   500,
+				Message: GetMessageErr(500),
 			})
+			log.ERROR(err.Error())
 			return
 		}
 
 	} else {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -135,10 +134,10 @@ type authorizeRequest struct {
 }
 
 type authorizeResponse struct {
-	Success      bool      `json:"success"`
-	AccessToken  string    `json:"access_token" swaggertype:"string" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY"`
-	RefreshToken string    `json:"refresh_token" swaggertype:"string" example:"213qwewq32q3q23qqrgrt67b54"`
-	ExpiresIn    time.Time `json:"expires_in" swaggertype:"string"`
+	Success      bool   `json:"success"`
+	AccessToken  string `json:"access_token" swaggertype:"string" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY"`
+	RefreshToken string `json:"refresh_token" swaggertype:"string" example:"cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"`
+	ExpiresIn    string `json:"expires_in" swaggertype:"string" example:"2006-01-02 15:04:05"`
 }
 
 // @Summary authorization
@@ -163,14 +162,7 @@ func Authorize(c *gin.Context) {
 		})
 		return
 	}
-	// if jsonData.Code == "" || (jsonData.Code != "123456" && config.App.Source != config.PROD) {
-	// 	c.JSON(http.StatusOK, responseError{
-	// 		Success: false,
-	// 		Error:   11,
-	// 		Message: GetMessageErr(11),
-	// 	})
-	// 	return
-	// }
+
 	if !jsonData.Email.IsValid() {
 		c.JSON(http.StatusBadRequest, responseError{
 			Success: false,
@@ -183,22 +175,22 @@ func Authorize(c *gin.Context) {
 	user, err := model.FindUserByEmail(string(jsonData.Email))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
 	authCode, err := model.FindCodeNotActivatedByUserCode(user, jsonData.Code)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -214,24 +206,24 @@ func Authorize(c *gin.Context) {
 	_, err = model.ActivateUserAuthCode(authCode)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, responseError{
-			Success:      false,
-			Error:        17,
-			Message:      GetMessageErr(17),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   17,
+			Message: GetMessageErr(17),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
-	tokenString, err := jwt.New(map[string]interface{}{
-		"user_id": user.ID,
-	}, []byte(config.App.JWTSecret), time.Duration(config.App.JWTLongTime))
+	tokenString, err := jwt.New(map[jwt.Fields]interface{}{
+		jwt.USER_ID: user.ID,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        13,
-			Message:      GetMessageErr(13),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   13,
+			Message: GetMessageErr(13),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -240,11 +232,11 @@ func Authorize(c *gin.Context) {
 	newSess, err := model.NewSession(user, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -252,7 +244,7 @@ func Authorize(c *gin.Context) {
 		Success:      true,
 		AccessToken:  tokenString,
 		RefreshToken: refreshToken,
-		ExpiresIn:    newSess.ExpiresIn,
+		ExpiresIn:    newSess.ExpiresIn.Format(time.DateTime),
 	})
 }
 
@@ -261,10 +253,10 @@ type refreshRequest struct {
 }
 
 type refreshResponse struct {
-	Success      bool      `json:"success"`
-	AccessToken  string    `json:"access_token" swaggertype:"string" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY"`
-	RefreshToken string    `json:"refresh_token" swaggertype:"string" example:"213qwewq32q3q23qqrgrt67b54"`
-	ExpiresIn    time.Time `json:"expires_in" swaggertype:"string"`
+	Success      bool   `json:"success"`
+	AccessToken  string `json:"access_token" swaggertype:"string" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY"`
+	RefreshToken string `json:"refresh_token" swaggertype:"string" example:"cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"`
+	ExpiresIn    string `json:"expires_in" swaggertype:"string" example:"2006-01-02 15:04:05"`
 }
 
 // @Summary authorization
@@ -283,11 +275,11 @@ func Refresh(c *gin.Context) {
 	err := c.ShouldBindJSON(&jData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      MessageErr[500],
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: MessageErr[500],
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -304,22 +296,22 @@ func Refresh(c *gin.Context) {
 	sess, err := model.FindSession(jData.RefreshToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        13,
-			Message:      GetMessageErr(13),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   13,
+			Message: GetMessageErr(13),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 	if sess.ID != 0 {
 		_, err := model.DeleteSession(sess.RefreshToken)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, responseError{
-				Success:      false,
-				Error:        500,
-				Message:      GetMessageErr(500),
-				ErrorMessage: err.Error(),
+				Success: false,
+				Error:   500,
+				Message: GetMessageErr(500),
 			})
+			log.ERROR(err.Error())
 			return
 		}
 	}
@@ -335,11 +327,11 @@ func Refresh(c *gin.Context) {
 	user, err := model.FindUserById(sess.UserId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 	if user.ID == 0 {
@@ -351,27 +343,27 @@ func Refresh(c *gin.Context) {
 		return
 	}
 
-	tokenString, err := jwt.New(map[string]interface{}{
-		"user_id": user.ID,
-	}, []byte(config.App.JWTSecret), time.Duration(config.App.JWTLongTime))
+	tokenString, err := jwt.New(map[jwt.Fields]interface{}{
+		jwt.USER_ID: user.ID,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        13,
-			Message:      GetMessageErr(13),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   13,
+			Message: GetMessageErr(13),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 	refreshToken := tools.RandStringRunes(100)
 	newSess, err := model.NewSession(user, refreshToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
-			Success:      false,
-			Error:        500,
-			Message:      GetMessageErr(500),
-			ErrorMessage: err.Error(),
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
 		})
+		log.ERROR(err.Error())
 		return
 	}
 
@@ -379,6 +371,6 @@ func Refresh(c *gin.Context) {
 		Success:      true,
 		AccessToken:  tokenString,
 		RefreshToken: refreshToken,
-		ExpiresIn:    newSess.ExpiresIn,
+		ExpiresIn:    newSess.ExpiresIn.Format(time.DateTime),
 	})
 }
