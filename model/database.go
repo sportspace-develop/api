@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"sport-space-api/logger"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,6 +11,7 @@ import (
 var (
 	Cfg DSN
 	DB  *gorm.DB
+	log *logger.Logger = logger.New("database")
 )
 
 type DSN interface {
@@ -39,6 +41,9 @@ func Connect() (*gorm.DB, error) {
 	if DB == nil {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", Cfg.Username(), Cfg.Password(), Cfg.Host(), Cfg.Port(), Cfg.DBName())
 		DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err != nil {
+			log.ERROR(err.Error())
+		}
 	}
 	return DB, err
 }

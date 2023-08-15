@@ -47,11 +47,13 @@ func Registration(email string) (User, error) {
 	}
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return user, err
 	}
 
 	result := db.Create(&user)
 	if result.Error != nil {
+		log.ERROR(result.Error.Error())
 		return user, result.Error
 	}
 
@@ -62,11 +64,13 @@ func FindUserByEmail(email string) (User, error) {
 	user := User{}
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return user, err
 	}
 
 	result := db.Where("email = ?", email).First(&user)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
 		return user, result.Error
 	}
 
@@ -77,11 +81,13 @@ func FindUserById(id uint) (User, error) {
 	user := User{}
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return user, err
 	}
 
 	result := db.First(&user, id)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
 		return user, result.Error
 	}
 
@@ -100,11 +106,13 @@ func CreateUserAuthCode(user User, code string) (bool, error) {
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return false, err
 	}
 
 	result := db.Create(&uCode)
 	if result.Error != nil {
+		log.ERROR(result.Error.Error())
 		return false, result.Error
 	}
 
@@ -115,12 +123,14 @@ func ActivateUserAuthCode(authCode UserAuthCode) (UserAuthCode, error) {
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return authCode, err
 	}
 
 	authCode.Status = CSActivated
 	result := db.Save(&authCode)
 	if result.Error != nil {
+		log.ERROR(result.Error.Error())
 		return authCode, result.Error
 	}
 
@@ -132,11 +142,13 @@ func FindCodeNotActivatedByUserCode(user User, code string) (UserAuthCode, error
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return dataAuthCode, err
 	}
 
 	result := db.Where("expires_in > ? and status = ? and code = ? and user_id = ?", time.Now().UTC(), string(CSWait), code, user.ID).First(&dataAuthCode)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
 		return dataAuthCode, result.Error
 	}
 
@@ -148,11 +160,13 @@ func FindCodeNotActivatedByUser(user User) (UserAuthCode, error) {
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return dataAuthCode, err
 	}
 
 	result := db.Where("expires_in > ? and status = ? and user_id = ?", time.Now().UTC(), string(CSWait), user.ID).First(&dataAuthCode)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
 		return dataAuthCode, result.Error
 	}
 
@@ -163,11 +177,13 @@ func SaveCodeNotActivatedByUser(data UserAuthCode) (UserAuthCode, error) {
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return data, err
 	}
 
 	result := db.Save(&data)
 	if result.Error != nil {
+		log.ERROR(result.Error.Error())
 		return data, result.Error
 	}
 
@@ -183,11 +199,13 @@ func NewSession(user User, refreshToken string) (Session, error) {
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return session, err
 	}
 
 	result := db.Create(&session)
 	if result.Error != nil {
+		log.ERROR(result.Error.Error())
 		return session, result.Error
 	}
 
@@ -197,16 +215,17 @@ func NewSession(user User, refreshToken string) (Session, error) {
 func DeleteSession(refreshToken string) (bool, error) {
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return false, err
 	}
 
 	result := db.Where("refresh_token = ?", refreshToken).Delete(&Session{})
 	if result.Error != nil {
+		log.ERROR(result.Error.Error())
 		return false, result.Error
 	}
 
 	return true, nil
-
 }
 
 func FindSession(refreshToken string) (Session, error) {
@@ -214,11 +233,13 @@ func FindSession(refreshToken string) (Session, error) {
 
 	db, err := Connect()
 	if err != nil {
+		log.ERROR(err.Error())
 		return session, err
 	}
 
 	result := db.Where("refresh_token = ?", refreshToken).First(&session)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
 		return session, result.Error
 	}
 
