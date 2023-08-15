@@ -9,6 +9,7 @@ import (
 
 var (
 	Cfg DSN
+	DB  *gorm.DB
 )
 
 type DSN interface {
@@ -34,6 +35,10 @@ func Init(cfg DSN) {
 }
 
 func Connect() (*gorm.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", Cfg.Username(), Cfg.Password(), Cfg.Host(), Cfg.Port(), Cfg.DBName())
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	var err error
+	if DB == nil {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", Cfg.Username(), Cfg.Password(), Cfg.Host(), Cfg.Port(), Cfg.DBName())
+		DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	}
+	return DB, err
 }
