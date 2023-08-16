@@ -11,7 +11,7 @@ import (
 var (
 	Cfg DSN
 	DB  *gorm.DB
-	log *logger.Logger = logger.New("database")
+	log *logger.Logger
 )
 
 type DSN interface {
@@ -23,6 +23,8 @@ type DSN interface {
 }
 
 func Init(cfg DSN) {
+	log = logger.New("database")
+	log.INFO("init database")
 	Cfg = cfg
 	db, err := Connect()
 	if err != nil {

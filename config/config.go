@@ -36,7 +36,7 @@ func Init() {
 	}
 	App.JWTLongTime, err = strconv.Atoi(os.Getenv("JWT_LONG_TIME"))
 	if err != nil {
-		App.JWTLongTime = 600
+		App.JWTLongTime = 60
 	}
 }
 

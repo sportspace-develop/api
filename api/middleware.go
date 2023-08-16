@@ -23,7 +23,7 @@ func AuthRequiredMiddleware() gin.HandlerFunc {
 			h_auth = h_auth_splited[1]
 		}
 
-		token, err := jwt.Check(h_auth)
+		token, err := jwt.Parse(h_auth)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, responseError{
 				Success: false,
@@ -35,14 +35,16 @@ func AuthRequiredMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		isExpired, err := jwt.IsExpired(token)
-		if !token.Valid || isExpired || err != nil {
+		isExpired, err := token.IsExpired()
+		if !token.Valid() || isExpired || err != nil {
 			c.JSON(http.StatusUnauthorized, responseError{
 				Success: false,
 				Error:   401,
-				Message: MessageErr[401],
+				Message: GetMessageErr(401),
 			})
-			log.ERROR(err.Error())
+			if err != nil {
+				log.ERROR(err.Error())
+			}
 			c.Abort()
 			return
 		}

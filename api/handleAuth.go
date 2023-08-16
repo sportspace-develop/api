@@ -214,9 +214,10 @@ func Authorize(c *gin.Context) {
 		return
 	}
 
-	tokenString, err := jwt.New(map[jwt.Fields]interface{}{
+	tkn := jwt.New(map[jwt.Fields]interface{}{
 		jwt.USER_ID: user.ID,
 	})
+	tokenString, err := tkn.String()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
 			Success: false,
@@ -229,7 +230,17 @@ func Authorize(c *gin.Context) {
 
 	refreshToken := tools.RandStringRunes(100)
 
-	newSess, err := model.NewSession(user, refreshToken)
+	_, err = model.NewSession(user, refreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responseError{
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
+		})
+		log.ERROR(err.Error())
+		return
+	}
+	expiresIn, err := tkn.GetExpiresDateString()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
 			Success: false,
@@ -244,7 +255,7 @@ func Authorize(c *gin.Context) {
 		Success:      true,
 		AccessToken:  tokenString,
 		RefreshToken: refreshToken,
-		ExpiresIn:    newSess.ExpiresIn.Format(time.DateTime),
+		ExpiresIn:    expiresIn,
 	})
 }
 
@@ -343,9 +354,10 @@ func Refresh(c *gin.Context) {
 		return
 	}
 
-	tokenString, err := jwt.New(map[jwt.Fields]interface{}{
+	tkn := jwt.New(map[jwt.Fields]interface{}{
 		jwt.USER_ID: user.ID,
 	})
+	tokenString, err := tkn.String()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
 			Success: false,
@@ -356,7 +368,18 @@ func Refresh(c *gin.Context) {
 		return
 	}
 	refreshToken := tools.RandStringRunes(100)
-	newSess, err := model.NewSession(user, refreshToken)
+	_, err = model.NewSession(user, refreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responseError{
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
+		})
+		log.ERROR(err.Error())
+		return
+	}
+
+	expiresIn, err := tkn.GetExpiresDateString()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, responseError{
 			Success: false,
@@ -371,6 +394,6 @@ func Refresh(c *gin.Context) {
 		Success:      true,
 		AccessToken:  tokenString,
 		RefreshToken: refreshToken,
-		ExpiresIn:    newSess.ExpiresIn.Format(time.DateTime),
+		ExpiresIn:    expiresIn,
 	})
 }

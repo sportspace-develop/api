@@ -6,6 +6,7 @@ import (
 	api "sport-space-api/api"
 	"sport-space-api/config"
 	"sport-space-api/docs"
+	"sport-space-api/logger"
 	"sport-space-api/model"
 	"sport-space-api/tools/email"
 	"sport-space-api/tools/jwt"
@@ -18,13 +19,20 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+var (
+	log *logger.Logger
+)
+
 func init() {
+	log = logger.New("main")
+	log.INFO("init app")
 	config.Init()
+	api.Init()
 	model.Init(config.DBCfg{})
 	email.Init(config.MailCfg{})
 
 	jwt.Secret = []byte(config.App.JWTSecret)
-	jwt.AccessTokenLongTime = time.Duration(config.App.JWTLongTime)
+	jwt.AccessTokenLongTime = time.Duration(config.App.JWTLongTime * int(time.Minute))
 }
 
 func initRoute() {
@@ -57,5 +65,6 @@ func initRoute() {
 }
 
 func main() {
+	log.INFO("Start app")
 	initRoute()
 }

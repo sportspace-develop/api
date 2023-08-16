@@ -1,0 +1,89 @@
+sport-space:
+  organization:
+    description: "Организация"
+  tournament:
+    description: "Турнир"
+    fields:
+      - title
+      - game
+      - type
+      - start registration
+      - end registration
+      - start
+      - end
+    role:
+      - owner
+
+  match:
+    description: "Матч"
+    fields:
+      - date start
+      - long time
+
+  team:
+    description: "Команда"
+    fields:
+      - title
+      - game
+
+  match_team:
+    description: "Команды матча"
+    fields:
+      - team
+      - match
+      - tournament
+
+  member:
+    description: "Член команды"
+    fields:
+      - first name
+      - second name
+      - last name
+      - berth day
+      - team_role
+      - position
+    // нужна история матчей игрока ?
+
+  team_member:
+    fields:
+      - member
+      - team
+
+  match_event:
+    description: "События матча"
+    fields:
+      - type
+      - match
+      - member
+      - time
+      - game
+
+
+fields:  
+  tournament:
+    game:
+      - footboll
+      - another games...
+    type: 
+      # https://sport.e-champs.com/faq/brackets
+      # https://scienceforum.ru/2023/article/2018032993
+      - single elimination
+      - double elimination
+      - ...?
+    role:
+      - owner
+      - manager ?
+  team_member:
+    role:
+      - player
+      - owner ?
+      - couch
+      - manager
+  match:
+    type:
+      - best of ...
+  match_event:
+    type:
+      - голы
+      - карточки
+      - ...?

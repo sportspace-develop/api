@@ -7,8 +7,13 @@ const (
 )
 
 var (
-	log *logger.Logger = logger.New("api")
+	log *logger.Logger
 )
+
+func Init() {
+	log = logger.New("api")
+	log.INFO("init api")
+}
 
 type responseError struct {
 	Success bool   `json:"success" swaggertype:"boolean" example:"false"`

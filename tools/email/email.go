@@ -12,7 +12,7 @@ import (
 
 var (
 	cfg config
-	log *logger.Logger = logger.New("mail")
+	log *logger.Logger
 )
 
 type config interface {
@@ -24,6 +24,8 @@ type config interface {
 }
 
 func Init(c config) {
+	log = logger.New("mail")
+	log.INFO("init email")
 	cfg = c
 }
 

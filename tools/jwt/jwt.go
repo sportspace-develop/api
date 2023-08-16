@@ -16,13 +16,32 @@ const (
 
 var (
 	Secret              []byte
-	AccessTokenLongTime time.Duration = time.Minute * 30
+	AccessTokenLongTime time.Duration
 )
 
-func New(jData map[Fields]interface{}) (string, error) {
+type tokenT struct {
+	t *gJWT.Token
+}
 
+func (t *tokenT) String() (string, error) {
+	return t.t.SignedString(Secret)
+}
+
+func Parse(token string) (*tokenT, error) {
+
+	tStr, err := Check(token)
+
+	return &tokenT{
+		t: tStr,
+	}, err
+}
+
+func New(jData map[Fields]interface{}) *tokenT {
+
+	fmt.Println("access long", AccessTokenLongTime)
+	expires := time.Now().UTC().Add(AccessTokenLongTime)
 	jwtData := gJWT.MapClaims{
-		"expires_in": time.Now().UTC().Add(time.Minute * AccessTokenLongTime).Format(DATE_FORMAT),
+		"expires_in": expires.Format(time.DateTime),
 	}
 
 	for k, v := range jData {
@@ -30,17 +49,19 @@ func New(jData map[Fields]interface{}) (string, error) {
 	}
 
 	token := gJWT.NewWithClaims(gJWT.SigningMethodHS256, jwtData)
-	return token.SignedString(Secret)
+	tkn := tokenT{
+		t: token,
+	}
+	return &tkn
 }
 
-func IsExpired(token *gJWT.Token) (bool, error) {
-	if claims, ok := token.Claims.(gJWT.MapClaims); ok && token.Valid {
-		fmt.Println(claims)
+func (t *tokenT) IsExpired() (bool, error) {
+	if claims, ok := t.t.Claims.(gJWT.MapClaims); ok && t.t.Valid {
 		if _, ok := claims["expires_in"]; !ok {
 			return true, fmt.Errorf("Token not valid")
 		}
 
-		expired_dt, err := time.Parse(DATE_FORMAT, claims["expires_in"].(string))
+		expired_dt, err := time.Parse(time.DateTime, claims["expires_in"].(string))
 		if err != nil {
 			return true, fmt.Errorf("Not found attribute expires_in")
 		}
@@ -50,6 +71,23 @@ func IsExpired(token *gJWT.Token) (bool, error) {
 	}
 
 	return false, nil
+
+}
+
+func (t *tokenT) Valid() bool {
+	return t.t.Valid
+}
+
+func (t *tokenT) GetExpiresDateString() (string, error) {
+	claims, ok := t.t.Claims.(gJWT.MapClaims)
+	if !ok {
+		return "", fmt.Errorf("Token not valid")
+	}
+	if _, ok := claims["expires_in"]; !ok {
+		return "", fmt.Errorf("Token not valid")
+	}
+
+	return claims["expires_in"].(string), nil
 
 }
 

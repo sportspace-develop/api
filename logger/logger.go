@@ -59,10 +59,10 @@ func (l *Logger) rotate() {
 				log.Fatal(err)
 			}
 
-			l.WarningLogger = log.New(l.file, "WARN: ", log.Ldate|log.Ltime|log.Llongfile)
-			l.InfoLogger = log.New(l.file, "INFO: ", log.Ldate|log.Ltime|log.Llongfile)
-			l.ErrorLogger = log.New(l.file, "ERROR: ", log.Ldate|log.Ltime|log.Llongfile)
-			l.DebugLogger = log.New(l.file, "DEBUG: ", log.Ldate|log.Ltime|log.Llongfile)
+			l.WarningLogger = log.New(l.file, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile)
+			l.InfoLogger = log.New(l.file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+			l.ErrorLogger = log.New(l.file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+			l.DebugLogger = log.New(l.file, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 		}
 	}
 }
@@ -86,10 +86,10 @@ func New(filename string) *Logger {
 		log.Fatal(err)
 	}
 
-	l.InfoLogger = log.New(l.file, "INFO: ", log.Ldate|log.Ltime|log.Llongfile)
-	l.WarningLogger = log.New(l.file, "WARN: ", log.Ldate|log.Ltime|log.Llongfile)
-	l.ErrorLogger = log.New(l.file, "ERROR: ", log.Ldate|log.Ltime|log.Llongfile)
-	l.DebugLogger = log.New(l.file, "DEBUG: ", log.Ldate|log.Ltime|log.Llongfile)
+	l.InfoLogger = log.New(l.file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	l.WarningLogger = log.New(l.file, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile)
+	l.ErrorLogger = log.New(l.file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	l.DebugLogger = log.New(l.file, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	l.SetLevelS(os.Getenv("LOG_LEVEL"))
 	go l.rotate()
@@ -97,22 +97,26 @@ func New(filename string) *Logger {
 }
 
 func (log *Logger) WARN(t ...string) {
-	if log.LogLevel >= WARN {
+	if log.LogLevel <= WARN {
+		fmt.Println(t)
 		log.WarningLogger.Output(2, fmt.Sprint(t))
 	}
 }
 func (log *Logger) INFO(t ...string) {
-	if log.LogLevel >= INFO {
+	if log.LogLevel <= INFO {
+		fmt.Println(t)
 		log.InfoLogger.Output(2, fmt.Sprint(t))
 	}
 }
 func (log *Logger) ERROR(t ...string) {
-	if log.LogLevel >= ERROR {
+	if log.LogLevel <= ERROR {
+		fmt.Println(t)
 		log.ErrorLogger.Output(2, fmt.Sprint(t))
 	}
 }
 func (log *Logger) DEBUG(t ...string) {
-	if log.LogLevel >= DEBUG {
+	if log.LogLevel <= DEBUG {
+		fmt.Println(t)
 		log.DebugLogger.Output(2, fmt.Sprint(t))
 	}
 }
