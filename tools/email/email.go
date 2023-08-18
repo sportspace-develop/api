@@ -86,7 +86,7 @@ func SendEmail(to, subject, body string) (bool, error) {
 	m.SetHeader("To", to)
 
 	// Set E-Mail subject
-	m.SetHeader("Subject", "Auth code")
+	m.SetHeader("Subject", subject)
 
 	// Set E-Mail body. You can set plain text or html with text/html
 	m.SetBody("text/plain", fmt.Sprintf("%s", body))
