@@ -93,36 +93,10 @@ func GetAuthCode(c *gin.Context) {
 		mCode.AttemptCount += 1
 		mCode.AttemptDate = time.Now().UTC()
 		mCode.ExpiresIn = time.Now().UTC().Add(time.Duration(time.Minute * 60))
-		model.SaveCodeNotActivatedByUser(mCode)
-
-		if sendOk, sendErr := email.SendCodeToEmail(jsonData.Email, code); sendErr != nil || !sendOk {
-			c.JSON(http.StatusInternalServerError, responseError{
-				Success: false,
-				Error:   500,
-				Message: GetMessageErr(500),
-			})
-			log.ERROR(err.Error())
-			return
-		}
+		model.UpdateCodeNotActivatedByUser(mCode)
+		email.AddMail(jsonData.Email, "Auth code", code)
 	} else if ok, err := model.CreateUserAuthCode(user, code); err == nil && ok {
-		if sendOk, sendErr := email.SendCodeToEmail(jsonData.Email, code); sendErr != nil || !sendOk {
-			c.JSON(http.StatusInternalServerError, responseError{
-				Success: false,
-				Error:   500,
-				Message: GetMessageErr(500),
-			})
-			log.ERROR(err.Error())
-			return
-		}
-
-	} else {
-		c.JSON(http.StatusInternalServerError, responseError{
-			Success: false,
-			Error:   500,
-			Message: GetMessageErr(500),
-		})
-		log.ERROR(err.Error())
-		return
+		email.AddMail(jsonData.Email, "Auth code", code)
 	}
 
 	c.JSON(http.StatusOK, loginResponse{Success: true})

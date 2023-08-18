@@ -173,7 +173,7 @@ func FindCodeNotActivatedByUser(user User) (UserAuthCode, error) {
 	return dataAuthCode, nil
 }
 
-func SaveCodeNotActivatedByUser(data UserAuthCode) (UserAuthCode, error) {
+func UpdateCodeNotActivatedByUser(data UserAuthCode) (UserAuthCode, error) {
 
 	db, err := Connect()
 	if err != nil {
