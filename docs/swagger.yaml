@@ -14,14 +14,200 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY
         type: string
       expires_in:
+        example: "2006-01-02 15:04:05"
         type: string
       refresh_token:
-        example: 213qwewq32q3q23qqrgrt67b54
+        example: cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh
         type: string
       success:
         type: boolean
     type: object
-  api.getUserResponse:
+  api.createOrganizationRequest:
+    properties:
+      addess:
+        type: string
+      title:
+        type: string
+    type: object
+  api.createOrganizationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.getOrganizationDataResponse'
+      success:
+        type: boolean
+    type: object
+  api.createTeamRequest:
+    properties:
+      game_type_id:
+        type: integer
+      title:
+        type: string
+    type: object
+  api.createTeamResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.getTeamDataResponse'
+      success:
+        type: boolean
+    type: object
+  api.createTournamentRequest:
+    properties:
+      end_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      end_registration_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      game_type_id:
+        description: вид спорта
+        example: 1
+        type: integer
+      is_team:
+        description: команды или индивидульно
+        type: boolean
+      start_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      start_registration_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      title:
+        type: string
+    type: object
+  api.createTournamentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.getTournamentDataResponse'
+      success:
+        type: boolean
+    type: object
+  api.getAllOrganizationDataResponse:
+    properties:
+      addess:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  api.getAllOrganizationResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/api.getAllOrganizationDataResponse'
+        type: array
+      success:
+        type: boolean
+    type: object
+  api.getOrganizationDataResponse:
+    properties:
+      addess:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  api.getOrganizationResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/api.getOrganizationDataResponse'
+        type: array
+      success:
+        type: boolean
+    type: object
+  api.getTeamDataResponse:
+    properties:
+      game_type_id:
+        type: integer
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  api.getTeamResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/api.getTeamDataResponse'
+        type: array
+      success:
+        type: boolean
+    type: object
+  api.getTournamentDataResponse:
+    properties:
+      end_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      end_registration_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      game_type_id:
+        description: вид спорта
+        example: 1
+        type: integer
+      id:
+        type: integer
+      is_team:
+        description: команды или индивидульно
+        type: boolean
+      start_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      start_registration_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      title:
+        type: string
+    type: object
+  api.getTournamentResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/api.getTournamentDataResponse'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  api.getTournamentsDataResponse:
+    properties:
+      end_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      end_registration_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      game_type_id:
+        description: вид спорта
+        example: 1
+        type: integer
+      id:
+        type: integer
+      is_team:
+        description: команды или индивидульно
+        type: boolean
+      organization_id:
+        type: integer
+      start_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      start_registration_date:
+        example: "2023-12-31 15:04:05"
+        type: string
+      title:
+        type: string
+    type: object
+  api.getTournamentsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/api.getTournamentsDataResponse'
+        type: array
+      success:
+        example: true
+        type: boolean
     type: object
   api.loginRequest:
     properties:
@@ -34,10 +220,16 @@ definitions:
       success:
         type: boolean
     type: object
+  api.logoutRequest:
+    properties:
+      refresh_token:
+        example: cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh
+        type: string
+    type: object
   api.refreshRequest:
     properties:
       refresh_token:
-        example: qweqwe231e2qeqae
+        example: cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh
         type: string
     type: object
   api.refreshResponse:
@@ -46,9 +238,10 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY
         type: string
       expires_in:
+        example: "2006-01-02 15:04:05"
         type: string
       refresh_token:
-        example: 213qwewq32q3q23qqrgrt67b54
+        example: cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh
         type: string
       success:
         type: boolean
@@ -57,12 +250,63 @@ definitions:
     properties:
       error:
         type: integer
-      errorMessage:
-        type: string
       message:
         type: string
       success:
         example: false
+        type: boolean
+    type: object
+  api.responseSuccess:
+    properties:
+      success:
+        example: true
+        type: boolean
+    type: object
+  api.updateOrganizationRequest:
+    properties:
+      addess:
+        type: string
+      title:
+        type: string
+    type: object
+  api.updateOrganizationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.getOrganizationDataResponse'
+      success:
+        type: boolean
+    type: object
+  api.updateTournamentRequest:
+    properties:
+      end_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      end_registration_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      game_type_id:
+        description: вид спорта
+        example: 1
+        type: integer
+      id:
+        type: integer
+      is_team:
+        description: команды или индивидульно
+        type: boolean
+      start_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      start_registration_date:
+        example: "2023-12-31 00:00:00"
+        type: string
+      title:
+        type: string
+    type: object
+  api.updateTournamentResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.getTournamentDataResponse'
+      success:
         type: boolean
     type: object
 info:
@@ -98,6 +342,37 @@ paths:
       summary: authorization
       tags:
       - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: logout
+      parameters:
+      - description: Refresh token
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.logoutRequest'
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseSuccess'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: logout
+      tags:
+      - auth
   /auth/otp:
     post:
       consumes:
@@ -125,7 +400,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.responseError'
-      summary: authorization
+      summary: send to email one time password
       tags:
       - auth
   /auth/refresh:
@@ -155,14 +430,33 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.responseError'
-      summary: authorization
+      summary: refresh token
       tags:
       - auth
-  /user:
+  /organization:
     get:
       consumes:
       - application/json
-      description: get user data
+      description: get organization data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getAllOrganizationResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: info for all users
+      tags:
+      - Guest
+  /profile/organization:
+    get:
+      consumes:
+      - application/json
+      description: get organization data
       parameters:
       - description: Bearer JWT
         in: header
@@ -175,7 +469,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.getUserResponse'
+            $ref: '#/definitions/api.getOrganizationResponse'
         "401":
           description: Unauthorized
           schema:
@@ -184,7 +478,331 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.responseError'
-      summary: user data
+      summary: organization data
       tags:
-      - user
+      - profile organization
+    post:
+      consumes:
+      - application/json
+      description: create organization
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.createOrganizationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.createOrganizationResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: create organization
+      tags:
+      - profile organization
+    put:
+      consumes:
+      - application/json
+      description: update organization
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Organization
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateOrganizationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.updateOrganizationResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: update organization
+      tags:
+      - profile organization
+  /profile/team:
+    get:
+      consumes:
+      - application/json
+      description: get team data
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getTeamResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: team data
+      tags:
+      - profile team
+    post:
+      consumes:
+      - application/json
+      description: create team
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Team
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.createTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.createTeamResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: create team
+      tags:
+      - profile team
+    put:
+      consumes:
+      - application/json
+      description: update team
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.responseSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: update team
+      tags:
+      - profile team
+  /profile/tournament:
+    get:
+      consumes:
+      - application/json
+      description: get tournament data
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Tournaments
+        in: query
+        name: tournament_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getTournamentResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: tournament data
+      tags:
+      - profile organization
+    post:
+      consumes:
+      - application/json
+      description: create tournament
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Tournament
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.createTournamentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/api.createTournamentResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: create tournament
+      tags:
+      - profile organization
+    put:
+      consumes:
+      - application/json
+      description: edit tournament
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Tournaments
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateTournamentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.updateTournamentResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: edit tournament
+      tags:
+      - profile organization
+  /team:
+    get:
+      consumes:
+      - application/json
+      description: get team data
+      parameters:
+      - description: Team
+        in: query
+        name: team_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getTeamResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: team data
+      tags:
+      - Guest
+  /tournament:
+    get:
+      consumes:
+      - application/json
+      description: get tournament data
+      parameters:
+      - description: Tournaments
+        in: query
+        name: tournament_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getTournamentsResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: tournament data
+      tags:
+      - Guest
 swagger: "2.0"

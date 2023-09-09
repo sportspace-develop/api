@@ -1,8 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"sport-space-api/model"
+	sessions "sport-space-api/session"
 	"sport-space-api/tools"
 	"sport-space-api/tools/email"
 	"sport-space-api/tools/jwt"
@@ -19,7 +21,7 @@ type loginResponse struct {
 	Success bool `json:"success"`
 }
 
-// @Summary authorization
+// @Summary send to email one time password
 // @Schemes
 // @Description send code to email
 // @Tags auth
@@ -126,6 +128,8 @@ type authorizeResponse struct {
 // @Failure 500 {object} responseError
 // @Router /auth/login [post]
 func Authorize(c *gin.Context) {
+	session := sessions.New(c)
+
 	var jsonData authorizeRequest
 	err := c.ShouldBindJSON(&jsonData)
 	if err != nil {
@@ -189,7 +193,7 @@ func Authorize(c *gin.Context) {
 	}
 
 	tkn := jwt.New(map[jwt.Fields]interface{}{
-		jwt.USER_ID: user.ID,
+		jwt.USER_ID: fmt.Sprint(user.ID),
 	})
 	tokenString, err := tkn.String()
 	if err != nil {
@@ -224,6 +228,20 @@ func Authorize(c *gin.Context) {
 		log.ERROR(err.Error())
 		return
 	}
+	userId, err := tkn.GetUserId()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responseError{
+			Success: false,
+			Error:   18,
+			Message: GetMessageErr(18),
+		})
+		log.ERROR(err.Error())
+		return
+	}
+	session.Clear()
+	session.SetUserId(userId)
+	session.Set("refresh_token", refreshToken)
+	session.Save()
 
 	c.JSON(http.StatusOK, authorizeResponse{
 		Success:      true,
@@ -234,7 +252,7 @@ func Authorize(c *gin.Context) {
 }
 
 type refreshRequest struct {
-	RefreshToken string `json:"refresh_token" swaggertype:"string" example:"qweqwe231e2qeqae"`
+	RefreshToken string `json:"refresh_token" swaggertype:"string" example:"cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"`
 }
 
 type refreshResponse struct {
@@ -244,7 +262,7 @@ type refreshResponse struct {
 	ExpiresIn    string `json:"expires_in" swaggertype:"string" example:"2006-01-02 15:04:05"`
 }
 
-// @Summary authorization
+// @Summary refresh token
 // @Schemes
 // @Description refresh token
 // @Tags auth
@@ -256,6 +274,8 @@ type refreshResponse struct {
 // @Failure 500 {object} responseError
 // @Router /auth/refresh [post]
 func Refresh(c *gin.Context) {
+	session := sessions.New(c)
+
 	jData := refreshRequest{}
 	err := c.ShouldBindJSON(&jData)
 	if err != nil {
@@ -329,7 +349,7 @@ func Refresh(c *gin.Context) {
 	}
 
 	tkn := jwt.New(map[jwt.Fields]interface{}{
-		jwt.USER_ID: user.ID,
+		jwt.USER_ID: fmt.Sprint(user.ID),
 	})
 	tokenString, err := tkn.String()
 	if err != nil {
@@ -364,10 +384,62 @@ func Refresh(c *gin.Context) {
 		return
 	}
 
+	session.Set("refresh_token", refreshToken)
+	session.Save()
+
 	c.JSON(http.StatusOK, refreshResponse{
 		Success:      true,
 		AccessToken:  tokenString,
 		RefreshToken: refreshToken,
 		ExpiresIn:    expiresIn,
+	})
+}
+
+type logoutRequest struct {
+	RefreshToken string `json:"refresh_token" swaggertype:"string" example:"cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"`
+}
+
+// @Summary logout
+// @Schemes
+// @Description logout
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param params body logoutRequest true "Refresh token"
+// @Param Authorization header string true "Bearer JWT"
+// @Success 401 {object} responseSuccess
+// @Failure 500 {object} responseError
+// @Router /auth/logout [post]
+func Logout(c *gin.Context) {
+	session := sessions.New(c)
+
+	// refreshToken := session.Get("refresh_token").(string)
+
+	var jsonData logoutRequest
+	err := c.ShouldBindJSON(&jsonData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responseError{
+			Success: false,
+			Error:   500,
+			Message: MessageErr[500],
+		})
+		return
+	}
+
+	_, err = model.DeleteSession(jsonData.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, responseError{
+			Success: false,
+			Error:   500,
+			Message: GetMessageErr(500),
+		})
+		log.ERROR(err.Error())
+		return
+	}
+
+	session.Clear()
+	session.Save()
+	c.JSON(http.StatusUnauthorized, responseSuccess{
+		Success: true,
 	})
 }

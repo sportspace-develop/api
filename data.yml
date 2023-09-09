@@ -40,14 +40,14 @@ sport-space:
       - second name
       - last name
       - berth day
-      - team_role
-      - position
     // нужна история матчей игрока ?
 
   team_member:
     fields:
       - member
       - team
+      - team_role
+      - position
 
   match_event:
     description: "События матча"

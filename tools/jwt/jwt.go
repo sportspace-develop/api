@@ -2,16 +2,18 @@ package jwt
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	gJWT "github.com/golang-jwt/jwt/v5"
 )
 
 type Fields string
 
 const (
-	DATE_FORMAT        = "02.01.2006 15:04:05"
-	USER_ID     Fields = "user_id"
+	USER_ID Fields = "user_id"
 )
 
 var (
@@ -88,7 +90,22 @@ func (t *tokenT) GetExpiresDateString() (string, error) {
 	}
 
 	return claims["expires_in"].(string), nil
+}
 
+func (t *tokenT) GetUserId() (uint, error) {
+	claims, ok := t.t.Claims.(gJWT.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("Token not valid")
+	}
+	if _, ok := claims["expires_in"]; !ok {
+		return 0, fmt.Errorf("Token not valid")
+	}
+	sUserId := claims["user_id"].(string)
+	userId, err := strconv.Atoi(sUserId)
+	if err != nil {
+		return 0, nil
+	}
+	return uint(userId), nil
 }
 
 func Check(hToken string) (*gJWT.Token, error) {
@@ -106,4 +123,15 @@ func Check(hToken string) (*gJWT.Token, error) {
 	}
 
 	return token, nil
+}
+
+func DefaultGin(c *gin.Context) (*tokenT, error) {
+	var h_auth string
+	if len(c.Request.Header["Authorization"]) > 0 {
+		h_auth = c.Request.Header["Authorization"][0]
+	}
+
+	h_auth = strings.ReplaceAll(h_auth, "Bearer ", "")
+	token, err := Parse(h_auth)
+	return token, err
 }

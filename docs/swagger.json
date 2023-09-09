@@ -50,6 +50,53 @@
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "description": "logout",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "logout",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.logoutRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseSuccess"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/otp": {
             "post": {
                 "description": "send code to email",
@@ -62,7 +109,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "authorization",
+                "summary": "send to email one time password",
                 "parameters": [
                     {
                         "description": "User email",
@@ -108,7 +155,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "authorization",
+                "summary": "refresh token",
                 "parameters": [
                     {
                         "description": "Refresh token",
@@ -142,9 +189,9 @@
                 }
             }
         },
-        "/user": {
+        "/organization": {
             "get": {
-                "description": "get user data",
+                "description": "get organization data",
                 "consumes": [
                     "application/json"
                 ],
@@ -152,9 +199,38 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "Guest"
                 ],
-                "summary": "user data",
+                "summary": "info for all users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getAllOrganizationResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/organization": {
+            "get": {
+                "description": "get organization data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile organization"
+                ],
+                "summary": "organization data",
                 "parameters": [
                     {
                         "type": "string",
@@ -168,11 +244,500 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.getUserResponse"
+                            "$ref": "#/definitions/api.getOrganizationResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update organization",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile organization"
+                ],
+                "summary": "update organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Organization",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.updateOrganizationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.updateOrganizationResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create organization",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile organization"
+                ],
+                "summary": "create organization",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "body",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.createOrganizationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.createOrganizationResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/team": {
+            "get": {
+                "description": "get team data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile team"
+                ],
+                "summary": "team data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getTeamResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile team"
+                ],
+                "summary": "update team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseSuccess"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile team"
+                ],
+                "summary": "create team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Team",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.createTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.createTeamResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/tournament": {
+            "get": {
+                "description": "get tournament data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile organization"
+                ],
+                "summary": "tournament data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Tournaments",
+                        "name": "tournament_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getTournamentResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "edit tournament",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile organization"
+                ],
+                "summary": "edit tournament",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Tournaments",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.updateTournamentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.updateTournamentResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create tournament",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile organization"
+                ],
+                "summary": "create tournament",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Tournament",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.createTournamentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/api.createTournamentResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/team": {
+            "get": {
+                "description": "get team data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Guest"
+                ],
+                "summary": "team data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team",
+                        "name": "team_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getTeamResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tournament": {
+            "get": {
+                "description": "get tournament data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Guest"
+                ],
+                "summary": "tournament data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tournaments",
+                        "name": "tournament_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getTournamentsResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -209,19 +774,294 @@
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY"
                 },
                 "expires_in": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2006-01-02 15:04:05"
                 },
                 "refresh_token": {
                     "type": "string",
-                    "example": "213qwewq32q3q23qqrgrt67b54"
+                    "example": "cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"
                 },
                 "success": {
                     "type": "boolean"
                 }
             }
         },
-        "api.getUserResponse": {
-            "type": "object"
+        "api.createOrganizationRequest": {
+            "type": "object",
+            "properties": {
+                "addess": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.createOrganizationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getOrganizationDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.createTeamRequest": {
+            "type": "object",
+            "properties": {
+                "game_type_id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.createTeamResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getTeamDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.createTournamentRequest": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "end_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "game_type_id": {
+                    "description": "вид спорта",
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_team": {
+                    "description": "команды или индивидульно",
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "start_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.createTournamentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getTournamentDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.getAllOrganizationDataResponse": {
+            "type": "object",
+            "properties": {
+                "addess": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getAllOrganizationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getAllOrganizationDataResponse"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.getOrganizationDataResponse": {
+            "type": "object",
+            "properties": {
+                "addess": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getOrganizationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getOrganizationDataResponse"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.getTeamDataResponse": {
+            "type": "object",
+            "properties": {
+                "game_type_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getTeamResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTeamDataResponse"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.getTournamentDataResponse": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "end_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "game_type_id": {
+                    "description": "вид спорта",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_team": {
+                    "description": "команды или индивидульно",
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "start_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getTournamentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTournamentDataResponse"
+                    }
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "api.getTournamentsDataResponse": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "end_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "game_type_id": {
+                    "description": "вид спорта",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_team": {
+                    "description": "команды или индивидульно",
+                    "type": "boolean"
+                },
+                "organization_id": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "start_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 15:04:05"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getTournamentsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTournamentsDataResponse"
+                    }
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
         },
         "api.loginRequest": {
             "type": "object",
@@ -240,12 +1080,21 @@
                 }
             }
         },
+        "api.logoutRequest": {
+            "type": "object",
+            "properties": {
+                "refresh_token": {
+                    "type": "string",
+                    "example": "cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"
+                }
+            }
+        },
         "api.refreshRequest": {
             "type": "object",
             "properties": {
                 "refresh_token": {
                     "type": "string",
-                    "example": "qweqwe231e2qeqae"
+                    "example": "cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"
                 }
             }
         },
@@ -257,11 +1106,12 @@
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIiLCJuYmYiOjE0NDQ0Nzg0MDB9.-5myAJwbMszwt7_iPciBQgICdujy20zKOZOUTXu9KyY"
                 },
                 "expires_in": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2006-01-02 15:04:05"
                 },
                 "refresh_token": {
                     "type": "string",
-                    "example": "213qwewq32q3q23qqrgrt67b54"
+                    "example": "cyYTkJzAjEAgcaIIUPeZvyLpZHVuBIArVXqpInHLrbvXzgofSWKWlbZflPUToIctnWJoJInIqfDVLTIOeBGtJMRnlhseRgpHlPxh"
                 },
                 "success": {
                     "type": "boolean"
@@ -274,15 +1124,90 @@
                 "error": {
                     "type": "integer"
                 },
-                "errorMessage": {
-                    "type": "string"
-                },
                 "message": {
                     "type": "string"
                 },
                 "success": {
                     "type": "boolean",
                     "example": false
+                }
+            }
+        },
+        "api.responseSuccess": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "api.updateOrganizationRequest": {
+            "type": "object",
+            "properties": {
+                "addess": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.updateOrganizationResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getOrganizationDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.updateTournamentRequest": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "end_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "game_type_id": {
+                    "description": "вид спорта",
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_team": {
+                    "description": "команды или индивидульно",
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "start_registration_date": {
+                    "type": "string",
+                    "example": "2023-12-31 00:00:00"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.updateTournamentResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getTournamentDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         }

@@ -9,14 +9,16 @@ import (
 
 type User struct {
 	gorm.Model
-	Email    string
-	Username sql.NullString
-	Password sql.NullString
-	Session  []Session
-	Code     []UserAuthCode
+	Email        string
+	Username     sql.NullString
+	Password     sql.NullString
+	Session      []UserSession
+	Code         []UserAuthCode
+	Tournament   []Tournament
+	Organization []Organization
 }
 
-type Session struct {
+type UserSession struct {
 	gorm.Model
 	UserId       uint
 	RefreshToken string
@@ -190,8 +192,8 @@ func UpdateCodeNotActivatedByUser(data UserAuthCode) (UserAuthCode, error) {
 	return data, nil
 }
 
-func NewSession(user User, refreshToken string) (Session, error) {
-	session := Session{
+func NewSession(user User, refreshToken string) (UserSession, error) {
+	session := UserSession{
 		UserId:       user.ID,
 		RefreshToken: refreshToken,
 		ExpiresIn:    time.Now().UTC().Add(time.Hour * 24 * 30),
@@ -219,7 +221,7 @@ func DeleteSession(refreshToken string) (bool, error) {
 		return false, err
 	}
 
-	result := db.Where("refresh_token = ?", refreshToken).Delete(&Session{})
+	result := db.Where("refresh_token = ?", refreshToken).Delete(&UserSession{})
 	if result.Error != nil {
 		log.ERROR(result.Error.Error())
 		return false, result.Error
@@ -228,8 +230,8 @@ func DeleteSession(refreshToken string) (bool, error) {
 	return true, nil
 }
 
-func FindSession(refreshToken string) (Session, error) {
-	session := Session{}
+func FindSession(refreshToken string) (UserSession, error) {
+	session := UserSession{}
 
 	db, err := Connect()
 	if err != nil {

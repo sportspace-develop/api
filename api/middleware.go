@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	sessions "sport-space-api/session"
 	"sport-space-api/tools/jwt"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,17 +13,9 @@ import (
 func AuthRequiredMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		var h_auth string
-		if len(c.Request.Header["Authorization"]) > 0 {
-			h_auth = c.Request.Header["Authorization"][0]
-		}
+		session := sessions.New(c)
 
-		h_auth_splited := strings.Split(h_auth, " ")
-		if len(h_auth_splited) > 1 {
-			h_auth = h_auth_splited[1]
-		}
-
-		token, err := jwt.Parse(h_auth)
+		token, err := jwt.DefaultGin(c)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, responseError{
 				Success: false,
@@ -47,6 +39,12 @@ func AuthRequiredMiddleware() gin.HandlerFunc {
 			}
 			c.Abort()
 			return
+		}
+		tUserId, _ := token.GetUserId()
+		if tUserId != session.GetUserId() && tUserId > 0 {
+			session.Clear()
+			session.SetUserId(tUserId)
+			session.Save()
 		}
 		c.Next()
 	}

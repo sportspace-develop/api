@@ -1,0 +1,6 @@
+{
+  "games": [
+    {"name": "football", "title": "Футбол"},
+    {"name": "mini football", "title": "Мини-футбол"}
+  ]
+}

@@ -33,9 +33,18 @@ func Init(cfg DSN) {
 
 	// defer db.Close()
 
+	// db.Migrator()
 	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Session{})
+	db.AutoMigrate(&UserSession{})
 	db.AutoMigrate(&UserAuthCode{})
+	db.AutoMigrate(&Team{})
+	db.AutoMigrate(&DGame{})
+	db.AutoMigrate(&Member{})
+	db.AutoMigrate(&Tournament{})
+	db.AutoMigrate(&TournamentApplication{})
+	db.AutoMigrate(&MemberOfTournamentApplication{})
+
+	db.AutoMigrate(&Organization{})
 }
 
 func Connect() (*gorm.DB, error) {
