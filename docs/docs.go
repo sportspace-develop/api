@@ -230,6 +230,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/profile": {
+            "get": {
+                "description": "get profile data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getProfileResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
         "/profile/organization": {
             "get": {
                 "description": "get organization data",
@@ -444,17 +488,32 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "description": "Team",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.updateTeamRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.responseSuccess"
+                            "$ref": "#/definitions/api.updateTeamResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -506,6 +565,113 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/team/invite": {
+            "get": {
+                "description": "create invite to team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile team"
+                ],
+                "summary": "create invite to team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getInviteToTeamResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create invite to team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile team"
+                ],
+                "summary": "create invite to team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "emails for invite",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.createInviteToTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseSuccess"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -613,6 +779,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -798,6 +970,20 @@ const docTemplate = `{
                 }
             }
         },
+        "api.createInviteToTeamRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "team_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "api.createOrganizationRequest": {
             "type": "object",
             "properties": {
@@ -824,6 +1010,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "game_type_id": {
+                    "type": "integer"
+                },
+                "id": {
                     "type": "integer"
                 },
                 "title": {
@@ -914,6 +1103,37 @@ const docTemplate = `{
                 }
             }
         },
+        "api.getInviteToTeamData": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getInviteToTeamResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getInviteToTeamData"
+                    }
+                },
+                "invite_status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "api.getOrganizationDataResponse": {
             "type": "object",
             "properties": {
@@ -941,6 +1161,9 @@ const docTemplate = `{
                     "type": "boolean"
                 }
             }
+        },
+        "api.getProfileResponse": {
+            "type": "object"
         },
         "api.getTeamDataResponse": {
             "type": "object",
@@ -1170,6 +1393,31 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/api.getOrganizationDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.updateTeamRequest": {
+            "type": "object",
+            "properties": {
+                "game_type_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.updateTeamResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getTeamDataResponse"
                 },
                 "success": {
                     "type": "boolean"

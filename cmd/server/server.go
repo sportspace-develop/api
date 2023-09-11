@@ -63,6 +63,8 @@ func initRoute() {
 		profile := v1.Group("/profile")
 		profile.Use(api.AuthRequiredMiddleware())
 		{
+			profile.GET("/", api.GetProfile)
+
 			profile.GET("/organization", api.GetOrganization)
 			profile.POST("/organization", api.CreateOrganization)
 			profile.PUT("/organization", api.UpdateOrganization)
@@ -74,10 +76,14 @@ func initRoute() {
 			profile.GET("/team", api.GetTeam)
 			profile.POST("/team", api.CreateTeam)
 			profile.PUT("/team", api.UpdateTeam)
+
+			profile.GET("/team/invite", api.GetInviteToTeam)
+			profile.POST("/team/invite", api.CreateInviteToTeam)
 		}
 
 		guest := v1.Group("/")
 		{
+			// guest.GET("/", api.Guest)  // - Общая информация для пользователя + справочники
 			guest.GET("/organization", api.GetAllOrganization)
 			guest.GET("/tournament", api.GetTournaments)
 			guest.GET("/team", api.GetTeams)

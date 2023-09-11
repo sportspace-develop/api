@@ -37,7 +37,10 @@ func Init(cfg DSN) {
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&UserSession{})
 	db.AutoMigrate(&UserAuthCode{})
+
 	db.AutoMigrate(&Team{})
+	db.AutoMigrate(&TeamInvite{})
+
 	db.AutoMigrate(&DGame{})
 	db.AutoMigrate(&Member{})
 	db.AutoMigrate(&Tournament{})

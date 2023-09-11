@@ -1,9 +1,12 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"sport-space-api/model"
 	sessions "sport-space-api/session"
+	"sport-space-api/tools"
+	"sport-space-api/tools/email"
 
 	"github.com/gin-gonic/gin"
 )
@@ -250,5 +253,158 @@ func UpdateTeam(c *gin.Context) {
 			Title:   result.Title,
 			DGameID: result.DGameID,
 		},
+	})
+}
+
+type getInviteToTeamData struct {
+	Status string `json:"status"`
+	Email  string `json:"email"`
+}
+
+type getInviteToTeamResponse struct {
+	Success      bool                  `json:"success"`
+	InviteStatus map[string]string     `json:"invite_status"`
+	Data         []getInviteToTeamData `json:"data"`
+}
+
+// @Summary create invite to team
+// @Schemes
+// @Description create invite to team
+// @Tags profile team
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer JWT"
+// @Success 200 {object} getInviteToTeamResponse
+// @Failure 401 {object} responseError
+// @Failure 403 {object} responseError
+// @Failure 500 {object} responseError
+// @Router /profile/team/invite [get]
+func GetInviteToTeam(c *gin.Context) {
+	session := sessions.New(c)
+	userId := session.GetUserId()
+	if userId == 0 {
+		c.JSON(http.StatusUnauthorized, responseError{
+			Success: false,
+			Error:   100,
+			Message: GetMessageErr(100),
+		})
+		return
+	}
+
+	team, err := model.GetTeamByUser(userId)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	var result []getInviteToTeamData
+	invites, err := model.GetInvitesToTeamByTeam(team.ID)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	for _, invite := range invites {
+		result = append(result, getInviteToTeamData{
+			Status: string(invite.Status),
+			Email:  invite.Email,
+		})
+	}
+
+	c.JSON(http.StatusOK, getInviteToTeamResponse{
+		Success: true,
+		InviteStatus: map[string]string{
+			model.TIWait.ToString():     model.TIWait.Title(),
+			model.TISended.ToString():   model.TISended.Title(),
+			model.TICancel.ToString():   model.TICancel.Title(),
+			model.TIRejected.ToString(): model.TIRejected.Title(),
+			model.TISuccess.ToString():  model.TISuccess.Title(),
+		},
+		Data: result,
+	})
+}
+
+type createInviteToTeamRequest struct {
+	TeamID uint          `json:"team_id"`
+	Email  []email.Email `json:"email"`
+}
+
+// @Summary create invite to team
+// @Schemes
+// @Description create invite to team
+// @Tags profile team
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer JWT"
+// @Param params body createInviteToTeamRequest true "emails for invite"
+// @Success 200 {object} responseSuccess
+// @Failure 401 {object} responseError
+// @Failure 403 {object} responseError
+// @Failure 500 {object} responseError
+// @Router /profile/team/invite [post]
+func CreateInviteToTeam(c *gin.Context) {
+	session := sessions.New(c)
+	userId := session.GetUserId()
+	if userId == 0 {
+		c.JSON(http.StatusUnauthorized, responseError{
+			Success: false,
+			Error:   100,
+			Message: GetMessageErr(100),
+		})
+		return
+	}
+
+	team, err := model.GetTeamByUser(userId)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	if team.ID == 0 {
+		log.ERROR(err.Error())
+		c.JSON(http.StatusInternalServerError, responseError{
+			Success: false,
+			Error:   1300,
+			Message: GetMessageErr(1300),
+		})
+		return
+	}
+
+	jData := createInviteToTeamRequest{}
+	err = c.ShouldBindJSON(&jData)
+	if err != nil {
+		responseErrorNumber(c, err, 1301, http.StatusInternalServerError)
+		return
+	}
+
+	var invites []model.TeamInvite
+
+	for _, inv := range jData.Email {
+		invites = append(invites, model.TeamInvite{
+			Email:  string(inv),
+			Code:   tools.RandNumRunes(6),
+			Status: model.TIWait,
+			TeamID: team.ID,
+		})
+	}
+
+	invites, err = model.CreateOrUpdateInvitesToTeam(invites, team.ID)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	for i, invite := range invites {
+		email.AddMail(invite.Email, "invite to team", fmt.Sprintf("Code for invite to team <b>%s</b>: %s", team.Title, invite.Code))
+		invites[i].Status = model.TISended
+	}
+
+	_, err = model.UpdateInvitesToTeam(invites)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, responseSuccess{
+		Success: true,
 	})
 }
