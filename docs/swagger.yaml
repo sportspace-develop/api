@@ -148,7 +148,83 @@ definitions:
       success:
         type: boolean
     type: object
+  api.getPlayerDataResponse:
+    properties:
+      b_day:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      second_name:
+        type: string
+    type: object
+  api.getPlayerInvitesDataResponse:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+      team_id:
+        type: integer
+      team_title:
+        type: string
+    type: object
+  api.getPlayerInvitesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/api.getPlayerInvitesDataResponse'
+        type: array
+      invite_status:
+        additionalProperties:
+          type: string
+        type: object
+      success:
+        type: boolean
+    type: object
+  api.getPlayerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.getPlayerDataResponse'
+      success:
+        type: boolean
+    type: object
+  api.getProfileGameTypesResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      title:
+        type: string
+    type: object
   api.getProfileResponse:
+    properties:
+      game_types:
+        items:
+          $ref: '#/definitions/api.getProfileGameTypesResponse'
+        type: array
+      invite_status:
+        additionalProperties:
+          type: string
+        type: object
+      invites_to_team:
+        items:
+          $ref: '#/definitions/api.getPlayerInvitesDataResponse'
+        type: array
+      organizations:
+        items:
+          $ref: '#/definitions/api.getOrganizationDataResponse'
+        type: array
+      player:
+        $ref: '#/definitions/api.getPlayerDataResponse'
+      success:
+        type: boolean
+      teams:
+        items:
+          $ref: '#/definitions/api.getTeamDataResponse'
+        type: array
     type: object
   api.getTeamDataResponse:
     properties:
@@ -295,6 +371,17 @@ definitions:
         example: true
         type: boolean
     type: object
+  api.updateInviteToTeamRequest:
+    properties:
+      email:
+        items:
+          type: string
+        type: array
+      status:
+        $ref: '#/definitions/model.TeamInviteStatus'
+      team_id:
+        type: integer
+    type: object
   api.updateOrganizationRequest:
     properties:
       addess:
@@ -308,6 +395,13 @@ definitions:
         $ref: '#/definitions/api.getOrganizationDataResponse'
       success:
         type: boolean
+    type: object
+  api.updatePlayerInviteRequest:
+    properties:
+      invite_id:
+        type: integer
+      status:
+        type: string
     type: object
   api.updateTeamRequest:
     properties:
@@ -358,6 +452,20 @@ definitions:
       success:
         type: boolean
     type: object
+  model.TeamInviteStatus:
+    enum:
+    - wait
+    - sended
+    - accepted
+    - rejected
+    - cancel
+    type: string
+    x-enum-varnames:
+    - TIWait
+    - TISended
+    - TIAccepted
+    - TIRejected
+    - TICancel
 info:
   contact: {}
 paths:
@@ -631,6 +739,106 @@ paths:
       summary: update organization
       tags:
       - profile organization
+  /profile/player:
+    get:
+      consumes:
+      - application/json
+      description: profile player
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Team id
+        in: query
+        name: team_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getPlayerResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: profile player
+      tags:
+      - profile player
+  /profile/player/invite:
+    get:
+      consumes:
+      - application/json
+      description: profile player invites
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Invite id
+        in: query
+        name: invite_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getPlayerInvitesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: profile player invites
+      tags:
+      - profile player
+    put:
+      consumes:
+      - application/json
+      description: update profile player invites
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: json
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.updatePlayerInviteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.responseSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: update profile player invites
+      tags:
+      - profile player
   /profile/team:
     get:
       consumes:
@@ -642,6 +850,10 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: Team id
+        in: query
+        name: team_id
+        type: integer
       produces:
       - application/json
       responses:
@@ -750,12 +962,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.getInviteToTeamResponse'
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.responseError'
-        "403":
-          description: Forbidden
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/api.responseError'
         "500":
@@ -788,12 +1000,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api.responseSuccess'
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/api.responseError'
-        "403":
-          description: Forbidden
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/api.responseError'
         "500":
@@ -801,6 +1013,44 @@ paths:
           schema:
             $ref: '#/definitions/api.responseError'
       summary: create invite to team
+      tags:
+      - profile team
+    put:
+      consumes:
+      - application/json
+      description: update invite to team
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: emails for invite
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateInviteToTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.responseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: update invite to team
       tags:
       - profile team
   /profile/tournament:

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"net/http"
 	"sport-space-api/logger"
 
 	"github.com/gin-gonic/gin"
@@ -33,8 +32,10 @@ type responseSuccess struct {
 func responseErrorNumber(c *gin.Context, err error, errNum int, statusCode int) {
 	if err != nil {
 		log.ERROR(err.Error())
+	} else {
+		log.ERROR(GetMessageErr(errNum))
 	}
-	c.JSON(http.StatusInternalServerError, responseError{
+	c.JSON(statusCode, responseError{
 		Success: false,
 		Error:   errNum,
 		Message: GetMessageErr(errNum),

@@ -79,6 +79,12 @@ func initRoute() {
 
 			profile.GET("/team/invite", api.GetInviteToTeam)
 			profile.POST("/team/invite", api.CreateInviteToTeam)
+			profile.PUT("/team/invite", api.UpdateInviteToTeam)
+
+			profile.GET("/player", api.GetPlayer)
+
+			profile.GET("/player/invite", api.GetPlayerInvite)
+			profile.PUT("/player/invite", api.UpdatePlayerInvite)
 		}
 
 		guest := v1.Group("/")

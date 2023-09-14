@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"sport-space-api/model"
 	sessions "sport-space-api/session"
-	"sport-space-api/tools"
 	"sport-space-api/tools/email"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,40 +34,49 @@ type getTeamResponse struct {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer JWT"
+// @Param team_id query int false "Team id"
 // @Success 200 {object} getTeamResponse
 // @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
 // @Router /profile/team [get]
 func GetTeam(c *gin.Context) {
 	session := sessions.New(c)
+
 	userId := session.GetUserId()
 	if userId == 0 {
-		c.JSON(http.StatusUnauthorized, responseError{
-			Success: false,
-			Error:   100,
-			Message: GetMessageErr(100),
-		})
+		responseErrorNumber(c, nil, 100, http.StatusUnauthorized)
 		return
 	}
 
-	t, err := model.GetTeamByUser(userId)
-	if err != nil {
-		log.ERROR(err.Error())
-		c.JSON(http.StatusInternalServerError, responseError{
-			Success: false,
-			Error:   1205,
-			Message: GetMessageErr(1205),
-		})
-		return
+	var err error
+	var teamId int
+	teamId, _ = strconv.Atoi(c.DefaultQuery("team_id", "0"))
+
+	var teams []model.Team
+	if teamId > 0 {
+		t, err := model.GetTeamById(uint(teamId))
+		if err != nil {
+			responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+			return
+		}
+		if t.ID > 0 && t.UserID == userId {
+			teams = append(teams, t)
+		}
+	} else {
+		teams, err = model.GetTeamsByUser(userId)
+		if err != nil {
+			responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	result := []getTeamDataResponse{}
 
-	if t.ID > 0 {
+	for _, team := range teams {
 		result = append(result, getTeamDataResponse{
-			ID:      t.ID,
-			Title:   t.Title,
-			DGameID: t.DGameID,
+			ID:      team.ID,
+			Title:   team.Title,
+			DGameID: team.DGameID,
 		})
 	}
 
@@ -275,8 +284,9 @@ type getInviteToTeamResponse struct {
 // @Produce json
 // @Param Authorization header string true "Bearer JWT"
 // @Success 200 {object} getInviteToTeamResponse
+// @Failure 400 {object} responseError
 // @Failure 401 {object} responseError
-// @Failure 403 {object} responseError
+// @Failure 400 {object} responseError
 // @Failure 500 {object} responseError
 // @Router /profile/team/invite [get]
 func GetInviteToTeam(c *gin.Context) {
@@ -296,6 +306,10 @@ func GetInviteToTeam(c *gin.Context) {
 		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
 	}
+	if team.ID == 0 {
+		responseErrorNumber(c, nil, 1300, http.StatusBadRequest)
+		return
+	}
 
 	var result []getInviteToTeamData
 	invites, err := model.GetInvitesToTeamByTeam(team.ID)
@@ -305,21 +319,15 @@ func GetInviteToTeam(c *gin.Context) {
 	}
 	for _, invite := range invites {
 		result = append(result, getInviteToTeamData{
-			Status: string(invite.Status),
+			Status: invite.Status.ToString(),
 			Email:  invite.Email,
 		})
 	}
 
 	c.JSON(http.StatusOK, getInviteToTeamResponse{
-		Success: true,
-		InviteStatus: map[string]string{
-			model.TIWait.ToString():     model.TIWait.Title(),
-			model.TISended.ToString():   model.TISended.Title(),
-			model.TICancel.ToString():   model.TICancel.Title(),
-			model.TIRejected.ToString(): model.TIRejected.Title(),
-			model.TISuccess.ToString():  model.TISuccess.Title(),
-		},
-		Data: result,
+		Success:      true,
+		InviteStatus: model.InviteStatus,
+		Data:         result,
 	})
 }
 
@@ -337,8 +345,8 @@ type createInviteToTeamRequest struct {
 // @Param Authorization header string true "Bearer JWT"
 // @Param params body createInviteToTeamRequest true "emails for invite"
 // @Success 200 {object} responseSuccess
+// @Failure 400 {object} responseError
 // @Failure 401 {object} responseError
-// @Failure 403 {object} responseError
 // @Failure 500 {object} responseError
 // @Router /profile/team/invite [post]
 func CreateInviteToTeam(c *gin.Context) {
@@ -360,8 +368,7 @@ func CreateInviteToTeam(c *gin.Context) {
 	}
 
 	if team.ID == 0 {
-		log.ERROR(err.Error())
-		c.JSON(http.StatusInternalServerError, responseError{
+		c.JSON(http.StatusBadRequest, responseError{
 			Success: false,
 			Error:   1300,
 			Message: GetMessageErr(1300),
@@ -380,8 +387,8 @@ func CreateInviteToTeam(c *gin.Context) {
 
 	for _, inv := range jData.Email {
 		invites = append(invites, model.TeamInvite{
-			Email:  string(inv),
-			Code:   tools.RandNumRunes(6),
+			Email: string(inv),
+			// Code:   tools.RandNumRunes(6),
 			Status: model.TIWait,
 			TeamID: team.ID,
 		})
@@ -394,7 +401,7 @@ func CreateInviteToTeam(c *gin.Context) {
 	}
 
 	for i, invite := range invites {
-		email.AddMail(invite.Email, "invite to team", fmt.Sprintf("Code for invite to team <b>%s</b>: %s", team.Title, invite.Code))
+		email.AddMail(invite.Email, "invite to team", fmt.Sprintf("Invite to team <b>%s</b>", team.Title))
 		invites[i].Status = model.TISended
 	}
 
@@ -402,6 +409,99 @@ func CreateInviteToTeam(c *gin.Context) {
 	if err != nil {
 		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
+	}
+
+	c.JSON(http.StatusOK, responseSuccess{
+		Success: true,
+	})
+}
+
+type updateInviteToTeamRequest struct {
+	TeamID uint                   `json:"team_id"`
+	Email  []email.Email          `json:"email"`
+	Status model.TeamInviteStatus `json:"status"`
+}
+
+// @Summary update invite to team
+// @Schemes
+// @Description update invite to team
+// @Tags profile team
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer JWT"
+// @Param params body updateInviteToTeamRequest true "emails for invite"
+// @Success 200 {object} responseSuccess
+// @Failure 400 {object} responseError
+// @Failure 401 {object} responseError
+// @Failure 500 {object} responseError
+// @Router /profile/team/invite [put]
+func UpdateInviteToTeam(c *gin.Context) {
+	session := sessions.New(c)
+	userId := session.GetUserId()
+	if userId == 0 {
+		c.JSON(http.StatusUnauthorized, responseError{
+			Success: false,
+			Error:   100,
+			Message: GetMessageErr(100),
+		})
+		return
+	}
+
+	team, err := model.GetTeamByUser(userId)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	if team.ID == 0 {
+		c.JSON(http.StatusBadRequest, responseError{
+			Success: false,
+			Error:   1300,
+			Message: GetMessageErr(1300),
+		})
+		return
+	}
+
+	jData := updateInviteToTeamRequest{}
+	err = c.ShouldBindJSON(&jData)
+	if err != nil {
+		responseErrorNumber(c, err, 1301, http.StatusInternalServerError)
+		return
+	}
+
+	if jData.Status != model.TICancel && jData.Status != model.TIWait {
+		responseErrorNumber(c, err, 1307, http.StatusBadRequest)
+		return
+	}
+
+	var invites []model.TeamInvite
+
+	for _, inv := range jData.Email {
+		invites = append(invites, model.TeamInvite{
+			Email: string(inv),
+			// Code:   tools.RandNumRunes(6),
+			Status: jData.Status,
+			TeamID: team.ID,
+		})
+	}
+	fmt.Println(invites)
+	invites, err = model.CreateOrUpdateInvitesToTeam(invites, team.ID)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	if jData.Status == model.TIWait {
+		for i, invite := range invites {
+			email.AddMail(invite.Email, "invite to team", fmt.Sprintf("Invite to team <b>%s</b>", team.Title))
+			invites[i].Status = model.TISended
+		}
+
+		_, err = model.UpdateInvitesToTeam(invites)
+		if err != nil {
+			responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, responseSuccess{

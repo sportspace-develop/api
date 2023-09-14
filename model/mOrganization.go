@@ -93,6 +93,24 @@ func GetOrganizationByUserId(userId uint) (Organization, error) {
 	return organization, nil
 }
 
+func GetOrganizationsByUserId(userId uint) ([]Organization, error) {
+	organization := []Organization{}
+
+	db, err := Connect()
+	if err != nil {
+		log.ERROR(err.Error())
+		return organization, err
+	}
+
+	result := db.Where("user_id = ?", userId).Find(&organization)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
+		return organization, result.Error
+	}
+
+	return organization, nil
+}
+
 func UpdateOrganization(o Organization) (Organization, error) {
 	// organization := Organization{
 	// 	Title:   title,

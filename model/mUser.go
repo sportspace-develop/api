@@ -16,6 +16,7 @@ type User struct {
 	Code         []UserAuthCode
 	Tournament   []Tournament
 	Organization []Organization
+	Player       []Player
 }
 
 type UserSession struct {

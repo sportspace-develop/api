@@ -1,24 +1,10 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 
 	"gorm.io/gorm"
 )
-
-/*
- * Игроки
- */
-type Member struct {
-	gorm.Model
-	FirstName                       string
-	SecondName                      string
-	LastName                        string
-	BDay                            sql.NullTime
-	TeamID                          uint
-	MemberOfTournamentApplicationID uint
-}
 
 /*
  * Команды
@@ -29,7 +15,7 @@ type Team struct {
 	DGameID               uint
 	UserID                uint
 	TournamentApplication []TournamentApplication
-	Member                []Member
+	Players               []Player `gorm:"many2many:team_players"`
 	TeamInvite            []TeamInvite
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
@@ -39,41 +25,54 @@ type Team struct {
 /*
  * Инвайты в команду
  */
-type teamInviteStatus string
+type TeamInviteStatus string
 
 const (
-	TIWait     teamInviteStatus = "wait"
-	TISended   teamInviteStatus = "sended"
-	TISuccess  teamInviteStatus = "success"
-	TIRejected teamInviteStatus = "rejected"
-	TICancel   teamInviteStatus = "cancel"
+	TIWait     TeamInviteStatus = "wait"
+	TISended   TeamInviteStatus = "sended"
+	TIAccepted TeamInviteStatus = "accepted"
+	TIRejected TeamInviteStatus = "rejected"
+	TICancel   TeamInviteStatus = "cancel"
 )
 
-func (s teamInviteStatus) ToString() string {
+func (s TeamInviteStatus) ToString() string {
 	return string(s)
 }
 
-func (s teamInviteStatus) Title() string {
+func (s TeamInviteStatus) Title() string {
 	switch s {
 	case TISended:
 		return "отправлен"
-	case TISuccess:
+	case TIAccepted:
 		return "подтвержден"
 	case TICancel:
 		return "отменен"
 	case TIRejected:
 		return "откланен"
-	default:
+	case TIWait:
 		return "ожидает"
+	default:
+		return ""
 	}
 }
+
+var (
+	InviteStatus = map[string]string{
+		TIWait.ToString():     TIWait.Title(),
+		TISended.ToString():   TISended.Title(),
+		TICancel.ToString():   TICancel.Title(),
+		TIRejected.ToString(): TIRejected.Title(),
+		TIAccepted.ToString(): TIAccepted.Title(),
+	}
+)
 
 type TeamInvite struct {
 	ID        uint   `gorm:"primarykey"`
 	Email     string `gorm:"index:,unique,composite:invite"`
 	Code      string
 	TeamID    uint             `gorm:"index:,unique,composite:invite"`
-	Status    teamInviteStatus `gorm:"type:enum('wait', 'sended', 'success', 'rejected', 'cancel')";"column:teamInviteStatus"`
+	Status    TeamInviteStatus `gorm:"type:enum('wait', 'sended', 'accepted', 'rejected', 'cancel')"`
+	UpdatedAt time.Time
 	CreatedAt time.Time
 }
 
@@ -127,6 +126,24 @@ func GetTeamByUser(userId uint) (Team, error) {
 	}
 
 	result := db.Where("user_id = ?", userId).First(&team)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
+		return team, result.Error
+	}
+
+	return team, nil
+}
+
+func GetTeamsByUser(userId uint) ([]Team, error) {
+	team := []Team{}
+
+	db, err := Connect()
+	if err != nil {
+		log.ERROR(err.Error())
+		return team, err
+	}
+
+	result := db.Where("user_id = ?", userId).Find(&team)
 	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		log.ERROR(result.Error.Error())
 		return team, result.Error
@@ -252,6 +269,7 @@ func CreateOrUpdateInvitesToTeam(invites []TeamInvite, teamId uint) ([]TeamInvit
 		var new = true
 		for _, createdInvite := range createdInvites {
 			if invite.Email == createdInvite.Email {
+				createdInvite.Status = invite.Status
 				reInvites = append(reInvites, createdInvite)
 				new = false
 				break

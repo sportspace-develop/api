@@ -39,16 +39,33 @@ type Tournament struct {
 // заявки на турнир
 type TournamentApplication struct {
 	gorm.Model
-	TournamentID                  uint `gorm:"index"`
-	TeamID                        uint `gorm:"index"`
-	Status                        string
-	MemberOfTournamentApplication []MemberOfTournamentApplication
+	TournamentID                 uint `gorm:"index"`
+	TeamID                       uint `gorm:"index"`
+	Status                       string
+	TournamentApplicationPlayers []TournamentApplicationPlayer
 }
 
-type MemberOfTournamentApplication struct {
+type TournamentApplicationPlayer struct {
 	gorm.Model
 	TournamentApplicationID uint
-	MemberID                uint
+	PlayerID                uint
+}
+
+func GetGameTypes() ([]DGame, error) {
+	var gTypes []DGame
+
+	db, err := Connect()
+	if err != nil {
+		log.ERROR(err.Error())
+		return gTypes, err
+	}
+
+	result := db.Find(&gTypes)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
+		return gTypes, result.Error
+	}
+	return gTypes, nil
 }
 
 func CreateTournament(title string, userId uint, startDate, endDate, startRegistrationDate, endRegistrationDate time.Time, isTeam bool, gameType uint) (Tournament, error) {

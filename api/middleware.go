@@ -73,8 +73,21 @@ func LoggingMiddleware() gin.HandlerFunc {
 		// Start timer
 		start := time.Now()
 
+		var request_body string
+		// if c.Request.Method != "GET" {
+
+		// 	jsonData, _ := ioutil.ReadAll(c.Request.Body)
+		// 	request_body = string(jsonData)
+		// }
+
 		// Process Request
 		c.Next()
+
+		token, err := jwt.DefaultGin(c)
+		var userId uint
+		if err == nil && token.Valid() {
+			userId, _ = token.GetUserId()
+		}
 
 		duration := time.Since(start).Seconds()
 		fields := map[string]interface{}{
@@ -85,14 +98,10 @@ func LoggingMiddleware() gin.HandlerFunc {
 			"path":                 c.Request.URL.Path,
 			"request":              c.Request.URL.RawQuery,
 			"status":               c.Writer.Status(),
-			// "user_id":    0, //util.GetUserID(c),
-			"referrer":   c.Request.Referer(),
-			"request_id": c.Writer.Header().Get("Request-Id"),
-		}
-		if c.Request.Method != "GET" {
-			var jsonDataBytes interface{} = make(map[string]interface{})
-			c.Copy().ShouldBindJSON(&jsonDataBytes)
-			fields["request_body"] = jsonDataBytes
+			"user_id":              userId,
+			"referrer":             c.Request.Referer(),
+			"request_id":           c.Writer.Header().Get("Request-Id"),
+			"request_body":         request_body,
 		}
 
 		marshaled, err := json.MarshalIndent(fields, "", "  ")

@@ -18,6 +18,10 @@ var (
 
 type Email string
 
+func (e Email) String() string {
+	return string(e)
+}
+
 type tMsg struct {
 	To      string
 	Subject string

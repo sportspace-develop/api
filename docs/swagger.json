@@ -414,6 +414,157 @@
                 }
             }
         },
+        "/profile/player": {
+            "get": {
+                "description": "profile player",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile player"
+                ],
+                "summary": "profile player",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Team id",
+                        "name": "team_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getPlayerResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/player/invite": {
+            "get": {
+                "description": "profile player invites",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile player"
+                ],
+                "summary": "profile player invites",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Invite id",
+                        "name": "invite_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getPlayerInvitesResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update profile player invites",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile player"
+                ],
+                "summary": "update profile player invites",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "json",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.updatePlayerInviteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseSuccess"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
         "/profile/team": {
             "get": {
                 "description": "get team data",
@@ -434,6 +585,12 @@
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Team id",
+                        "name": "team_id",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -595,14 +752,71 @@
                             "$ref": "#/definitions/api.getInviteToTeamResponse"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
                     },
-                    "403": {
-                        "description": "Forbidden",
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update invite to team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile team"
+                ],
+                "summary": "update invite to team",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "emails for invite",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.updateInviteToTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseSuccess"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -652,14 +866,14 @@
                             "$ref": "#/definitions/api.responseSuccess"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
                     },
-                    "403": {
-                        "description": "Forbidden",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -1150,8 +1364,125 @@
                 }
             }
         },
+        "api.getPlayerDataResponse": {
+            "type": "object",
+            "properties": {
+                "b_day": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "second_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getPlayerInvitesDataResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "team_id": {
+                    "type": "integer"
+                },
+                "team_title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.getPlayerInvitesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getPlayerInvitesDataResponse"
+                    }
+                },
+                "invite_status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.getPlayerResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.getPlayerDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "api.getProfileGameTypesResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "api.getProfileResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "game_types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getProfileGameTypesResponse"
+                    }
+                },
+                "invite_status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "invites_to_team": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getPlayerInvitesDataResponse"
+                    }
+                },
+                "organizations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getOrganizationDataResponse"
+                    }
+                },
+                "player": {
+                    "$ref": "#/definitions/api.getPlayerDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTeamDataResponse"
+                    }
+                }
+            }
         },
         "api.getTeamDataResponse": {
             "type": "object",
@@ -1365,6 +1696,23 @@
                 }
             }
         },
+        "api.updateInviteToTeamRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "$ref": "#/definitions/model.TeamInviteStatus"
+                },
+                "team_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "api.updateOrganizationRequest": {
             "type": "object",
             "properties": {
@@ -1384,6 +1732,17 @@
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "api.updatePlayerInviteRequest": {
+            "type": "object",
+            "properties": {
+                "invite_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -1458,6 +1817,23 @@
                     "type": "boolean"
                 }
             }
+        },
+        "model.TeamInviteStatus": {
+            "type": "string",
+            "enum": [
+                "wait",
+                "sended",
+                "accepted",
+                "rejected",
+                "cancel"
+            ],
+            "x-enum-varnames": [
+                "TIWait",
+                "TISended",
+                "TIAccepted",
+                "TIRejected",
+                "TICancel"
+            ]
         }
     }
 }
