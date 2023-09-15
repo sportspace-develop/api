@@ -82,6 +82,7 @@ func initRoute() {
 			profile.PUT("/team/invite", api.UpdateInviteToTeam)
 
 			profile.GET("/player", api.GetPlayer)
+			profile.PUT("/player", api.UpdatePlayer)
 
 			profile.GET("/player/invite", api.GetPlayerInvite)
 			profile.PUT("/player/invite", api.UpdatePlayerInvite)

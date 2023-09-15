@@ -20,6 +20,7 @@ type getProfileResponse struct {
 	Success       bool                           `json:"success"`
 	GameTypes     []getProfileGameTypesResponse  `json:"game_types"`
 	Organizations []getOrganizationDataResponse  `json:"organizations"`
+	Tournaments   []getTournamentsDataResponse   `json:"tournaments"`
 	Teams         []getTeamDataResponse          `json:"teams"`
 	InviteStatus  map[string]string              `json:"invite_status"`
 	InviteToTeam  []getPlayerInvitesDataResponse `json:"invites_to_team"`
@@ -119,7 +120,7 @@ func GetProfile(c *gin.Context) {
 		})
 	}
 
-	player, err := model.GetPlayerByUserId(userId)
+	player, err := model.GetPlayerFullByUserId(userId)
 	if err != nil {
 		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
@@ -130,17 +131,46 @@ func GetProfile(c *gin.Context) {
 		playerBDay = player.BDay.Time.Format(time.DateOnly)
 	}
 
+	var playerTeams []getPlayerTeamDataResponse
+	for _, team := range player.Teams {
+		playerTeams = append(playerTeams, getPlayerTeamDataResponse{
+			ID:    team.ID,
+			Title: team.Title,
+		})
+	}
+
+	var tournamentsResult []getTournamentsDataResponse
+	tournamets, err := model.GetTournamentsByUser(userId)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	for _, tournament := range tournamets {
+		tournamentsResult = append(tournamentsResult, getTournamentsDataResponse{
+			ID:                    tournament.ID,
+			Title:                 tournament.Title,
+			StartDate:             tournament.StartDate.Format(time.DateTime),
+			EndDate:               tournament.EndDate.Format(time.DateTime),
+			StartRegistrationDate: tournament.StartRegistrationDate.Format(time.DateTime),
+			EndRegistrationDate:   tournament.EndRegistrationDate.Format(time.DateTime),
+			IsTeam:                tournament.IsTeam,
+			DGameID:               tournament.DGameID,
+		})
+	}
+
 	playerResult := getPlayerDataResponse{
 		FirstName:  player.FirstName,
 		SecondName: player.SecondName,
 		LastName:   player.LastName,
 		BDay:       playerBDay,
+		Teams:      playerTeams,
 	}
 
 	c.JSON(http.StatusOK, getProfileResponse{
 		Success:       true,
 		GameTypes:     gameTypesResult,
 		Organizations: organizationsResult,
+		Tournaments:   tournamentsResult,
 		Teams:         teamsResult,
 		InviteToTeam:  invitesToTeamResult,
 		Player:        playerResult,

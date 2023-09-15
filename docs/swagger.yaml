@@ -151,6 +151,7 @@ definitions:
   api.getPlayerDataResponse:
     properties:
       b_day:
+        example: "2000-12-31"
         type: string
       first_name:
         type: string
@@ -158,6 +159,10 @@ definitions:
         type: string
       second_name:
         type: string
+      teams:
+        items:
+          $ref: '#/definitions/api.getPlayerTeamDataResponse'
+        type: array
     type: object
   api.getPlayerInvitesDataResponse:
     properties:
@@ -189,6 +194,13 @@ definitions:
         $ref: '#/definitions/api.getPlayerDataResponse'
       success:
         type: boolean
+    type: object
+  api.getPlayerTeamDataResponse:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
     type: object
   api.getProfileGameTypesResponse:
     properties:
@@ -224,6 +236,10 @@ definitions:
       teams:
         items:
           $ref: '#/definitions/api.getTeamDataResponse'
+        type: array
+      tournaments:
+        items:
+          $ref: '#/definitions/api.getTournamentsDataResponse'
         type: array
     type: object
   api.getTeamDataResponse:
@@ -396,12 +412,41 @@ definitions:
       success:
         type: boolean
     type: object
+  api.updatePlayerDataResponse:
+    properties:
+      bday:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      second_name:
+        type: string
+    type: object
   api.updatePlayerInviteRequest:
     properties:
       invite_id:
         type: integer
       status:
         type: string
+    type: object
+  api.updatePlayerRequest:
+    properties:
+      bday:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      second_name:
+        type: string
+    type: object
+  api.updatePlayerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/api.updatePlayerDataResponse'
+      success:
+        type: boolean
     type: object
   api.updateTeamRequest:
     properties:
@@ -772,6 +817,43 @@ paths:
       summary: profile player
       tags:
       - profile player
+    put:
+      consumes:
+      - application/json
+      description: update profile player
+      parameters:
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Body
+        in: body
+        name: params
+        schema:
+          $ref: '#/definitions/api.updatePlayerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.updatePlayerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: update profile player
+      tags:
+      - profile player
   /profile/player/invite:
     get:
       consumes:
@@ -948,7 +1030,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: create invite to team
+      description: get invite to team
       parameters:
       - description: Bearer JWT
         in: header
@@ -974,7 +1056,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.responseError'
-      summary: create invite to team
+      summary: get invite to team
       tags:
       - profile team
     post:

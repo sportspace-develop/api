@@ -276,9 +276,9 @@ type getInviteToTeamResponse struct {
 	Data         []getInviteToTeamData `json:"data"`
 }
 
-// @Summary create invite to team
+// @Summary get invite to team
 // @Schemes
-// @Description create invite to team
+// @Description get invite to team
 // @Tags profile team
 // @Accept json
 // @Produce json

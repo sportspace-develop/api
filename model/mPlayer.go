@@ -43,6 +43,41 @@ func GetPlayerByUserId(userId uint) (Player, error) {
 	return player, nil
 }
 
+func GetPlayerFullByUserId(userId uint) (Player, error) {
+	player := Player{}
+
+	db, err := Connect()
+	if err != nil {
+		log.ERROR(err.Error())
+		return player, err
+	}
+
+	result := db.Preload("Teams").Where("user_id = ?", userId).First(&player)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
+		return player, result.Error
+	}
+
+	return player, nil
+}
+
+func UpdatePlayer(player Player) (Player, error) {
+
+	db, err := Connect()
+	if err != nil {
+		log.ERROR(err.Error())
+		return player, err
+	}
+
+	result := db.Save(player)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		log.ERROR(result.Error.Error())
+		return player, result.Error
+	}
+
+	return player, nil
+}
+
 func GetPlayerInviteToTeamByEmail(email string, status TeamInviteStatus) ([]TeamInvite, error) {
 	var invites []TeamInvite
 

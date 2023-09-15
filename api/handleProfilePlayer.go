@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 	"sport-space-api/model"
 	sessions "sport-space-api/session"
@@ -11,11 +12,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type getPlayerTeamDataResponse struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
+}
+
 type getPlayerDataResponse struct {
-	FirstName  string `json:"first_name"`
-	SecondName string `json:"second_name"`
-	LastName   string `json:"last_name"`
-	BDay       string `json:"b_day" example:"2000-12-31`
+	FirstName  string                      `json:"first_name"`
+	SecondName string                      `json:"second_name"`
+	LastName   string                      `json:"last_name"`
+	BDay       string                      `json:"b_day" example:"2000-12-31"`
+	Teams      []getPlayerTeamDataResponse `json:"teams"`
 }
 
 type getPlayerResponse struct {
@@ -44,20 +51,124 @@ func GetPlayer(c *gin.Context) {
 		return
 	}
 
+	player, err := model.GetPlayerFullByUserId(userId)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	var playerBDay string
+	if player.BDay.Valid {
+		playerBDay = player.BDay.Time.Format(time.DateOnly)
+	}
+
+	result := getPlayerDataResponse{
+		FirstName:  player.FirstName,
+		SecondName: player.SecondName,
+		LastName:   player.LastName,
+		BDay:       playerBDay,
+	}
+
+	for _, team := range player.Teams {
+		result.Teams = append(result.Teams, getPlayerTeamDataResponse{
+			ID:    team.ID,
+			Title: team.Title,
+		})
+	}
+
+	c.JSON(http.StatusOK, getPlayerResponse{
+		Success: true,
+		Data:    result,
+	})
+}
+
+type updatePlayerRequest struct {
+	FirstName  string `json:"first_name"`
+	SecondName string `json:"second_name"`
+	LastName   string `json:"last_name"`
+	BDay       string `json:"bday"`
+}
+
+type updatePlayerDataResponse struct {
+	FirstName  string `json:"first_name"`
+	SecondName string `json:"second_name"`
+	LastName   string `json:"last_name"`
+	BDay       string `json:"bday"`
+}
+
+type updatePlayerResponse struct {
+	Success bool                     `json:"success"`
+	Data    updatePlayerDataResponse `json:"data"`
+}
+
+// @Summary update profile player
+// @Schemes
+// @Description update profile player
+// @Tags profile player
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer JWT"
+// @Param params body updatePlayerRequest false "Body"
+// @Success 200 {object} updatePlayerResponse
+// @Failure 400 {object} responseError
+// @Failure 401 {object} responseError
+// @Failure 500 {object} responseError
+// @Router /profile/player [put]
+func UpdatePlayer(c *gin.Context) {
+	session := sessions.New(c)
+
+	userId := session.GetUserId()
+	if userId == 0 {
+		responseErrorNumber(c, nil, 100, http.StatusUnauthorized)
+		return
+	}
+
+	jsonData := updatePlayerRequest{}
+	err := c.ShouldBindJSON(&jsonData)
+	if err != nil {
+		responseErrorNumber(c, err, 1400, http.StatusInternalServerError)
+		return
+	}
+
 	player, err := model.GetPlayerByUserId(userId)
 	if err != nil {
 		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, getPlayerResponse{
+	if jsonData.BDay != "" {
+		jsonDataBDay, err := time.Parse(time.DateOnly, jsonData.BDay)
+		if err != nil {
+			responseErrorNumber(c, err, 1401, http.StatusInternalServerError)
+			return
+		}
+		var playerBDaySQL sql.NullTime
+		err = playerBDaySQL.Scan(jsonDataBDay)
+		if err != nil {
+			responseErrorNumber(c, err, 1402, http.StatusInternalServerError)
+			return
+		}
+		player.BDay = playerBDaySQL
+	}
+
+	player.FirstName = jsonData.FirstName
+	player.SecondName = jsonData.SecondName
+	player.LastName = jsonData.LastName
+	player, err = model.UpdatePlayer(player)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	result := updatePlayerDataResponse{
+		FirstName:  player.FirstName,
+		SecondName: player.SecondName,
+		LastName:   player.LastName,
+		BDay:       player.BDay.Time.Format(time.DateOnly),
+	}
+
+	c.JSON(http.StatusOK, updatePlayerResponse{
 		Success: true,
-		Data: getPlayerDataResponse{
-			FirstName:  player.FirstName,
-			SecondName: player.SecondName,
-			LastName:   player.LastName,
-			BDay:       player.BDay.Time.Format(time.DateOnly),
-		},
+		Data:    result,
 	})
 }
 

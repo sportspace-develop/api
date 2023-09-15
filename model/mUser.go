@@ -20,10 +20,12 @@ type User struct {
 }
 
 type UserSession struct {
-	gorm.Model
+	ID           uint `gorm:"primarykey"`
 	UserId       uint
 	RefreshToken string
 	ExpiresIn    time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type userAuthCodeStatus string

@@ -474,6 +474,62 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "update profile player",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile player"
+                ],
+                "summary": "update profile player",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "params",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/api.updatePlayerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.updatePlayerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
             }
         },
         "/profile/player/invite": {
@@ -737,7 +793,7 @@ const docTemplate = `{
         },
         "/profile/team/invite": {
             "get": {
-                "description": "create invite to team",
+                "description": "get invite to team",
                 "consumes": [
                     "application/json"
                 ],
@@ -747,7 +803,7 @@ const docTemplate = `{
                 "tags": [
                     "profile team"
                 ],
-                "summary": "create invite to team",
+                "summary": "get invite to team",
                 "parameters": [
                     {
                         "type": "string",
@@ -1380,7 +1436,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "b_day": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2000-12-31"
                 },
                 "first_name": {
                     "type": "string"
@@ -1390,6 +1447,12 @@ const docTemplate = `{
                 },
                 "second_name": {
                     "type": "string"
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getPlayerTeamDataResponse"
+                    }
                 }
             }
         },
@@ -1438,6 +1501,17 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "api.getPlayerTeamDataResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -1492,6 +1566,12 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/api.getTeamDataResponse"
+                    }
+                },
+                "tournaments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTournamentsDataResponse"
                     }
                 }
             }
@@ -1747,6 +1827,23 @@ const docTemplate = `{
                 }
             }
         },
+        "api.updatePlayerDataResponse": {
+            "type": "object",
+            "properties": {
+                "bday": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "second_name": {
+                    "type": "string"
+                }
+            }
+        },
         "api.updatePlayerInviteRequest": {
             "type": "object",
             "properties": {
@@ -1755,6 +1852,34 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "api.updatePlayerRequest": {
+            "type": "object",
+            "properties": {
+                "bday": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "second_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.updatePlayerResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/api.updatePlayerDataResponse"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },
