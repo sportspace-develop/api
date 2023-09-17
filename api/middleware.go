@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	sessions "sport-space-api/session"
@@ -110,5 +111,43 @@ func LoggingMiddleware() gin.HandlerFunc {
 		}
 
 		log.INFO(string(marshaled))
+	}
+}
+
+func APIWrapper(c *gin.Context, process func(*gin.Context)) {
+
+	ctx := c.Request.Context()
+
+	doneChan := make(chan bool)
+
+	go func() {
+		process(c)
+		close(doneChan)
+	}()
+
+	select {
+	case <-ctx.Done():
+		responseErrorNumber(c, ctx.Err(), 408, http.StatusRequestTimeout)
+		return
+	case <-doneChan:
+		return
+	}
+}
+
+func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
+
+		defer func() {
+			if ctx.Err() == context.DeadlineExceeded {
+				c.Abort()
+			}
+
+			cancel()
+		}()
+
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
 	}
 }
