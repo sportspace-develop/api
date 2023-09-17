@@ -22,6 +22,9 @@ func New(c *gin.Context) Session {
 // User
 func (s *Session) GetUserId() uint {
 
+	if s.Get("user_id") == nil {
+		return 0
+	}
 	userId, err := strconv.Atoi(s.Get("user_id").(string))
 	if err != nil {
 		return 0
