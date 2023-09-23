@@ -110,6 +110,29 @@ definitions:
       success:
         type: boolean
     type: object
+  api.getHomeResponse:
+    properties:
+      game_types:
+        items:
+          $ref: '#/definitions/api.getProfileGameTypesResponse'
+        type: array
+      organizations:
+        items:
+          $ref: '#/definitions/api.getAllOrganizationDataResponse'
+        type: array
+      success:
+        type: boolean
+      teams:
+        items:
+          $ref: '#/definitions/api.getTeamsDataResponse'
+        type: array
+      tournaments:
+        items:
+          $ref: '#/definitions/api.getTournamentsDataResponse'
+        type: array
+      user_Id:
+        type: integer
+    type: object
   api.getInviteToTeamData:
     properties:
       email:
@@ -259,6 +282,15 @@ definitions:
         type: array
       success:
         type: boolean
+    type: object
+  api.getTeamsDataResponse:
+    properties:
+      game_type_id:
+        type: integer
+      id:
+        type: integer
+      title:
+        type: string
     type: object
   api.getTournamentDataResponse:
     properties:
@@ -635,6 +667,25 @@ paths:
       summary: refresh token
       tags:
       - auth
+  /home:
+    get:
+      consumes:
+      - application/json
+      description: get home data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getHomeResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: home data
+      tags:
+      - Home
   /organization:
     get:
       consumes:
@@ -653,7 +704,7 @@ paths:
             $ref: '#/definitions/api.responseError'
       summary: info for all users
       tags:
-      - Guest
+      - Home
   /profile:
     get:
       consumes:
@@ -731,8 +782,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/api.createOrganizationResponse'
         "401":
@@ -1191,8 +1242,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/api.createTournamentResponse'
         "401":
@@ -1271,7 +1322,7 @@ paths:
             $ref: '#/definitions/api.responseError'
       summary: team data
       tags:
-      - Guest
+      - Home
   /tournament:
     get:
       consumes:
@@ -1299,5 +1350,5 @@ paths:
             $ref: '#/definitions/api.responseError'
       summary: tournament data
       tags:
-      - Guest
+      - Home
 swagger: "2.0"

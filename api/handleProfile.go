@@ -139,7 +139,7 @@ func GetProfile(c *gin.Context) {
 		})
 	}
 
-	var tournamentsResult []getTournamentsDataResponse
+	var tournamentsResult = []getTournamentsDataResponse{}
 	tournamets, err := model.GetTournamentsByUser(userId)
 	if err != nil {
 		responseErrorNumber(c, err, 500, http.StatusInternalServerError)

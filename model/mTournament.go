@@ -111,7 +111,7 @@ func GetTournamentById(tournamentId uint) (Tournament, error) {
 	return tournament, nil
 }
 
-func GetTournaments(id uint) ([]Tournament, error) {
+func GetTournaments[ID uint | int](id ID) ([]Tournament, error) {
 	tournaments := []Tournament{}
 
 	db, err := Connect()

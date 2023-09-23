@@ -40,7 +40,8 @@ func initRoute() {
 	r.Use(api.LoggingMiddleware())
 	r.Use(api.CORSMiddleware())
 	r.Use(gin.Recovery())
-	// store := cookie.NewStore([]byte(config.App.CookieSecret))
+	// r.Use(api.TimeoutMiddleware(2 * time.Second))
+
 	db, err := model.Connect()
 	if err != nil {
 		panic(err)
@@ -90,7 +91,7 @@ func initRoute() {
 
 		guest := v1.Group("/")
 		{
-			// guest.GET("/", api.Guest)  // - Общая информация для пользователя + справочники
+			guest.GET("/home", api.GetHome) // - Общая информация для пользователя + справочники
 			guest.GET("/organization", api.GetAllOrganization)
 			guest.GET("/tournament", api.GetTournaments)
 			guest.GET("/team", api.GetTeams)

@@ -39,7 +39,7 @@ type UserAuthCode struct {
 	gorm.Model
 	UserId       uint
 	Code         string
-	Status       userAuthCodeStatus `gorm:"type:enum('wait', 'activated')";"column:userAuthCodeStatus"`
+	Status       userAuthCodeStatus `sql:"type:userAuthCodeStatus"`
 	ExpiresIn    time.Time
 	AttemptCount uint8
 	AttemptDate  time.Time

@@ -71,12 +71,12 @@ type TeamInvite struct {
 	Email     string `gorm:"index:,unique,composite:invite"`
 	Code      string
 	TeamID    uint             `gorm:"index:,unique,composite:invite"`
-	Status    TeamInviteStatus `gorm:"type:enum('wait', 'sended', 'accepted', 'rejected', 'cancel')"`
+	Status    TeamInviteStatus `sql:"type:TeamInviteStatus"`
 	UpdatedAt time.Time
 	CreatedAt time.Time
 }
 
-func GetTeams(id uint) ([]Team, error) {
+func GetTeams[ID uint | int](id ID) ([]Team, error) {
 	team := []Team{}
 
 	db, err := Connect()

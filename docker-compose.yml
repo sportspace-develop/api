@@ -18,7 +18,7 @@ services:
       COOKIE_SECRET: cookiesecret
 
       DB_HOST: sportspace-db
-      DB_PORT: 3306
+      DB_PORT: 5432
       DB_NAME: sportspace
       DB_USERNAME: root
       DB_PASSWORD: root
@@ -38,20 +38,19 @@ services:
       - space
 
   database:
-    image: mysql:5.7
+    image: postgres:13.3
     container_name: sportspace-db
     restart: always
     environment:
-      MYSQL_DATABASE: 'sportspace'   
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'root'
-      MYSQL_ROOT_PASSWORD: 'root'
-    ports:
-      - '3306:3306'
-    expose:
-      - '3306'
+      POSTGRES_DB: sportspace
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
     volumes:
-      - ./mysql-data/db:/var/lib/mysql
+      - ./pgs-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    expose:
+      - '5432'
     networks:
       - space
 

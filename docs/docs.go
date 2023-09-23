@@ -201,6 +201,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/home": {
+            "get": {
+                "description": "get home data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Home"
+                ],
+                "summary": "home data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.getHomeResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
         "/organization": {
             "get": {
                 "description": "get organization data",
@@ -211,7 +240,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Guest"
+                    "Home"
                 ],
                 "summary": "info for all users",
                 "responses": {
@@ -405,8 +434,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.createOrganizationResponse"
                         }
@@ -1104,8 +1133,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/api.createTournamentResponse"
                         }
@@ -1135,7 +1164,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Guest"
+                    "Home"
                 ],
                 "summary": "team data",
                 "parameters": [
@@ -1172,7 +1201,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Guest"
+                    "Home"
                 ],
                 "summary": "tournament data",
                 "parameters": [
@@ -1370,6 +1399,41 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "api.getHomeResponse": {
+            "type": "object",
+            "properties": {
+                "game_types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getProfileGameTypesResponse"
+                    }
+                },
+                "organizations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getAllOrganizationDataResponse"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTeamsDataResponse"
+                    }
+                },
+                "tournaments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.getTournamentsDataResponse"
+                    }
+                },
+                "user_Id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1601,6 +1665,20 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "api.getTeamsDataResponse": {
+            "type": "object",
+            "properties": {
+                "game_type_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

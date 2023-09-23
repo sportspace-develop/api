@@ -87,7 +87,6 @@ func GetTeam(c *gin.Context) {
 }
 
 type createTeamRequest struct {
-	ID      uint   `json:"id"`
 	Title   string `json:"title"`
 	DGameID uint   `json:"game_type_id"`
 }

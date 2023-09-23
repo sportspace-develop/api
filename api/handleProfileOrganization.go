@@ -86,7 +86,7 @@ type createOrganizationResponse struct {
 // @Produce json
 // @Param Authorization header string true "Bearer JWT"
 // @Param params body createOrganizationRequest true "body"
-// @Success 201 {object} createOrganizationResponse
+// @Success 200 {object} createOrganizationResponse
 // @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
 // @Router /profile/organization [post]
@@ -160,7 +160,7 @@ func CreateOrganization(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createOrganizationResponse{
+	c.JSON(http.StatusOK, createOrganizationResponse{
 		Success: true,
 		Data: getOrganizationDataResponse{
 			ID:      organization.ID,

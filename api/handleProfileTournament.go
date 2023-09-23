@@ -132,7 +132,7 @@ type createTournamentResponse struct {
 // @Produce json
 // @Param Authorization header string true "Bearer JWT"
 // @Param params body createTournamentRequest true "Tournament"
-// @Success 201 {object} createTournamentResponse
+// @Success 200 {object} createTournamentResponse
 // @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
 // @Router /profile/tournament [post]
@@ -213,7 +213,7 @@ func CreateTournament(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createTournamentResponse{
+	c.JSON(http.StatusOK, createTournamentResponse{
 		Success: true,
 		Data: getTournamentDataResponse{
 			ID:                    t.ID,

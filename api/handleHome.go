@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"sport-space-api/model"
+	sessions "sport-space-api/session"
 	"strconv"
 	"time"
 
@@ -23,7 +24,7 @@ type getAllOrganizationResponse struct {
 // @Summary info for all users
 // @Schemes
 // @Description get organization data
-// @Tags Guest
+// @Tags Home
 // @Accept json
 // @Produce json
 // @Success 200 {object} getAllOrganizationResponse
@@ -44,11 +45,7 @@ func GetAllOrganization(c *gin.Context) {
 
 	organizations, err := model.GetOrganizations()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, responseError{
-			Success: false,
-			Error:   1004,
-			Message: GetMessageErr(1004),
-		})
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
 	}
 	result := []getAllOrganizationDataResponse{}
@@ -88,7 +85,7 @@ type getTournamentsResponse struct {
 // @Summary tournament data
 // @Schemes
 // @Description get tournament data
-// @Tags Guest
+// @Tags Home
 // @Accept json
 // @Produce json
 // @Param tournament_id query int false "Tournaments"
@@ -103,13 +100,9 @@ func GetTournaments(c *gin.Context) {
 
 	response := getTournamentsResponse{}
 	response.Data = []getTournamentsDataResponse{}
-	tournaments, err := model.GetTournaments(uint(tournamentId))
+	tournaments, err := model.GetTournaments(tournamentId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, responseError{
-			Success: false,
-			Error:   701,
-			Message: GetMessageErr(701),
-		})
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
 	}
 
@@ -149,7 +142,7 @@ type getTeamsResponse struct {
 // @Summary team data
 // @Schemes
 // @Description get team data
-// @Tags Guest
+// @Tags Home
 // @Accept json
 // @Produce json
 // @Param team_id query int false "Team"
@@ -161,13 +154,9 @@ func GetTeams(c *gin.Context) {
 	var teamId int
 	teamId, _ = strconv.Atoi(c.DefaultQuery("team_id", "0"))
 
-	teams, err := model.GetTeams(uint(teamId))
+	teams, err := model.GetTeams(teamId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, responseError{
-			Success: false,
-			Error:   1205,
-			Message: GetMessageErr(1205),
-		})
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
 		return
 	}
 
@@ -184,5 +173,102 @@ func GetTeams(c *gin.Context) {
 	c.JSON(http.StatusOK, getTeamsResponse{
 		Success: true,
 		Data:    result,
+	})
+}
+
+type getHomeResponse struct {
+	Success       bool                             `json:"success"`
+	UserID        uint                             `json:"user_Id"`
+	GameTypes     []getProfileGameTypesResponse    `json:"game_types"`
+	Organizations []getAllOrganizationDataResponse `json:"organizations"`
+	Tournaments   []getTournamentsDataResponse     `json:"tournaments"`
+	Teams         []getTeamsDataResponse           `json:"teams"`
+}
+
+// @Summary home data
+// @Schemes
+// @Description get home data
+// @Tags Home
+// @Accept json
+// @Produce json
+// @Success 200 {object} getHomeResponse
+// @Failure 500 {object} responseError
+// @Router /home [get]
+func GetHome(c *gin.Context) {
+	session := sessions.New(c)
+	userId := session.GetUserId()
+
+	gameTypes, err := model.GetGameTypes()
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	gameTypesResult := []getProfileGameTypesResponse{}
+	for _, gType := range gameTypes {
+		gameTypesResult = append(gameTypesResult, getProfileGameTypesResponse{
+			ID:    gType.ID,
+			Title: gType.Title,
+			Name:  gType.Name,
+		})
+	}
+
+	organizations, err := model.GetOrganizations()
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	resultOrganizations := []getAllOrganizationDataResponse{}
+
+	for _, organization := range organizations {
+		resultOrganizations = append(resultOrganizations, getAllOrganizationDataResponse{
+			ID:      organization.ID,
+			Title:   organization.Title,
+			Address: organization.Address,
+		})
+	}
+
+	tournaments, err := model.GetTournaments[int](0)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	resultTournaments := []getTournamentsDataResponse{}
+	for _, t := range tournaments {
+		resultTournaments = append(resultTournaments, getTournamentsDataResponse{
+			ID:                    t.ID,
+			Title:                 t.Title,
+			StartDate:             t.StartDate.Format(time.DateTime),
+			EndDate:               t.EndDate.Format(time.DateTime),
+			StartRegistrationDate: t.StartRegistrationDate.Format(time.DateTime),
+			EndRegistrationDate:   t.EndRegistrationDate.Format(time.DateTime),
+			IsTeam:                t.IsTeam,
+			DGameID:               t.DGameID,
+			OrganizationID:        t.OrganizationID,
+		})
+	}
+
+	teams, err := model.GetTeams(0)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	resultTeams := []getTeamsDataResponse{}
+
+	for _, team := range teams {
+		resultTeams = append(resultTeams, getTeamsDataResponse{
+			ID:      team.ID,
+			Title:   team.Title,
+			DGameID: team.DGameID,
+		})
+	}
+
+	c.JSON(http.StatusOK, getHomeResponse{
+		Success:       true,
+		UserID:        userId,
+		GameTypes:     gameTypesResult,
+		Organizations: resultOrganizations,
+		Tournaments:   resultTournaments,
+		Teams:         resultTeams,
 	})
 }
