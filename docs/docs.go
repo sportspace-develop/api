@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
-                "description": "user authorization",
+                "description": "Авторизация по паролю или по коду из email, action = \"code\" | \"password\", Для code обязательное поле \"code\", для пароля обязательное поле \"password\"",
                 "consumes": [
                     "application/json"
                 ],
@@ -49,6 +49,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/api.responseError"
                         }
@@ -662,6 +668,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/profile/setPassword": {
+            "post": {
+                "description": "set password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "logout",
+                "parameters": [
+                    {
+                        "description": "set password",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.setPasswordRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseSuccess"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.responseError"
+                        }
+                    }
+                }
+            }
+        },
         "/profile/team": {
             "get": {
                 "description": "get team data",
@@ -1239,6 +1304,10 @@ const docTemplate = `{
         "api.authorizeRequest": {
             "type": "object",
             "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "code"
+                },
                 "code": {
                     "type": "string",
                     "example": "123456"
@@ -1246,6 +1315,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string",
                     "example": "test@test.ru"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password_string"
                 }
             }
         },
@@ -1309,9 +1382,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "game_type_id": {
-                    "type": "integer"
-                },
-                "id": {
                     "type": "integer"
                 },
                 "title": {
@@ -1863,6 +1933,20 @@ const docTemplate = `{
                 "success": {
                     "type": "boolean",
                     "example": true
+                }
+            }
+        },
+        "api.setPasswordRequest": {
+            "type": "object",
+            "properties": {
+                "old_password": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "password2": {
+                    "type": "string"
                 }
             }
         },

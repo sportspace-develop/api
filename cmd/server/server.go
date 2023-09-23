@@ -66,6 +66,8 @@ func initRoute() {
 		{
 			profile.GET("/", api.GetProfile)
 
+			profile.POST("/setPassword", api.SetPassword)
+
 			profile.GET("/organization", api.GetOrganization)
 			profile.POST("/organization", api.CreateOrganization)
 			profile.PUT("/organization", api.UpdateOrganization)

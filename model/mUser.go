@@ -250,3 +250,13 @@ func FindSession(refreshToken string) (UserSession, error) {
 
 	return session, nil
 }
+
+func UpdUser(user User) (User, error) {
+	db, err := Connect()
+	if err != nil {
+		log.ERROR(err.Error())
+		return user, err
+	}
+
+	return user, db.Save(user).Error
+}

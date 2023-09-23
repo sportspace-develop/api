@@ -1,11 +1,17 @@
 definitions:
   api.authorizeRequest:
     properties:
+      action:
+        example: code
+        type: string
       code:
         example: "123456"
         type: string
       email:
         example: test@test.ru
+        type: string
+      password:
+        example: password_string
         type: string
     type: object
   api.authorizeResponse:
@@ -48,8 +54,6 @@ definitions:
   api.createTeamRequest:
     properties:
       game_type_id:
-        type: integer
-      id:
         type: integer
       title:
         type: string
@@ -419,6 +423,15 @@ definitions:
         example: true
         type: boolean
     type: object
+  api.setPasswordRequest:
+    properties:
+      old_password:
+        type: string
+      password:
+        type: string
+      password2:
+        type: string
+    type: object
   api.updateInviteToTeamRequest:
     properties:
       email:
@@ -550,7 +563,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: user authorization
+      description: Авторизация по паролю или по коду из email, action = "code" | "password",
+        Для code обязательное поле "code", для пароля обязательное поле "password"
       parameters:
       - description: User email
         in: body
@@ -567,6 +581,10 @@ paths:
             $ref: '#/definitions/api.authorizeResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/api.responseError'
         "500":
@@ -972,6 +990,45 @@ paths:
       summary: update profile player invites
       tags:
       - profile player
+  /profile/setPassword:
+    post:
+      consumes:
+      - application/json
+      description: set password
+      parameters:
+      - description: set password
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/api.setPasswordRequest'
+      - description: Bearer JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.responseSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/api.responseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.responseError'
+      summary: logout
+      tags:
+      - profile
   /profile/team:
     get:
       consumes:

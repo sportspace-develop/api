@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sport-space-api/model"
 	sessions "sport-space-api/session"
+	"sport-space-api/tools/password"
 	"strings"
 	"time"
 
@@ -175,5 +176,90 @@ func GetProfile(c *gin.Context) {
 		InviteToTeam:  invitesToTeamResult,
 		Player:        playerResult,
 		InviteStatus:  model.InviteStatus,
+	})
+}
+
+type setPasswordRequest struct {
+	OldPassword string `json:"old_password"`
+	Password    string `json:"password"`
+	Password2   string `json:"password2"`
+}
+
+// @Summary logout
+// @Schemes
+// @Description set password
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Param params body setPasswordRequest true "set password"
+// @Param Authorization header string true "Bearer JWT"
+// @Success 200 {object} responseSuccess
+// @Failure 400 {object} responseError
+// @Failure 401 {object} responseError
+// @Failure 500 {object} responseError
+// @Router /profile/setPassword [post]
+func SetPassword(c *gin.Context) {
+	session := sessions.New(c)
+
+	userId := session.GetUserId()
+	if userId == 0 {
+		responseErrorNumber(c, nil, 100, http.StatusUnauthorized)
+		return
+	}
+
+	user, err := model.FindUserById(userId)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+	if user.ID == 0 {
+		responseErrorNumber(c, nil, 16, http.StatusUnauthorized)
+		return
+	}
+
+	jData := setPasswordRequest{}
+	err = c.ShouldBindJSON(&jData)
+	if err != nil {
+		responseErrorNumber(c, err, 9, http.StatusInternalServerError)
+		return
+	}
+
+	if jData.OldPassword == "" && jData.OldPassword != user.Password.String {
+		responseErrorNumber(c, nil, 200, http.StatusBadRequest)
+		return
+	}
+
+	if jData.Password != jData.Password2 {
+		responseErrorNumber(c, nil, 201, http.StatusBadRequest)
+		return
+	}
+
+	if jData.Password == "" {
+		responseErrorNumber(c, nil, 205, http.StatusBadRequest)
+		return
+	}
+
+	if jData.OldPassword != "" && !password.CheckPasswordHash(jData.OldPassword, user.Password.String) {
+		responseErrorNumber(c, nil, 202, http.StatusBadRequest)
+		return
+	}
+	hashPass, err := password.HashPassword(jData.Password)
+	if err != nil {
+		responseErrorNumber(c, err, 203, http.StatusInternalServerError)
+		return
+	}
+	err = user.Password.Scan(hashPass)
+	if err != nil {
+		responseErrorNumber(c, err, 204, http.StatusInternalServerError)
+		return
+	}
+	_, err = model.UpdUser(user)
+	if err != nil {
+		responseErrorNumber(c, err, 500, http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, responseSuccess{
+		Success: true,
 	})
 }

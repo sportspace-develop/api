@@ -8,6 +8,7 @@ import (
 	"sport-space-api/tools"
 	"sport-space-api/tools/email"
 	"sport-space-api/tools/jwt"
+	"sport-space-api/tools/password"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -104,9 +105,18 @@ func GetAuthCode(c *gin.Context) {
 	c.JSON(http.StatusOK, loginResponse{Success: true})
 }
 
+type authAction string
+
+const (
+	ActionCode     = "code"
+	ActionPassword = "password"
+)
+
 type authorizeRequest struct {
-	Email email.Email `json:"email" swaggertype:"string" example:"test@test.ru"`
-	Code  string      `json:"code" swaggertype:"string" example:"123456"`
+	Email    email.Email `json:"email" swaggertype:"string" example:"test@test.ru"`
+	Action   authAction  `json:"action" swaggertype:"string" example:"code"`
+	Code     string      `json:"code" swaggertype:"string" example:"123456"`
+	Password string      `json:"password" swaggertype:"string" example:"password_string"`
 }
 
 type authorizeResponse struct {
@@ -118,13 +128,14 @@ type authorizeResponse struct {
 
 // @Summary authorization
 // @Schemes
-// @Description user authorization
+// @Description Авторизация по паролю или по коду из email, action = "code" | "password". Для code обязательное поле "code", для пароля обязательное поле "password"
 // @Tags auth
 // @Accept json
 // @Produce json
 // @Param params body authorizeRequest true "User email"
 // @Success 200 {object} authorizeResponse
 // @Failure 400 {object} responseError
+// @Failure 401 {object} responseError
 // @Failure 500 {object} responseError
 // @Router /auth/login [post]
 func Authorize(c *gin.Context) {
@@ -161,34 +172,46 @@ func Authorize(c *gin.Context) {
 		return
 	}
 
-	authCode, err := model.FindCodeNotActivatedByUserCode(user, jsonData.Code)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, responseError{
-			Success: false,
-			Error:   500,
-			Message: GetMessageErr(500),
-		})
-		log.ERROR(err.Error())
-		return
-	}
+	// if user.ID == 0 {
+	// 	responseErrorNumber(c, nil, 19, http.StatusUnauthorized)
+	// 	return
+	// }
 
-	if authCode.ID == 0 {
-		c.JSON(http.StatusBadRequest, responseError{
-			Success: false,
-			Error:   11,
-			Message: GetMessageErr(11),
-		})
-		return
-	}
+	if jsonData.Action == ActionCode {
+		authCode, err := model.FindCodeNotActivatedByUserCode(user, jsonData.Code)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, responseError{
+				Success: false,
+				Error:   500,
+				Message: GetMessageErr(500),
+			})
+			log.ERROR(err.Error())
+			return
+		}
 
-	_, err = model.ActivateUserAuthCode(authCode)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, responseError{
-			Success: false,
-			Error:   17,
-			Message: GetMessageErr(17),
-		})
-		log.ERROR(err.Error())
+		if authCode.ID == 0 {
+			responseErrorNumber(c, nil, 11, http.StatusBadRequest)
+			return
+		}
+
+		_, err = model.ActivateUserAuthCode(authCode)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, responseError{
+				Success: false,
+				Error:   17,
+				Message: GetMessageErr(17),
+			})
+			log.ERROR(err.Error())
+			return
+		}
+	} else if jsonData.Action == ActionPassword {
+		if !password.CheckPasswordHash(jsonData.Password, user.Password.String) {
+			responseErrorNumber(c, nil, 19, http.StatusUnauthorized)
+			return
+		}
+
+	} else {
+		responseErrorNumber(c, nil, 9, http.StatusBadRequest)
 		return
 	}
 
