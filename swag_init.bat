@@ -1,1 +1,0 @@
-swag init -g cmd/server/server.go

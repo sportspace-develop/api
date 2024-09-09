@@ -1,6 +1,7 @@
 .env
 main.exe
 
+golangci-lint
 mysql-data
 pgs-data
 
