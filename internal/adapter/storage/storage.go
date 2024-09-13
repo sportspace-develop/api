@@ -23,13 +23,24 @@ type Store interface {
 	NewTeam(ctx context.Context, team *models.Team) (*models.Team, error)
 	GetTeams(ctx context.Context, user *models.User) (*[]models.Team, error)
 	GetTeamByID(ctx context.Context, teamID uint) (*models.Team, error)
-	UpdTeam(ctx context.Context, team *models.Team) (*models.Team, error)
+	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
+	GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
-	AddPlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error
 	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
-	RemovePlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error
+	NewApplication(ctx context.Context, application *models.Application, player *[]models.Player) (
+		*models.Application, *[]models.Player, error,
+	)
+	UpdApplication(ctx context.Context, application *models.Application, players *[]models.Player) (
+		*models.Application, *[]models.Player, error,
+	)
+	GetApplicationFromTeamTournament(ctx context.Context, tournamentID, teamID uint) (*models.Application, error)
+	GetApplicationByID(ctx context.Context, applicationID uint) (*models.Application, error)
+	GetApplicationsByTeamID(ctx context.Context, teamID uint) (*[]models.Application, error)
+	GetPlayersFromApplication(ctx context.Context, applicationID uint) (*[]models.Player, error)
+	GetApplicationsFromTournament(ctx context.Context, tournamentID uint) (*[]models.Application, error)
+	UpdApplicationTournament(ctx context.Context, application *models.Application) (*models.Application, error)
 }
 
 type Config struct {

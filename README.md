@@ -3,7 +3,7 @@
 ## develop server
 1. git clone https://github.com/sportspace-develop/api.git
 2. cd api/deploy
-3. docker-compose up
+3. запустить ```docker-compose up``` или пересобрать и запустить ```docker-compose up --build```
 
 ### file .env example
 ```text
@@ -22,13 +22,13 @@ MAIL_SENDER_PASSWORD=test
 MAIL_SECURE=0
 ```
 
-### Docker
-```cmd
-docker-compose up --build
-```
-
-### API Docs
+### Swagger docs
 http://localhost:8080/swagger/index.html
 
 ### Email UI (dev)
 http://localhost:1080/
+
+# build
+```bash
+go build -ldflags "-X main.buildVersion=v0.0.1 -X 'main.buildDate=$(date +'%Y/%m/%d %H:%M:%S')' -X 'main.buildCommit=$(git show --oneline -s)'" ./cmd/sportspace/sportspace.go
+```

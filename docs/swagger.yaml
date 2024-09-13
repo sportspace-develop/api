@@ -1,5 +1,16 @@
 basePath: /api/v1
 definitions:
+  rest.tApplication:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+      tournament_id:
+        type: integer
+      tournament_title:
+        type: string
+    type: object
   rest.tAuthorization:
     properties:
       email:
@@ -16,6 +27,99 @@ definitions:
   rest.tCreateTournament:
     properties:
       title:
+        type: string
+    type: object
+  rest.tGetApplicationResponse:
+    properties:
+      id:
+        type: integer
+      players:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+      status:
+        type: string
+      tournament_id:
+        type: integer
+      tournament_title:
+        type: string
+    type: object
+  rest.tGetApplicationsTeamResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/rest.tApplication'
+        type: array
+    type: object
+  rest.tGetPlayersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+    type: object
+  rest.tGetTeamResponse:
+    properties:
+      id:
+        type: integer
+      players:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+      title:
+        type: string
+    type: object
+  rest.tGetTorunamentApplicationResponse:
+    properties:
+      id:
+        type: integer
+      players:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+      status:
+        type: string
+      taem_id:
+        type: integer
+      team_title:
+        type: string
+    type: object
+  rest.tGetTorunamentsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/rest.tTournament'
+        type: array
+    type: object
+  rest.tGetTournamentApplicationsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/rest.tTournamentApplication'
+        type: array
+    type: object
+  rest.tNewApplicationRequest:
+    properties:
+      player_ids:
+        items:
+          type: integer
+        type: array
+      tournament_id:
+        type: integer
+    type: object
+  rest.tNewApplicationResponse:
+    properties:
+      id:
+        type: integer
+      players:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+      status:
+        type: string
+      tournament_id:
+        type: integer
+      tournament_title:
         type: string
     type: object
   rest.tNewPlayer:
@@ -57,29 +161,84 @@ definitions:
       title:
         type: string
     type: object
+  rest.tTournamentApplication:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+      taem_id:
+        type: integer
+      team_title:
+        type: string
+    type: object
+  rest.tUpdApplicationResponse:
+    properties:
+      id:
+        type: integer
+      players:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+      status:
+        type: string
+      tournament_id:
+        type: integer
+      tournament_title:
+        type: string
+    type: object
+  rest.tUpdApplicationStatusRequest:
+    properties:
+      player_ids:
+        items:
+          type: integer
+        type: array
+      status:
+        enum:
+        - submit
+        - cancel
+        type: string
+    type: object
+  rest.tUpdTeamRequest:
+    properties:
+      player_ids:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+    type: object
+  rest.tUpdTeamResponse:
+    properties:
+      id:
+        type: integer
+      players:
+        items:
+          $ref: '#/definitions/rest.tPlayer'
+        type: array
+      title:
+        type: string
+    type: object
+  rest.tUpdTournamentApplicationRequest:
+    properties:
+      status:
+        enum:
+        - accept
+        - reject
+        type: string
+    type: object
+  rest.tUpdTournamentRequest:
+    properties:
+      title:
+        type: string
+    type: object
   rest.tUpdatePlayer:
     properties:
       firstname:
         type: string
-      id:
-        type: integer
       lastname:
         type: string
       secondname:
-        type: string
-    type: object
-  rest.tUpdateTeam:
-    properties:
-      id:
-        type: integer
-      title:
-        type: string
-    type: object
-  rest.tUpdateTournament:
-    properties:
-      id:
-        type: integer
-      title:
         type: string
     type: object
 externalDocs:
@@ -203,11 +362,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/rest.tPlayer'
-            type: array
-        "204":
-          description: No Content
+            $ref: '#/definitions/rest.tGetPlayersResponse'
         "400":
           description: Bad Request
         "500":
@@ -238,9 +393,15 @@ paths:
       summary: Добавить игрока
       tags:
       - user players
+  /user/players/{player_id}:
     put:
       description: обновить игрока
       parameters:
+      - description: player id
+        in: path
+        name: player_id
+        required: true
+        type: integer
       - description: player
         in: body
         name: id
@@ -307,38 +468,13 @@ paths:
       summary: создать команду
       tags:
       - user team
-    put:
-      description: обновление команды пользователя
-      parameters:
-      - description: team
-        in: body
-        name: id
-        required: true
-        schema:
-          $ref: '#/definitions/rest.tUpdateTeam'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/rest.tTeam'
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: обновление команды пользователя
-      tags:
-      - user team
-  /user/teams/{id}:
+  /user/teams/{team_id}:
     get:
       description: информация команды пользователя
       parameters:
       - description: team id
         in: path
-        name: id
+        name: team_id
         required: true
         type: integer
       produces:
@@ -347,7 +483,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.tTeam'
+            $ref: '#/definitions/rest.tGetTeamResponse'
         "204":
           description: No Content
         "400":
@@ -357,45 +493,43 @@ paths:
       summary: информация команды пользователя
       tags:
       - user team
-  /user/teams/{id}/players:
-    delete:
-      description: удалить игроков из команду
+    put:
+      description: обновление команды пользователя
       parameters:
       - description: team id
         in: path
-        name: id
+        name: team_id
         required: true
         type: integer
-      - description: player id`s
+      - description: team
         in: body
-        name: player
+        name: team
         required: true
         schema:
-          items:
-            type: integer
-          type: array
+          $ref: '#/definitions/rest.tUpdTeamRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/rest.tUpdTeamResponse'
         "204":
           description: No Content
         "400":
           description: Bad Request
-        "409":
-          description: Conflict
         "500":
           description: Internal Server Error
-      summary: удалить игроков из команду
+      summary: обновление команды пользователя
       tags:
       - user team
+  /user/teams/{team_id}/applications:
     get:
-      description: игроки в команде
+      description: заявки команды
       parameters:
       - description: team id
         in: path
-        name: id
+        name: team_id
         required: true
         type: integer
       produces:
@@ -404,60 +538,119 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.tPlayer'
+            $ref: '#/definitions/rest.tGetApplicationsTeamResponse'
         "400":
-          description: Bad Request
+          description: команда не найдена
         "500":
           description: Internal Server Error
-      summary: игроки в команде
+      summary: заявки команды
       tags:
       - user team
     post:
-      description: пдобавить игрока в команду
+      description: подать заявку
       parameters:
       - description: team id
         in: path
-        name: id
+        name: team_id
         required: true
         type: integer
-      - description: player id`s
+      - description: application
         in: body
-        name: player
+        name: application
         required: true
         schema:
-          items:
-            type: integer
-          type: array
+          $ref: '#/definitions/rest.tNewApplicationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: заявка создана
+          schema:
+            $ref: '#/definitions/rest.tNewApplicationResponse'
+        "400":
+          description: не корректный запрос
+        "409":
+          description: "заявка\tуже\tбыла создана ранее"
+        "500":
+          description: Internal Server Error
+      summary: подать заявку
+      tags:
+      - user team
+  /user/teams/{team_id}/applications/{application_id}:
+    get:
+      description: заявка команды
+      parameters:
+      - description: team id
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: application id
+        in: path
+        name: application_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
-        "204":
-          description: No Content
+          schema:
+            $ref: '#/definitions/rest.tGetApplicationResponse'
         "400":
-          description: Bad Request
-        "409":
-          description: Conflict
+          description: не корректный запрос
         "500":
           description: Internal Server Error
-      summary: добавить игрока в команду
+      summary: заявка команды
+      tags:
+      - user team
+    put:
+      description: изменить заявку
+      parameters:
+      - description: team id
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: "application\tid"
+        in: path
+        name: application_id
+        required: true
+        type: integer
+      - description: application status
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/rest.tUpdApplicationStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.tUpdApplicationResponse'
+        "204":
+          description: заявка не найдена
+        "400":
+          description: не найден или не может изменить
+        "500":
+          description: Internal Server Error
+      summary: изменить заявку
       tags:
       - user team
   /user/tournaments:
     get:
       consumes:
       - application/json
-      description: создать турнир
+      description: турниры пользователя
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/rest.tTournament'
-            type: array
+            $ref: '#/definitions/rest.tGetTorunamentsResponse'
         "204":
           description: No Content
         "400":
@@ -492,38 +685,13 @@ paths:
       summary: создать турнир
       tags:
       - user tournament
-    put:
-      consumes:
-      - application/json
-      description: Обновить турнир
-      parameters:
-      - description: tournament
-        in: body
-        name: tournamet
-        required: true
-        schema:
-          $ref: '#/definitions/rest.tUpdateTournament'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: Обновить турнир
-      tags:
-      - user tournament
-  /user/tournaments/{id}:
+  /user/tournaments/{tournament_id}:
     get:
       description: информация турнира пользователя
       parameters:
       - description: tournament id
         in: path
-        name: id
+        name: tournament_id
         required: true
         type: integer
       produces:
@@ -540,6 +708,120 @@ paths:
         "500":
           description: Internal Server Error
       summary: информация турнира пользователя
+      tags:
+      - user tournament
+    put:
+      consumes:
+      - application/json
+      description: Обновить турнир
+      parameters:
+      - description: tournament id
+        in: path
+        name: tournament_id
+        required: true
+        type: integer
+      - description: tournament
+        in: body
+        name: tournamet
+        required: true
+        schema:
+          $ref: '#/definitions/rest.tUpdTournamentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Обновить турнир
+      tags:
+      - user tournament
+  /user/tournaments/{tournament_id}/applications:
+    get:
+      description: заявки на турнир
+      parameters:
+      - description: tournament id
+        in: path
+        name: tournament_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.tGetTournamentApplicationsResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: заявки на турнир
+      tags:
+      - user tournament
+  /user/tournaments/{tournament_id}/applications/{application_id}:
+    get:
+      description: заявка турнира
+      parameters:
+      - description: tournament id
+        in: path
+        name: tournament_id
+        required: true
+        type: integer
+      - description: application id
+        in: path
+        name: application_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.tGetTorunamentApplicationResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: заявка турнира
+      tags:
+      - user tournament
+    put:
+      description: изменить заявку
+      parameters:
+      - description: tournament id
+        in: path
+        name: tournament_id
+        required: true
+        type: integer
+      - description: application id
+        in: path
+        name: application_id
+        required: true
+        type: integer
+      - description: application
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/rest.tUpdTournamentApplicationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.tApplication'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: изменить заявку
       tags:
       - user tournament
 swagger: "2.0"

@@ -38,13 +38,22 @@ type sport interface {
 	NewTeam(ctx context.Context, team *models.Team) (*models.Team, error)
 	GetTeams(ctx context.Context, user *models.User) (*[]models.Team, error)
 	GetTeamByID(ctx context.Context, teamID uint) (*models.Team, error)
-	UpdTeam(ctx context.Context, team *models.Team) (*models.Team, error)
+	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
-	AddPlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error
 	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
-	RemovePlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error
+	NewApplicationTeam(ctx context.Context, playerIDs *[]uint, tournamentID, teamID, userID uint) (
+		*models.Application, *[]models.Player, error,
+	)
+	UpdApplicationTeam(ctx context.Context, applicationID uint, playerIDs *[]uint, status models.ApplicationStatus, teamID uint, userID uint) (
+		*models.Application, *[]models.Player, error,
+	)
+	GetApplicationsTeam(ctx context.Context, teamID uint) (*[]models.Application, error)
+	GetApplicationByID(ctx context.Context, applicationID uint) (*models.Application, error)
+	GetPlayersFromApplication(ctx context.Context, applicationID uint) (*[]models.Player, error)
+	GetApplicationsFromTournament(ctx context.Context, tournamentID uint) (*[]models.Application, error)
+	UpdApplicationTournament(ctx context.Context, applicationID uint, status models.ApplicationStatus, tournamentID uint, userID uint) (*models.Application, error)
 }
 
 type Server struct {
@@ -121,28 +130,27 @@ func (s *Server) Run() error {
 			user.POST("/tournaments", s.handlerUserNewTournament)
 			user.GET("/tournaments", s.handlerUserTournaments)
 			user.GET("/tournaments/:id", s.handlerUserTournament)
-			user.PUT("/tournaments", s.handlerUserUpdTournament)
+			user.PUT("/tournaments/:id", s.handlerUserUpdTournament)
 
 			user.POST("/teams", s.handlerUserNewTeam)
 			user.GET("/teams", s.handlerUserTeams)
-			user.GET("teams/:id", s.handlerUserTeam)
-			user.PUT("/teams", s.handlerUserUptTeam)
-
-			user.POST("/teams/:id/players", s.handlerUserTeamAddPlayer)
-			user.GET("/teams/:id/players", s.handlerUserTeamPlayers)
-			user.DELETE("/teams/:id/players", s.handlerUserTeamRemovePlayers)
+			user.GET("/teams/:id", s.handlerUserTeam)
+			user.PUT("/teams/:id", s.handlerUserUptTeam)
 
 			user.POST("/players", s.handlerUserNewPlayer)
-			user.GET("/players/", s.handlerUserPlayers)
-			user.PUT("/players", s.handlerUserUpdatePlayer)
+			user.GET("/players", s.handlerUserPlayers)
+			user.PUT("/players/:id", s.handlerUserUpdatePlayer)
 
 			// заявки турнира
-			// user.GET("/tournaments/:id/applications", s.handlerGetTournamentApplications)
-			// user.PUT("/tournaments/:id/applications/:aid", s.handlerUpdTournamentApplication)
+			user.GET("/tournaments/:id/applications", s.handlerGetTournamentApplications)
+			user.GET("/tournaments/:id/applications/:aid", s.handlerGetTournamentApplication)
+			user.PUT("/tournaments/:id/applications/:aid", s.handlerUpdTournamentApplication)
 
 			// заявки команды
-			// user.POST("/teams/:id/applications", s.handlerNewTeamApplication)
-			// user.GET("/teams/:id/applications", s.handlerGetTeamApplications)
+			user.POST("/teams/:id/applications", s.handlerNewTeamApplication)
+			user.PUT("/teams/:id/applications/:aid", s.handlerUpdStatusTeamApplication)
+			user.GET("/teams/:id/applications", s.handlerGetTeamApplications)
+			user.GET("/teams/:id/applications/:aid", s.handlerGetApplication)
 		}
 
 		guest := api.Group("/")

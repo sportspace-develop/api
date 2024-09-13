@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
@@ -48,8 +49,9 @@ func New(ctx context.Context, cfg Config, options ...option) (*Storage, error) {
 		&models.Tournament{},
 		&models.Team{},
 		&models.Player{},
-		&models.TeamPlayer{},
-		&models.TournamentApplication{},
+		// &models.TeamPlayer{},
+		&models.Application{},
+		// &models.ApplicationPlayer{},
 	)
 
 	if err != nil {
@@ -78,7 +80,7 @@ func (s *Storage) GetUserByEmail(ctx context.Context, email string) (*models.Use
 	user := &models.User{
 		Email: email,
 	}
-	err := s.db.WithContext(ctx).First(user).Error
+	err := s.db.WithContext(ctx).Where("email = ?", email).First(user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.Join(err, errstore.ErrNotFoundData)
@@ -114,7 +116,7 @@ func (s *Storage) GetOTP(ctx context.Context, user *models.User) (*models.OTPUse
 	otp := &models.OTPUser{
 		UserID: user.ID,
 	}
-	err := s.db.WithContext(ctx).First(otp).Error
+	err := s.db.WithContext(ctx).Where("user_id = ?", user.ID).First(otp).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return otp, errors.Join(err, errstore.ErrNotFoundData)
@@ -137,7 +139,10 @@ func (s *Storage) RemoveOTP(ctx context.Context, user *models.User) error {
 func (s *Storage) GetAllTournaments(ctx context.Context) (tournaments *[]models.Tournament, err error) {
 	tournaments = &[]models.Tournament{}
 	err = s.db.Find(tournaments).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.Join(err, errstore.ErrNotFoundData)
+		}
 		return nil, fmt.Errorf("failed get all torurnaments: %w", err)
 	}
 	return tournaments, nil
@@ -156,7 +161,10 @@ func (s *Storage) NewTournament(ctx context.Context, tournament *models.Tourname
 func (s *Storage) GetTournaments(ctx context.Context, userID uint) (*[]models.Tournament, error) {
 	tournaments := &[]models.Tournament{}
 	err := s.db.Where("user_id = ?", userID).Find(tournaments).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.Join(err, errstore.ErrNotFoundData)
+		}
 		return nil, fmt.Errorf("failed found tournaments by user: %w", err)
 	}
 
@@ -165,8 +173,11 @@ func (s *Storage) GetTournaments(ctx context.Context, userID uint) (*[]models.To
 
 func (s *Storage) GetTournamentByID(ctx context.Context, tournamentID uint) (*models.Tournament, error) {
 	tournament := &models.Tournament{}
-	err := s.db.Where("id = ?", tournamentID).First(tournament).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	err := s.db.Where("id = ?", tournamentID).Preload("Applications").First(tournament).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.Join(err, errstore.ErrNotFoundData)
+		}
 		return nil, fmt.Errorf("failed found tournament by id: %w", err)
 	}
 
@@ -198,7 +209,10 @@ func (s *Storage) NewTeam(ctx context.Context, team *models.Team) (*models.Team,
 func (s *Storage) GetTeams(ctx context.Context, user *models.User) (*[]models.Team, error) {
 	teams := &[]models.Team{}
 	err := s.db.Where("user_id = ?", user.ID).Find(teams).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errstore.ErrNotFoundData
+		}
 		return nil, fmt.Errorf("failed find teams by user: %w", err)
 	}
 
@@ -207,24 +221,41 @@ func (s *Storage) GetTeams(ctx context.Context, user *models.User) (*[]models.Te
 
 func (s *Storage) GetTeamByID(ctx context.Context, teamID uint) (*models.Team, error) {
 	team := &models.Team{}
-	err := s.db.Where("id = ?", teamID).First(team).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	err := s.db.Where("id = ?", teamID).Preload("Players").First(team).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errstore.ErrNotFoundData
+		}
 		return nil, fmt.Errorf("failed get team by id: %w", err)
 	}
 	return team, nil
 }
 
-func (s *Storage) UpdTeam(ctx context.Context, team *models.Team) (*models.Team, error) {
-	res := s.db.Model(team).
-		Where("user_id = ? and id = ?", team.UserID, team.ID).
-		Updates(models.Tournament{Title: team.Title})
-	if res.RowsAffected == 0 {
-		return nil, errstore.ErrNotFoundData
+func (s *Storage) UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error) {
+	err := s.db.Transaction(func(tx *gorm.DB) error {
+		if playersIDs != nil {
+			_players := &[]models.Player{}
+			err := tx.Where("id IN ?", *playersIDs).Find(_players).Error
+			if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("failed find players: %w", err)
+			}
+			err = tx.Model(team).Association("Players").Replace(_players)
+			if err != nil {
+				return fmt.Errorf("failed replace players: %w", err)
+			}
+			team.Players = *_players
+		}
+		err := tx.Updates(team).Error
+		if err != nil {
+			return fmt.Errorf("failed update team: %w", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed update team by user: %w", err)
 	}
-	if err := res.Error; err != nil {
-		return nil, fmt.Errorf("failed update team by user: %w", err)
-	}
-	return team, nil
+	return team, &team.Players, nil
 }
 
 func (s *Storage) NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {
@@ -259,121 +290,181 @@ func (s *Storage) UpdPlayer(ctx context.Context, player *models.Player) (*models
 	return player, nil
 }
 
-func (s *Storage) AddPlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error {
-	if len(*playerIDs) == 0 {
-		return fmt.Errorf("list IDs is empty: %w", errstore.ErrNotFoundData)
-	}
-
-	team, err := s.GetTeamByID(ctx, teamID)
-	if err != nil {
-		return fmt.Errorf("failed find team by id `%d`: %w", teamID, err)
-	}
-
-	if team.UserID != userID {
-		return fmt.Errorf("not found team by user: %w", errstore.ErrNotFoundData)
-	}
-
-	tx := s.db.Begin().WithContext(ctx)
-	defer tx.Rollback()
-	players := &[]models.Player{}
-	err = tx.Where("user_id = ?", userID).Find(players, playerIDs).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.Join(err, errstore.ErrNotFoundData)
-		}
-		return fmt.Errorf("failed get players by IDs: %w", err)
-	}
-
-	teamPlayer := []models.TeamPlayer{}
-	for _, id := range *playerIDs {
-		teamPlayer = append(teamPlayer, models.TeamPlayer{PlayerID: id, TeamID: teamID})
-	}
-	err = tx.CreateInBatches(&teamPlayer, len(teamPlayer)).Error
-	if err != nil {
-		var sqlError *pgconn.PgError
-		if errors.As(err, &sqlError) && sqlError.Code == pgerrcode.UniqueViolation {
-			return errors.Join(err, errstore.ErrConflictData)
-		}
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return errors.Join(err, errstore.ErrConflictData)
-		}
-		return fmt.Errorf("failed add players to team: %w", err)
-	}
-	err = tx.Commit().Error
-	if err != nil {
-		return fmt.Errorf("failed transaction: %w", err)
-	}
-	return nil
-}
-
 func (s *Storage) GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error) {
 	var players *[]models.Player
-	err := s.db.Transaction(func(tx *gorm.DB) error {
-		err := tx.Where("id = ? and user_id = ?", team.ID, team.UserID).First(team).Error
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return errors.Join(err, errstore.ErrNotFoundData)
-			}
-			return fmt.Errorf("failed get team: %w", err)
-		}
-		teamPlayers := &[]models.TeamPlayer{}
-		err = tx.Where("team_id =?", team.ID).Find(teamPlayers).Error
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return nil
-			}
-			return fmt.Errorf("failed get players from team: %w", err)
-		}
-		IDs := []uint{}
-		for _, player := range *teamPlayers {
-			IDs = append(IDs, player.PlayerID)
-		}
+	// err := s.db.Transaction(func(tx *gorm.DB) error {
+	// 	err := tx.Where("id = ? and user_id = ?", team.ID, team.UserID).First(team).Error
+	// 	if err != nil {
+	// 		if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 			return errors.Join(err, errstore.ErrNotFoundData)
+	// 		}
+	// 		return fmt.Errorf("failed get team: %w", err)
+	// 	}
+	// 	teamPlayers := &[]models.TeamPlayer{}
+	// 	err = tx.Where("team_id =?", team.ID).Find(teamPlayers).Error
+	// 	if err != nil {
+	// 		if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 			return nil
+	// 		}
+	// 		return fmt.Errorf("failed get players from team: %w", err)
+	// 	}
+	// 	IDs := []uint{}
+	// 	for _, player := range *teamPlayers {
+	// 		IDs = append(IDs, player.PlayerID)
+	// 	}
 
-		err = tx.Where("id in ?", IDs).Find(&players).Error
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("failed find players: %w", err)
-		}
+	// 	err = tx.Where("id in ?", IDs).Find(&players).Error
+	// 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	// 		return fmt.Errorf("failed find players: %w", err)
+	// 	}
 
-		return nil
-	})
+	// 	return nil
+	// })
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed get players by team: %w", err)
+	// }
+
+	return players, nil
+}
+
+func (s *Storage) GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error) {
+	players := &[]models.Player{}
+	err := s.db.Joins("JOIN team_players on team_players.player_id = players.id", s.db.Where("team_players.team_id = ?", teamID)).Find(players).Error
 	if err != nil {
-		return nil, fmt.Errorf("failed get players by team: %w", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errstore.ErrNotFoundData
+		}
+		return nil, fmt.Errorf("failed found players from team: %w", err)
 	}
 
 	return players, nil
 }
 
-func (s *Storage) RemovePlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error {
-	tx := s.db.Begin().WithContext(ctx)
-	defer tx.Rollback()
+func (s *Storage) NewApplication(ctx context.Context, application *models.Application, players *[]models.Player) (
+	*models.Application, *[]models.Player, error,
+) {
+	application.Status = models.Draft
+	application.StatusDate = time.Now()
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.Create(application).Error
+		if err != nil {
+			return fmt.Errorf("failed create application: %w", err)
+		}
+		err = tx.Model(application).Association("Players").Replace(players)
+		if err != nil {
+			return fmt.Errorf("failed create application batch players: %w", err)
+		}
 
-	team, err := s.GetTeamByID(ctx, teamID)
+		return nil
+	})
 	if err != nil {
-		return fmt.Errorf("failed get players by team: %w", err)
-	}
-	if team.UserID != userID {
-		return fmt.Errorf("not found team by user: %w", errstore.ErrNotFoundData)
+		var sqlError *pgconn.PgError
+		if errors.As(err, &sqlError) && sqlError.Code == pgerrcode.UniqueViolation {
+			return nil, nil, errors.Join(err, errstore.ErrConflictData)
+		}
+		return nil, nil, fmt.Errorf("failed create application with transactions: %w", err)
 	}
 
-	teamPlayers := &[]models.TeamPlayer{}
-	err = tx.Where("team_id = ? and player_id IN ?", team.ID, *playerIDs).Find(teamPlayers).Error
+	return application, players, nil
+}
+
+func (s *Storage) GetApplicationFromTeamTournament(ctx context.Context, tournamentID, teamID uint) (*models.Application, error) {
+	application := &models.Application{}
+	err := s.db.WithContext(ctx).Where("tournament_id = ? and team_id = ?", tournamentID, teamID).First(application).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
+			return nil, errstore.ErrNotFoundData
 		}
-		return fmt.Errorf("failed get players from team: %w", err)
+		return nil, fmt.Errorf("failed get appliction: %w", err)
 	}
-	if len(*teamPlayers) == 0 {
-		return fmt.Errorf("found players in team `%d` is empty: %w", teamID, errstore.ErrNotFoundData)
-	}
+	return application, nil
+}
 
-	err = tx.Delete(teamPlayers).Error
+func (s *Storage) GetApplicationByID(ctx context.Context, applicationID uint) (*models.Application, error) {
+	application := &models.Application{}
+	err := s.db.Where("id = ?", applicationID).Preload("Players").First(application).Error
 	if err != nil {
-		return fmt.Errorf("failed remove players from team: %w", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("not found application: %w", errors.Join(err, errstore.ErrNotFoundData))
+		}
+		return nil, fmt.Errorf("failed find application: %w", err)
+	}
+	return application, nil
+}
+
+func (s *Storage) UpdApplication(ctx context.Context, application *models.Application, players *[]models.Player) (
+	*models.Application, *[]models.Player, error,
+) {
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.Where("id = ?", application.ID).Updates(application).Error
+		if err != nil {
+			return fmt.Errorf("failed update application: %w", err)
+		}
+		if *players != nil {
+			err = tx.Model(application).Association("Players").Replace(players)
+			if err != nil {
+				return fmt.Errorf("failed create application batch players: %w", err)
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil, fmt.Errorf("not found application: %w", errors.Join(err, errstore.ErrNotFoundData))
+		}
+		var sqlError *pgconn.PgError
+		if errors.As(err, &sqlError) && sqlError.Code == pgerrcode.UniqueViolation {
+			return nil, nil, errors.Join(err, errstore.ErrConflictData)
+		}
+		return nil, nil, fmt.Errorf("failed update application with transactions: %w", err)
 	}
 
-	if err = tx.Commit().Error; err != nil {
-		return fmt.Errorf("failed commit deleting: %w", err)
+	return application, players, nil
+}
+
+func (s *Storage) GetApplicationsByTeamID(ctx context.Context, teamID uint) (*[]models.Application, error) {
+	applications := &[]models.Application{}
+	err := s.db.Where("team_id = ?", teamID).Find(applications).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return applications, fmt.Errorf("not found applications: %w", errors.Join(err, errstore.ErrNotFoundData))
+		}
+		return nil, fmt.Errorf("failed get applications: %w", err)
 	}
-	return nil
+
+	return applications, nil
+}
+
+func (s *Storage) GetPlayersFromApplication(ctx context.Context, applicationID uint) (*[]models.Player, error) {
+	application := &models.Application{}
+	err := s.db.Where("id = ?", applicationID).Preload("Players").First(application).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &application.Players, fmt.Errorf("not found players from application: %w", errors.Join(err, errstore.ErrNotFoundData))
+		}
+		return nil, fmt.Errorf("failed get players from application: %w", err)
+	}
+	return &application.Players, nil
+}
+
+func (s *Storage) GetApplicationsFromTournament(ctx context.Context, tournamentID uint) (*[]models.Application, error) {
+	applications := &[]models.Application{}
+	statuses := []models.ApplicationStatus{models.InProgress, models.Accepted, models.Rejected}
+	err := s.db.Model(&models.Tournament{}).Where("tournament_id = ? and status in ?", tournamentID, statuses).Association("Applications").Find(applications)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("not found applications: %w", errors.Join(err, errstore.ErrNotFoundData))
+		}
+		return nil, fmt.Errorf("failed get applications: %w", err)
+	}
+	return applications, nil
+}
+
+func (s *Storage) UpdApplicationTournament(ctx context.Context, application *models.Application) (*models.Application, error) {
+	err := s.db.WithContext(ctx).Where("id = ?", application.ID).Updates(application).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed update application: %w", err)
+	}
+	return application, nil
 }

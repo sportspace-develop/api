@@ -10,6 +10,9 @@ type User struct {
 	ID           uint `gorm:"primarykey"`
 	Login        string
 	Email        string `gorm:"index"`
+	Tournaments  []Tournament
+	Teams        []Team
+	Players      []Player
 	PasswordHash string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -27,29 +30,29 @@ type OTPUser struct {
 }
 
 type Tournament struct {
-	ID        uint `gorm:"primarykey"`
-	UserID    uint `gorm:"index;not null"`
-	User      User
-	Title     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID           uint `gorm:"primarykey"`
+	UserID       uint `gorm:"index;not null"`
+	Title        string
+	Applications []Application
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 
 type Team struct {
-	ID        uint `gorm:"primarykey"`
-	UserID    uint `gorm:"index;not null"`
-	User      User
-	Title     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID           uint `gorm:"primarykey"`
+	UserID       uint `gorm:"index;not null"`
+	Title        string
+	Players      []Player `gorm:"many2many:team_players"`
+	Applications []Application
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 
 type Player struct {
 	ID         uint `gorm:"primarykey"`
 	UserID     uint `gorm:"index;not null"`
-	User       User
 	FirstName  string
 	SecondName string
 	LastName   string
@@ -58,36 +61,34 @@ type Player struct {
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 }
 
-type TeamPlayer struct {
-	ID        uint `gorm:"primarykey"`
-	PlayerID  uint `gorm:"index:idx_team_player,unique;not null"`
-	Player    Player
-	TeamID    uint `gorm:"index:idx_team_player,unique;not null"`
-	Team      Team
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
+type ApplicationStatus string
 
-type TournamentApplication struct {
-	ID           uint `gorm:"primarykey"`
-	TeamID       uint `gorm:"index:idx_application_team;not null"`
-	Team         Team
-	TournamentID uint `gorm:"index:idx_application_tournament;not null"`
-	Tournament   Tournament
-	Accepted     bool
-	AcceptedDate time.Time
+const (
+	Draft      ApplicationStatus = "draft"
+	InProgress ApplicationStatus = "inprogress"
+	Accepted   ApplicationStatus = "accepted"
+	Rejected   ApplicationStatus = "rejected"
+	Canceled   ApplicationStatus = "canceled"
+)
+
+type Application struct {
+	ID           uint              `gorm:"primarykey"`
+	TeamID       uint              `gorm:"index:idx_application,unique;not null"`
+	TournamentID uint              `gorm:"index:idx_application,unique;not null"`
+	Players      []Player          `gorm:"many2many:application_players"`
+	Status       ApplicationStatus `gorm:"index:idx_status;not null"`
+	StatusDate   time.Time
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 
 // type ApplicationPlayer struct {
-// 	ID            uint `gorm:"primarykey"`
-// 	ApplicationID uint `gorm:"index:idx_application_player;not null"`
+// 	ID                      uint `gorm:"primarykey"`
+// 	ApplicationID uint `gorm:"index:idx_application;not null"`
 // 	Application   Application
-// 	PlayerID      uint
-// 	Player        Player
-// 	CreatedAt     time.Time
-// 	UpdatedAt     time.Time
-// 	DeletedAt     gorm.DeletedAt `gorm:"index"`
+// 	PlayerID                uint
+// 	Player                  Player
+// 	CreatedAt               time.Time
+// 	UpdatedAt               time.Time
 // }

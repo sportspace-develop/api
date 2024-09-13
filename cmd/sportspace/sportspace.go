@@ -13,7 +13,16 @@ import (
 	"sport-space/internal/core/sportspace"
 )
 
+var (
+	buildVersion string
+	buildDate    string
+	buildCommit  string
+)
+
 func main() {
+	fmt.Println("Build verson: " + BuildData(buildVersion))
+	fmt.Println("Build date: " + BuildData(buildDate))
+	fmt.Println("Build commit: " + BuildData(buildCommit))
 	if err := run(); err != nil {
 		log.Fatal(err)
 	}
@@ -56,4 +65,10 @@ func run() error {
 		return err
 	}
 	return err
+}
+func BuildData(data string) string {
+	if data != "" {
+		return data
+	}
+	return "N/A"
 }

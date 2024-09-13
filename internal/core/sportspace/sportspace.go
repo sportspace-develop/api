@@ -32,13 +32,24 @@ type storage interface {
 	NewTeam(ctx context.Context, team *models.Team) (*models.Team, error)
 	GetTeams(ctx context.Context, user *models.User) (*[]models.Team, error)
 	GetTeamByID(ctx context.Context, teamID uint) (*models.Team, error)
-	UpdTeam(ctx context.Context, team *models.Team) (*models.Team, error)
+	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
+	GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
-	AddPlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error
 	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
-	RemovePlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error
+	NewApplication(ctx context.Context, application *models.Application, player *[]models.Player) (
+		*models.Application, *[]models.Player, error,
+	)
+	UpdApplication(ctx context.Context, application *models.Application, players *[]models.Player) (
+		*models.Application, *[]models.Player, error,
+	)
+	GetApplicationFromTeamTournament(ctx context.Context, tournamentID, teamID uint) (*models.Application, error)
+	GetApplicationByID(ctx context.Context, applicationID uint) (*models.Application, error)
+	GetApplicationsByTeamID(ctx context.Context, teamID uint) (*[]models.Application, error)
+	GetPlayersFromApplication(ctx context.Context, applicationID uint) (*[]models.Player, error)
+	GetApplicationsFromTournament(ctx context.Context, tournamentID uint) (*[]models.Application, error)
+	UpdApplicationTournament(ctx context.Context, application *models.Application) (*models.Application, error)
 }
 
 type sender interface {
@@ -209,12 +220,12 @@ func (s *SportSpace) GetTeamByID(ctx context.Context, teamID uint) (*models.Team
 	return team, nil
 }
 
-func (s *SportSpace) UpdTeam(ctx context.Context, team *models.Team) (*models.Team, error) {
-	team, err := s.store.UpdTeam(ctx, team)
+func (s *SportSpace) UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error) {
+	team, players, err := s.store.UpdTeam(ctx, team, playersIDs)
 	if err != nil {
-		return nil, fmt.Errorf("failed update team: %w", err)
+		return nil, nil, fmt.Errorf("failed update team: %w", err)
 	}
-	return team, nil
+	return team, players, nil
 }
 
 func (s *SportSpace) NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {
@@ -229,18 +240,196 @@ func (s *SportSpace) UpdPlayer(ctx context.Context, player *models.Player) (*mod
 	return s.store.UpdPlayer(ctx, player)
 }
 
-func (s *SportSpace) AddPlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error {
-	return s.store.AddPlayersTeam(ctx, playerIDs, teamID, userID)
-}
-
 func (s *SportSpace) GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error) {
 	return s.store.GetPlayersTeam(ctx, team)
 }
 
-func (s *SportSpace) RemovePlayersTeam(ctx context.Context, playerIDs *[]uint, teamID uint, userID uint) error {
-	err := s.store.RemovePlayersTeam(ctx, playerIDs, teamID, userID)
+func (s *SportSpace) NewApplicationTeam(ctx context.Context, playerIDs *[]uint, tournamentID, teamID, userID uint) (
+	*models.Application, *[]models.Player, error,
+) {
+	team, err := s.store.GetTeamByID(ctx, teamID)
 	if err != nil {
-		return fmt.Errorf("failed remove players from team: %w", err)
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			return nil, nil, fmt.Errorf("not found team: %w", err)
+		}
+		return nil, nil, fmt.Errorf("failed get team: %w", err)
 	}
-	return nil
+
+	if team.UserID != userID {
+		return nil, nil, fmt.Errorf("not found team: %w", errstore.ErrNotFoundData)
+	}
+
+	tournament, err := s.store.GetTournamentByID(ctx, tournamentID)
+	if err != nil {
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			return nil, nil, fmt.Errorf("not found tournament: %w", err)
+		}
+		return nil, nil, fmt.Errorf("failed get tournament: %w", err)
+	}
+
+	application, err := s.store.GetApplicationFromTeamTournament(ctx, tournament.ID, team.ID)
+	if err != nil && !errors.Is(err, errstore.ErrNotFoundData) {
+		return nil, nil, fmt.Errorf("failed get application form team and tournament: %w", err)
+	}
+	if application != nil && application.ID != 0 {
+		return nil, nil, errstore.ErrConflictData
+	}
+
+	players, err := s.store.GetPlayersFromTeam(ctx, team.ID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed find players: %w", err)
+	}
+
+	applicationPlayers := []models.Player{}
+	for _, player := range *players {
+		for _, id := range *playerIDs {
+			if id == player.ID {
+				applicationPlayers = append(applicationPlayers, player)
+			}
+		}
+	}
+
+	application, players, err = s.store.NewApplication(ctx,
+		&models.Application{TeamID: team.ID, TournamentID: tournament.ID, Status: models.Draft},
+		&applicationPlayers,
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed create application: %w", err)
+	}
+	application.TournamentID = tournament.ID
+	application.TeamID = team.ID
+
+	return application, players, nil
+}
+
+func (s *SportSpace) UpdApplicationTeam(ctx context.Context, applicationID uint, playerIDs *[]uint, status models.ApplicationStatus, teamID uint, userID uint) (
+	*models.Application, *[]models.Player, error,
+) {
+	team, err := s.store.GetTeamByID(ctx, teamID)
+	if err != nil {
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			return nil, nil, fmt.Errorf("not found team: %w", err)
+		}
+		return nil, nil, fmt.Errorf("failed get team: %w", err)
+	}
+
+	if team.UserID != userID {
+		return nil, nil, fmt.Errorf("not found team: %w", errstore.ErrNotFoundData)
+	}
+
+	application, err := s.store.GetApplicationByID(ctx, applicationID)
+	if err != nil && !errors.Is(err, errstore.ErrNotFoundData) {
+		return nil, nil, fmt.Errorf("failed get application form team and tournament: %w", err)
+	}
+	if application.ID == 0 {
+		return nil, nil, errstore.ErrNotFoundData
+	}
+
+	if (status != "" && !(application.Status == models.Draft || status == models.Canceled || application.Status == models.Canceled)) ||
+		(status == "" && (application.Status == models.InProgress || application.Status == models.Rejected || application.Status == models.Accepted)) {
+		return nil, nil, errstore.ErrForbidden
+	}
+
+	_, err = s.store.GetTournamentByID(ctx, application.TournamentID)
+	if err != nil {
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			return nil, nil, fmt.Errorf("not found tournament: %w", err)
+		}
+		return nil, nil, fmt.Errorf("failed get tournament: %w", err)
+	}
+
+	players, err := s.store.GetPlayersFromTeam(ctx, team.ID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed find players: %w", err)
+	}
+
+	var applicationPlayers []models.Player
+	if playerIDs != nil {
+		applicationPlayers = []models.Player{}
+		for _, player := range *players {
+			for _, id := range *playerIDs {
+				if id == player.ID {
+					applicationPlayers = append(applicationPlayers, player)
+				}
+			}
+		}
+		players = &applicationPlayers
+	}
+
+	if status != "" {
+		application.Status = status
+		application.StatusDate = time.Now()
+	}
+	application, players, err = s.store.UpdApplication(ctx, application, &applicationPlayers)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed create application: %w", err)
+	}
+
+	return application, players, nil
+}
+
+func (s *SportSpace) GetApplicationsTeam(ctx context.Context, teamID uint) (*[]models.Application, error) {
+	applications, err := s.store.GetApplicationsByTeamID(ctx, teamID)
+	if err != nil {
+		return nil, fmt.Errorf("failed get applications: %w", err)
+	}
+
+	return applications, nil
+}
+func (s *SportSpace) GetApplicationByID(ctx context.Context, applicationID uint) (*models.Application, error) {
+	application, err := s.store.GetApplicationByID(ctx, applicationID)
+	if err != nil {
+		return nil, fmt.Errorf("failed get application: %w", err)
+	}
+	return application, nil
+}
+
+func (s *SportSpace) GetPlayersFromApplication(ctx context.Context, applicationID uint) (*[]models.Player, error) {
+	players, err := s.store.GetPlayersFromApplication(ctx, applicationID)
+	if err != nil {
+		return nil, fmt.Errorf("failed get players from application: %w", err)
+	}
+	return players, nil
+}
+
+func (s *SportSpace) GetApplicationsFromTournament(ctx context.Context, tournamentID uint) (*[]models.Application, error) {
+	applications, err := s.store.GetApplicationsFromTournament(ctx, tournamentID)
+	if err != nil {
+		return nil, fmt.Errorf("failed get applications: %w", err)
+	}
+
+	return applications, nil
+}
+
+func (s *SportSpace) UpdApplicationTournament(ctx context.Context, applicationID uint, status models.ApplicationStatus, tournamentID uint, userID uint) (
+	*models.Application, error,
+) {
+	tournament, err := s.store.GetTournamentByID(ctx, tournamentID)
+	if err != nil {
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			return nil, fmt.Errorf("not found tournament: %w", err)
+		}
+		return nil, fmt.Errorf("failed get tournament: %w", err)
+	}
+
+	application, err := s.store.GetApplicationByID(ctx, applicationID)
+	if err != nil {
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			return nil, fmt.Errorf("not found application: %w", err)
+		}
+		return nil, fmt.Errorf("failed get application: %w", err)
+	}
+
+	if application.TournamentID != tournament.ID {
+		return nil, fmt.Errorf("not found application: %w", err)
+	}
+
+	if application.Status == models.Draft || application.Status == models.Canceled {
+		return nil, errstore.ErrForbidden
+	}
+
+	application.Status = status
+	application.StatusDate = time.Now()
+
+	return s.store.UpdApplicationTournament(ctx, application)
 }

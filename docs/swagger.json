@@ -179,52 +179,8 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/rest.tPlayer"
-                            }
+                            "$ref": "#/definitions/rest.tGetPlayersResponse"
                         }
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "put": {
-                "description": "обновить игрока",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user players"
-                ],
-                "summary": "обновить игрока",
-                "parameters": [
-                    {
-                        "description": "player",
-                        "name": "id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rest.tUpdatePlayer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/rest.tPlayer"
-                        }
-                    },
-                    "204": {
-                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -270,6 +226,53 @@
                 }
             }
         },
+        "/user/players/{player_id}": {
+            "put": {
+                "description": "обновить игрока",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user players"
+                ],
+                "summary": "обновить игрока",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "player id",
+                        "name": "player_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "player",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdatePlayer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tPlayer"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/user/teams": {
             "get": {
                 "description": "команды пользователя",
@@ -289,44 +292,6 @@
                                 "$ref": "#/definitions/rest.tTeam"
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "put": {
-                "description": "обновление команды пользователя",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user team"
-                ],
-                "summary": "обновление команды пользователя",
-                "parameters": [
-                    {
-                        "description": "team",
-                        "name": "id",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rest.tUpdateTeam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/rest.tTeam"
-                        }
-                    },
-                    "204": {
-                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -375,7 +340,7 @@
                 }
             }
         },
-        "/user/teams/{id}": {
+        "/user/teams/{team_id}": {
             "get": {
                 "description": "информация команды пользователя",
                 "produces": [
@@ -389,7 +354,7 @@
                     {
                         "type": "integer",
                         "description": "team id",
-                        "name": "id",
+                        "name": "team_id",
                         "in": "path",
                         "required": true
                     }
@@ -398,173 +363,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest.tTeam"
-                        }
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/user/teams/{id}/players": {
-            "get": {
-                "description": "игроки в команде",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user team"
-                ],
-                "summary": "игроки в команде",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "team id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/rest.tPlayer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "post": {
-                "description": "пдобавить игрока в команду",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user team"
-                ],
-                "summary": "добавить игрока в команду",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "team id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "player id`s",
-                        "name": "player",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "409": {
-                        "description": "Conflict"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "delete": {
-                "description": "удалить игроков из команду",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user team"
-                ],
-                "summary": "удалить игроков из команду",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "team id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "player id`s",
-                        "name": "player",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "409": {
-                        "description": "Conflict"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/user/tournaments": {
-            "get": {
-                "description": "создать турнир",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user tournament"
-                ],
-                "summary": "турниры пользователя",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/rest.tTournament"
-                            }
+                            "$ref": "#/definitions/rest.tGetTeamResponse"
                         }
                     },
                     "204": {
@@ -579,7 +378,228 @@
                 }
             },
             "put": {
-                "description": "Обновить турнир",
+                "description": "обновление команды пользователя",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user team"
+                ],
+                "summary": "обновление команды пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "team id",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "team",
+                        "name": "team",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdTeamResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/teams/{team_id}/applications": {
+            "get": {
+                "description": "заявки команды",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user team"
+                ],
+                "summary": "заявки команды",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "team id",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tGetApplicationsTeamResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "команда не найдена"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "подать заявку",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user team"
+                ],
+                "summary": "подать заявку",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "team id",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "application",
+                        "name": "application",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.tNewApplicationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "заявка создана",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tNewApplicationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "не корректный запрос"
+                    },
+                    "409": {
+                        "description": "заявка\tуже\tбыла создана ранее"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/teams/{team_id}/applications/{application_id}": {
+            "get": {
+                "description": "заявка команды",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user team"
+                ],
+                "summary": "заявка команды",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "team id",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "application id",
+                        "name": "application_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tGetApplicationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "не корректный запрос"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "description": "изменить заявку",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user team"
+                ],
+                "summary": "изменить заявку",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "team id",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "application\tid",
+                        "name": "application_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "application status",
+                        "name": "application",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdApplicationStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdApplicationResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "заявка не найдена"
+                    },
+                    "400": {
+                        "description": "не найден или не может изменить"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/tournaments": {
+            "get": {
+                "description": "турниры пользователя",
                 "consumes": [
                     "application/json"
                 ],
@@ -589,21 +609,13 @@
                 "tags": [
                     "user tournament"
                 ],
-                "summary": "Обновить турнир",
-                "parameters": [
-                    {
-                        "description": "tournament",
-                        "name": "tournamet",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rest.tUpdateTournament"
-                        }
-                    }
-                ],
+                "summary": "турниры пользователя",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tGetTorunamentsResponse"
+                        }
                     },
                     "204": {
                         "description": "No Content"
@@ -655,7 +667,7 @@
                 }
             }
         },
-        "/user/tournaments/{id}": {
+        "/user/tournaments/{tournament_id}": {
             "get": {
                 "description": "информация турнира пользователя",
                 "produces": [
@@ -669,7 +681,7 @@
                     {
                         "type": "integer",
                         "description": "tournament id",
-                        "name": "id",
+                        "name": "tournament_id",
                         "in": "path",
                         "required": true
                     }
@@ -691,10 +703,198 @@
                         "description": "Internal Server Error"
                     }
                 }
+            },
+            "put": {
+                "description": "Обновить турнир",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user tournament"
+                ],
+                "summary": "Обновить турнир",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "tournament id",
+                        "name": "tournament_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "tournament",
+                        "name": "tournamet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdTournamentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/tournaments/{tournament_id}/applications": {
+            "get": {
+                "description": "заявки на турнир",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user tournament"
+                ],
+                "summary": "заявки на турнир",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "tournament id",
+                        "name": "tournament_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tGetTournamentApplicationsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/user/tournaments/{tournament_id}/applications/{application_id}": {
+            "get": {
+                "description": "заявка турнира",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user tournament"
+                ],
+                "summary": "заявка турнира",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "tournament id",
+                        "name": "tournament_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "application id",
+                        "name": "application_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tGetTorunamentApplicationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "description": "изменить заявку",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user tournament"
+                ],
+                "summary": "изменить заявку",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "tournament id",
+                        "name": "tournament_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "application id",
+                        "name": "application_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "application",
+                        "name": "application",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdTournamentApplicationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tApplication"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
             }
         }
     },
     "definitions": {
+        "rest.tApplication": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tournament_id": {
+                    "type": "integer"
+                },
+                "tournament_title": {
+                    "type": "string"
+                }
+            }
+        },
         "rest.tAuthorization": {
             "type": "object",
             "properties": {
@@ -719,6 +919,150 @@
             "type": "object",
             "properties": {
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tGetApplicationResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tournament_id": {
+                    "type": "integer"
+                },
+                "tournament_title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tGetApplicationsTeamResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tApplication"
+                    }
+                }
+            }
+        },
+        "rest.tGetPlayersResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                }
+            }
+        },
+        "rest.tGetTeamResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tGetTorunamentApplicationResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "taem_id": {
+                    "type": "integer"
+                },
+                "team_title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tGetTorunamentsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tTournament"
+                    }
+                }
+            }
+        },
+        "rest.tGetTournamentApplicationsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tTournamentApplication"
+                    }
+                }
+            }
+        },
+        "rest.tNewApplicationRequest": {
+            "type": "object",
+            "properties": {
+                "player_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "tournament_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "rest.tNewApplicationResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tournament_id": {
+                    "type": "integer"
+                },
+                "tournament_title": {
                     "type": "string"
                 }
             }
@@ -784,41 +1128,125 @@
                 }
             }
         },
+        "rest.tTournamentApplication": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "taem_id": {
+                    "type": "integer"
+                },
+                "team_title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tUpdApplicationResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tournament_id": {
+                    "type": "integer"
+                },
+                "tournament_title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tUpdApplicationStatusRequest": {
+            "type": "object",
+            "properties": {
+                "player_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "submit",
+                        "cancel"
+                    ]
+                }
+            }
+        },
+        "rest.tUpdTeamRequest": {
+            "type": "object",
+            "properties": {
+                "player_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tUpdTeamResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayer"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tUpdTournamentApplicationRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "accept",
+                        "reject"
+                    ]
+                }
+            }
+        },
+        "rest.tUpdTournamentRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "rest.tUpdatePlayer": {
             "type": "object",
             "properties": {
                 "firstname": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "lastname": {
                     "type": "string"
                 },
                 "secondname": {
-                    "type": "string"
-                }
-            }
-        },
-        "rest.tUpdateTeam": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "rest.tUpdateTournament": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
                     "type": "string"
                 }
             }
