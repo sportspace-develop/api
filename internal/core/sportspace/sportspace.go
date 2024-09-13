@@ -35,6 +35,7 @@ type storage interface {
 	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
+	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
 	GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
@@ -234,6 +235,10 @@ func (s *SportSpace) NewPlayer(ctx context.Context, player *models.Player) (*mod
 
 func (s *SportSpace) GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error) {
 	return s.store.GetPlayers(ctx, userID)
+}
+
+func (s *SportSpace) GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error) {
+	return s.store.GetPlayerByID(ctx, playerID)
 }
 
 func (s *SportSpace) UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {

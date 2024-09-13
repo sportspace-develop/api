@@ -26,6 +26,7 @@ type Store interface {
 	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
+	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
 	GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)

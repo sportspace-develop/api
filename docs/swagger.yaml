@@ -139,6 +139,8 @@ definitions:
         type: integer
       lastname:
         type: string
+      photo_url:
+        type: string
       secondname:
         type: string
     type: object
@@ -158,6 +160,8 @@ definitions:
     properties:
       id:
         type: integer
+      logo_url:
+        type: string
       title:
         type: string
     type: object
@@ -247,10 +251,10 @@ externalDocs:
 host: localhost:8080
 info:
   contact: {}
-  description: This is a sample server celler server.
+  description: sport-space api documentation
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
-  version: "1.0"
+  title: SportSpace API
+  version: 0.0.1
 paths:
   /auth/login:
     post:
@@ -422,6 +426,33 @@ paths:
         "500":
           description: Internal Server Error
       summary: обновить игрока
+      tags:
+      - user players
+  /user/players/{player_id}/upload:
+    put:
+      description: загрузка файлов игрока
+      parameters:
+      - description: player id
+        in: path
+        name: player_id
+        required: true
+        type: integer
+      - description: фотография
+        in: formData
+        name: photo_file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: загрузка файлов игрока
       tags:
       - user players
   /user/teams:
@@ -822,6 +853,35 @@ paths:
         "500":
           description: Internal Server Error
       summary: изменить заявку
+      tags:
+      - user tournament
+  /user/tournaments/{tournament_id}/upload:
+    put:
+      consumes:
+      - application/json
+      description: загрузка файлов турнира
+      parameters:
+      - description: tournament id
+        in: path
+        name: tournament_id
+        required: true
+        type: integer
+      - description: файл лого
+        in: formData
+        name: logo_file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: загрузка файлов турнира
       tags:
       - user tournament
 swagger: "2.0"

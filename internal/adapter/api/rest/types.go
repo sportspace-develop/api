@@ -24,8 +24,9 @@ type tUpdTournamentRequest struct {
 }
 
 type tTournament struct {
-	ID    uint   `json:"id"`
-	Title string `json:"title"`
+	ID      uint   `json:"id"`
+	Title   string `json:"title"`
+	LogoURL string `json:"logo_url"`
 }
 
 type tGetTorunamentsResponse struct {
@@ -69,6 +70,7 @@ type tPlayer struct {
 	FirstName  string `json:"firstname"`
 	SecondName string `json:"secondname"`
 	LastName   string `json:"lastname"`
+	PhotoURL   string `json:"photo_url"`
 }
 
 type tGetPlayersResponse struct {

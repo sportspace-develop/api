@@ -5,13 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 	"sport-space/internal/core/sportspace"
 	"sport-space/pkg/jwt"
+	"sport-space/pkg/tools"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -41,6 +46,7 @@ type sport interface {
 	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
+	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
 	NewApplicationTeam(ctx context.Context, playerIDs *[]uint, tournamentID, teamID, userID uint) (
@@ -57,10 +63,14 @@ type sport interface {
 }
 
 type Server struct {
-	srv    *http.Server
-	log    *zap.Logger
-	sport  sport
-	secret string
+	srv           *http.Server
+	log           *zap.Logger
+	sport         sport
+	secret        string
+	uploadPath    string
+	uploadURL     string
+	uploadMaxSize int64
+	baseURL       string
 }
 
 type option func(s *Server)
@@ -83,11 +93,28 @@ func SetSecretKey(secret string) option {
 	}
 }
 
+func SetUploadPath(path string) option {
+	return func(s *Server) {
+		s.uploadPath = path
+	}
+}
+
+func SetBaseURL(url string) option {
+	return func(s *Server) {
+		s.baseURL = url
+	}
+}
+
 func New(service sport, options ...option) (*Server, error) {
 	s := &Server{
-		srv:   &http.Server{},
-		log:   zap.NewNop(),
-		sport: service,
+		srv:           &http.Server{},
+		log:           zap.NewNop(),
+		sport:         service,
+		uploadPath:    "./uploads", // Directory upload.
+		uploadURL:     "/uploads",  // URL upload.
+		uploadMaxSize: 2 << 20,
+		secret:        "",
+		baseURL:       "",
 	}
 
 	for _, opt := range options {
@@ -97,9 +124,9 @@ func New(service sport, options ...option) (*Server, error) {
 	return s, nil
 }
 
-//	@title			Swagger Example API
-//	@version		1.0
-//	@description	This is a sample server celler server.
+//	@title			SportSpace API
+//	@version		0.0.1
+//	@description	sport-space api documentation
 //	@termsOfService	http://swagger.io/terms/
 
 //	@host		localhost:8080
@@ -109,11 +136,13 @@ func New(service sport, options ...option) (*Server, error) {
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func (s *Server) Run() error {
 	r := gin.New()
+	r.MaxMultipartMemory = s.uploadMaxSize
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"*"}
 	r.Use(cors.New(corsConfig))
 	r.Use(s.middlewareLogger())
 	r.GET("/ping", s.handlerPing)
+	r.Static(s.uploadURL, s.uploadPath)
 
 	api := r.Group("/api/v1")
 	{
@@ -131,6 +160,7 @@ func (s *Server) Run() error {
 			user.GET("/tournaments", s.handlerUserTournaments)
 			user.GET("/tournaments/:id", s.handlerUserTournament)
 			user.PUT("/tournaments/:id", s.handlerUserUpdTournament)
+			user.PUT("/tournaments/:id/upload", s.handlerUserUploadTournament)
 
 			user.POST("/teams", s.handlerUserNewTeam)
 			user.GET("/teams", s.handlerUserTeams)
@@ -140,6 +170,7 @@ func (s *Server) Run() error {
 			user.POST("/players", s.handlerUserNewPlayer)
 			user.GET("/players", s.handlerUserPlayers)
 			user.PUT("/players/:id", s.handlerUserUpdatePlayer)
+			user.PUT("/players/:id/upload", s.handlerUserUploadPlayer)
 
 			// заявки турнира
 			user.GET("/tournaments/:id/applications", s.handlerGetTournamentApplications)
@@ -237,4 +268,37 @@ func (s *Server) login(c *gin.Context, login, password string) (int, string) {
 		return http.StatusInternalServerError, ""
 	}
 	return http.StatusOK, ""
+}
+
+func (s *Server) genUploadName(name string) string {
+	return "/" + tools.RandomString(20) + filepath.Ext(name)
+}
+
+func (s *Server) saveFile(file *multipart.FileHeader, dst string) error {
+	return tools.SaveUploadedFile(file, s.uploadPath+dst)
+}
+
+func (s *Server) removeFile(dst string) error {
+	return os.Remove(s.uploadPath + dst)
+}
+
+func (s Server) getFullUploadPath(name string) string {
+	if name == "" {
+		return ""
+	}
+	return s.uploadURL + name
+}
+
+func (s Server) getFullUploadURL(name string) string {
+	if name == "" {
+		return ""
+	}
+	return s.baseURL + s.uploadURL + name
+}
+
+func (s Server) isValidImgExtension(file *multipart.FileHeader) bool {
+	return strings.HasSuffix(file.Filename, ".png") ||
+		strings.HasSuffix(file.Filename, ".jpg") ||
+		strings.HasSuffix(file.Filename, ".jpeg") ||
+		strings.HasSuffix(file.Filename, ".gif")
 }

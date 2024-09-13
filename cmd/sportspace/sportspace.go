@@ -56,7 +56,13 @@ func run() error {
 		return fmt.Errorf("failed initialize sportspace service: %w", err)
 	}
 
-	server, err := rest.New(sspace, rest.SetLogger(lgr), rest.SetAddress(cfg.Address), rest.SetSecretKey(cfg.SecretKey))
+	server, err := rest.New(sspace,
+		rest.SetLogger(lgr),
+		rest.SetAddress(cfg.Address),
+		rest.SetSecretKey(cfg.SecretKey),
+		rest.SetUploadPath(cfg.UploadPath),
+		rest.SetBaseURL(cfg.BaseURL),
+	)
 	if err != nil {
 		return fmt.Errorf("failed initalize rest api: %w", err)
 	}

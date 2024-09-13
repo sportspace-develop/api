@@ -10,10 +10,13 @@ services:
     restart: always
     environment:
       HTTP_ADDRESS: 0.0.0.0:8080
+      BASE_URL: http://localhost:8080
       SECRET_KEY: secret_key_phrase
       LOG_LEVEL: debug
       DATABASE_URI: postgres://root:root@database:5432/sportspace?sslmode=disable
       GIN_MODE: release
+      UPLOAD_PATH: ./uploads
+      UPLOAD_MAX_SIZE: 2097152 #2mb
 
       MAIL_SMTP_HOST: mail
       MAIL_SMTP_PORT: 1025

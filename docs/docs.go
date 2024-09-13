@@ -279,6 +279,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/players/{player_id}/upload": {
+            "put": {
+                "description": "загрузка файлов игрока",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user players"
+                ],
+                "summary": "загрузка файлов игрока",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "player id",
+                        "name": "player_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "фотография",
+                        "name": "photo_file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/user/teams": {
             "get": {
                 "description": "команды пользователя",
@@ -881,6 +922,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/tournaments/{tournament_id}/upload": {
+            "put": {
+                "description": "загрузка файлов турнира",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user tournament"
+                ],
+                "summary": "загрузка файлов турнира",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "tournament id",
+                        "name": "tournament_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "файл лого",
+                        "name": "logo_file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1099,6 +1184,9 @@ const docTemplate = `{
                 "lastname": {
                     "type": "string"
                 },
+                "photo_url": {
+                    "type": "string"
+                },
                 "secondname": {
                     "type": "string"
                 }
@@ -1128,6 +1216,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "logo_url": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -1266,12 +1357,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "0.0.1",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Swagger Example API",
-	Description:      "This is a sample server celler server.",
+	Title:            "SportSpace API",
+	Description:      "sport-space api documentation",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

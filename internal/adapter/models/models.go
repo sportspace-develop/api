@@ -33,6 +33,7 @@ type Tournament struct {
 	ID           uint `gorm:"primarykey"`
 	UserID       uint `gorm:"index;not null"`
 	Title        string
+	LogoURL      string
 	Applications []Application
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -56,6 +57,7 @@ type Player struct {
 	FirstName  string
 	SecondName string
 	LastName   string
+	PhotoURL   string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt `gorm:"index"`

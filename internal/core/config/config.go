@@ -14,10 +14,12 @@ import (
 )
 
 type Config struct {
-	Store     storage.Config
-	Sender    sender.Config
-	Address   string `env:"HTTP_ADDRESS"`
-	SecretKey string `env:"SECRET_KEY"`
+	Store      storage.Config
+	Sender     sender.Config
+	Address    string `env:"HTTP_ADDRESS" default:":8080"`
+	BaseURL    string `env:"BASE_URL" default:"http://localhost:8080"`
+	SecretKey  string `env:"SECRET_KEY" default:""`
+	UploadPath string `env:"UPLOAD_PATH" default:"/uploads"`
 }
 
 func Init() (*Config, error) {

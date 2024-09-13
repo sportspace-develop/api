@@ -187,7 +187,7 @@ func (s *Storage) GetTournamentByID(ctx context.Context, tournamentID uint) (*mo
 func (s *Storage) UpdTournamentByUser(ctx context.Context, tournament *models.Tournament) (*models.Tournament, error) {
 	res := s.db.Model(tournament).
 		Where("user_id = ? and id = ?", tournament.UserID, tournament.ID).
-		Updates(models.Tournament{Title: tournament.Title})
+		Updates(tournament)
 	if res.RowsAffected == 0 {
 		return nil, errstore.ErrNotFoundData
 	}
@@ -274,6 +274,18 @@ func (s *Storage) GetPlayers(ctx context.Context, userID uint) (*[]models.Player
 	}
 
 	return players, nil
+}
+
+func (s *Storage) GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error) {
+	player := &models.Player{}
+	err := s.db.Where("id = ?", playerID).First(player).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.Join(err, errstore.ErrNotFoundData)
+		}
+		return nil, fmt.Errorf("failed find player: %w", err)
+	}
+	return player, nil
 }
 
 func (s *Storage) UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {
