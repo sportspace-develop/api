@@ -15,7 +15,7 @@ services:
       LOG_LEVEL: debug
       DATABASE_URI: postgres://root:root@database:5432/sportspace?sslmode=disable
       GIN_MODE: release
-      UPLOAD_PATH: ./uploads
+      UPLOAD_PATH: /app/uploads
       UPLOAD_MAX_SIZE: 2097152 #2mb
 
       MAIL_SMTP_HOST: mail
@@ -28,7 +28,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./logs:/app/logs
+      - ./data/logs:/app/logs
+      - ./data/uploads:/app/uploads
     networks:
       - space
 

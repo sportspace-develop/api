@@ -14,7 +14,7 @@ COPY pkg ./pkg
 
 # Build
 WORKDIR /app/cmd/sportspace
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/cmd/sportspace
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.buildVersion=v0.0.1 -X 'main.buildDate=$(date +'%Y/%m/%d %H:%M:%S')' -X 'main.buildCommit=$(git show --oneline -s)'" -o /app/cmd/sportspace
 
 FROM ubuntu:latest
 
