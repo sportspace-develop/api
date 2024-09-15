@@ -84,13 +84,3 @@ type Application struct {
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
-
-// type ApplicationPlayer struct {
-// 	ID                      uint `gorm:"primarykey"`
-// 	ApplicationID uint `gorm:"index:idx_application;not null"`
-// 	Application   Application
-// 	PlayerID                uint
-// 	Player                  Player
-// 	CreatedAt               time.Time
-// 	UpdatedAt               time.Time
-// }

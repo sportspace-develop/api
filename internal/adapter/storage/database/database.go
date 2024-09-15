@@ -302,43 +302,6 @@ func (s *Storage) UpdPlayer(ctx context.Context, player *models.Player) (*models
 	return player, nil
 }
 
-func (s *Storage) GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error) {
-	var players *[]models.Player
-	// err := s.db.Transaction(func(tx *gorm.DB) error {
-	// 	err := tx.Where("id = ? and user_id = ?", team.ID, team.UserID).First(team).Error
-	// 	if err != nil {
-	// 		if errors.Is(err, gorm.ErrRecordNotFound) {
-	// 			return errors.Join(err, errstore.ErrNotFoundData)
-	// 		}
-	// 		return fmt.Errorf("failed get team: %w", err)
-	// 	}
-	// 	teamPlayers := &[]models.TeamPlayer{}
-	// 	err = tx.Where("team_id =?", team.ID).Find(teamPlayers).Error
-	// 	if err != nil {
-	// 		if errors.Is(err, gorm.ErrRecordNotFound) {
-	// 			return nil
-	// 		}
-	// 		return fmt.Errorf("failed get players from team: %w", err)
-	// 	}
-	// 	IDs := []uint{}
-	// 	for _, player := range *teamPlayers {
-	// 		IDs = append(IDs, player.PlayerID)
-	// 	}
-
-	// 	err = tx.Where("id in ?", IDs).Find(&players).Error
-	// 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-	// 		return fmt.Errorf("failed find players: %w", err)
-	// 	}
-
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed get players by team: %w", err)
-	// }
-
-	return players, nil
-}
-
 func (s *Storage) GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error) {
 	players := &[]models.Player{}
 	err := s.db.Joins("JOIN team_players on team_players.player_id = players.id", s.db.Where("team_players.team_id = ?", teamID)).Find(players).Error

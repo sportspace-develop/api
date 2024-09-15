@@ -48,7 +48,6 @@ type sport interface {
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
 	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
-	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
 	NewApplicationTeam(ctx context.Context, playerIDs *[]uint, tournamentID, teamID, userID uint) (
 		*models.Application, *[]models.Player, error,
 	)

@@ -29,7 +29,6 @@ type Store interface {
 	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
 	GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
-	GetPlayersTeam(ctx context.Context, team *models.Team) (*[]models.Player, error)
 	NewApplication(ctx context.Context, application *models.Application, player *[]models.Player) (
 		*models.Application, *[]models.Player, error,
 	)
