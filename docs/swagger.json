@@ -1,14 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "sport-space api documentation",
-        "title": "SportSpace API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {},
-        "version": "0.0.1"
+        "contact": {}
     },
-    "host": "localhost:8080",
-    "basePath": "/api/v1",
     "paths": {
         "/auth/login": {
             "post": {
@@ -1003,6 +997,22 @@
         "rest.tCreateTournament": {
             "type": "object",
             "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
                 "title": {
                     "type": "string"
                 }

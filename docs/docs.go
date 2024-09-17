@@ -9,7 +9,6 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {},
         "version": "{{.Version}}"
     },
@@ -1009,6 +1008,22 @@ const docTemplate = `{
         "rest.tCreateTournament": {
             "type": "object",
             "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -1357,12 +1372,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.0.1",
-	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "SportSpace API",
-	Description:      "sport-space api documentation",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

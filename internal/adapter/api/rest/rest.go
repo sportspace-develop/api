@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"sport-space/docs"
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 	"sport-space/internal/core/sportspace"
@@ -123,17 +124,17 @@ func New(service sport, options ...option) (*Server, error) {
 	return s, nil
 }
 
-//	@title			SportSpace API
-//	@version		0.0.1
-//	@description	sport-space api documentation
-//	@termsOfService	http://swagger.io/terms/
-
-//	@host		localhost:8080
-//	@BasePath	/api/v1
-
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func (s *Server) Run() error {
+	// swagger info.
+	docs.SwaggerInfo.Host = s.baseURL
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Schemes = []string{"http"}
+	docs.SwaggerInfo.Title = "SportSpace API"
+	docs.SwaggerInfo.Version = "0.0.1"
+	docs.SwaggerInfo.Description = "sport-space api documentation"
+
 	r := gin.New()
 	r.MaxMultipartMemory = s.uploadMaxSize
 	corsConfig := cors.DefaultConfig()

@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   rest.tApplication:
     properties:
@@ -26,6 +25,18 @@ definitions:
     type: object
   rest.tCreateTournament:
     properties:
+      end_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      register_end_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      register_start_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      start_date:
+        example: "2024-12-31 00:00:00"
+        type: string
       title:
         type: string
     type: object
@@ -248,13 +259,8 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8080
 info:
   contact: {}
-  description: sport-space api documentation
-  termsOfService: http://swagger.io/terms/
-  title: SportSpace API
-  version: 0.0.1
 paths:
   /auth/login:
     post:
