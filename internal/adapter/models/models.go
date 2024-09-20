@@ -30,14 +30,18 @@ type OTPUser struct {
 }
 
 type Tournament struct {
-	ID           uint `gorm:"primarykey"`
-	UserID       uint `gorm:"index;not null"`
-	Title        string
-	LogoURL      string
-	Applications []Application
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	ID                uint `gorm:"primarykey"`
+	UserID            uint `gorm:"index;not null"`
+	Title             string
+	LogoURL           string
+	Applications      []Application
+	StartDate         *time.Time `gorm:"default:null"`
+	EndDate           *time.Time `gorm:"default:null"`
+	RegisterStartDate *time.Time `gorm:"default:null"`
+	RegisterEndDate   *time.Time `gorm:"default:null"`
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	DeletedAt         gorm.DeletedAt `gorm:"index"`
 }
 
 type Team struct {
@@ -57,6 +61,7 @@ type Player struct {
 	FirstName  string
 	SecondName string
 	LastName   string
+	BDay       *time.Time `gorm:"default:null"`
 	PhotoURL   string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time

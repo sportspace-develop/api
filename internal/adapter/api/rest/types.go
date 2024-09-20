@@ -3,7 +3,51 @@ package rest
 import (
 	"sport-space/internal/adapter/models"
 	"sport-space/pkg/email"
+	"time"
 )
+
+type sportTime string
+
+func (st *sportTime) DateTime() *time.Time {
+	if st == nil {
+		return nil
+	}
+
+	res, _ := time.Parse(defaultDateTimeFormat, string(*st))
+	return &res
+}
+
+func (st *sportTime) Date() *time.Time {
+	if st == nil {
+		return nil
+	}
+
+	res, _ := time.Parse(defaultDateFormat, string(*st))
+	return &res
+}
+
+func formatDateTime(t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	_t := t.Format(defaultDateTimeFormat)
+	return _t
+}
+
+func formatDate(t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	_t := t.Format(defaultDateFormat)
+	return _t
+}
+
+func (st *sportTime) String() string {
+	if st == nil {
+		return ""
+	}
+	return string(*st)
+}
 
 type tAuthorization struct {
 	Email string `json:"email"`
@@ -16,17 +60,38 @@ type tRequestOTP struct {
 }
 
 type tCreateTournament struct {
-	Title string `json:"title"`
+	Title             string     `json:"title" validate:"required"`
+	StartDate         *sportTime `json:"start_date" example:"2024-12-31 00:00:00" validate:"required"`
+	EndDate           *sportTime `json:"end_date" example:"2024-12-31 00:00:00" validate:"required"`
+	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31 00:00:00"`
+	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31 00:00:00"`
+}
+
+func (tct tCreateTournament) IsValid() bool {
+	return !(tct.Title == "" || tct.StartDate == nil || tct.EndDate == nil)
 }
 
 type tUpdTournamentRequest struct {
-	Title string `json:"title"`
+	Title             string     `json:"title"`
+	StartDate         *sportTime `json:"start_date" example:"2024-12-31 00:00:00" validate:"required"`
+	EndDate           *sportTime `json:"end_date" example:"2024-12-31 00:00:00" validate:"required"`
+	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31 00:00:00"`
+	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31 00:00:00"`
+}
+
+func (tutr tUpdTournamentRequest) IsValid() bool {
+	return !(tutr.Title == "" || tutr.StartDate == nil || tutr.EndDate == nil)
 }
 
 type tTournament struct {
-	ID      uint   `json:"id"`
-	Title   string `json:"title"`
-	LogoURL string `json:"logo_url"`
+	ID                uint   `json:"id"`
+	Title             string `json:"title"`
+	StartDate         string `json:"start_date"`
+	EndDate           string `json:"end_date"`
+	RegisterStartDate string `json:"register_start_date"`
+	RegisterEndDate   string `json:"register_end_date"`
+	BDay              string `json:"b_day"`
+	LogoURL           string `json:"logo_url"`
 }
 
 type tGetTorunamentsResponse struct {
@@ -60,9 +125,14 @@ type tUpdTeamResponse struct {
 }
 
 type tNewPlayer struct {
-	FirstName  string `json:"firstname"`
-	SecondName string `json:"secondname"`
-	LastName   string `json:"lastname"`
+	FirstName  string     `json:"firstname"`
+	SecondName string     `json:"secondname"`
+	LastName   string     `json:"lastname"`
+	BDay       *sportTime `json:"b_day" example:"2024-12-31"`
+}
+
+func (tnp tNewPlayer) IsValid() bool {
+	return !(tnp.FirstName == "" || tnp.LastName == "")
 }
 
 type tPlayer struct {
@@ -71,6 +141,7 @@ type tPlayer struct {
 	SecondName string `json:"secondname"`
 	LastName   string `json:"lastname"`
 	PhotoURL   string `json:"photo_url"`
+	BDay       string `json:"b_day" example:"2024-12-31"`
 }
 
 type tGetPlayersResponse struct {
@@ -78,9 +149,14 @@ type tGetPlayersResponse struct {
 }
 
 type tUpdatePlayer struct {
-	FirstName  string `json:"firstname"`
-	SecondName string `json:"secondname"`
-	LastName   string `json:"lastname"`
+	FirstName  string     `json:"firstname"`
+	SecondName string     `json:"secondname"`
+	LastName   string     `json:"lastname"`
+	BDay       *sportTime `json:"b_day" example:"2024-12-31"`
+}
+
+func (tup tUpdatePlayer) IsValid() bool {
+	return !(tup.FirstName == "" || tup.LastName == "")
 }
 
 type tApplication struct {

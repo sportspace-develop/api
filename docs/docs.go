@@ -1007,6 +1007,11 @@ const docTemplate = `{
         },
         "rest.tCreateTournament": {
             "type": "object",
+            "required": [
+                "end_date",
+                "start_date",
+                "title"
+            ],
             "properties": {
                 "end_date": {
                     "type": "string",
@@ -1176,6 +1181,10 @@ const docTemplate = `{
         "rest.tNewPlayer": {
             "type": "object",
             "properties": {
+                "b_day": {
+                    "type": "string",
+                    "example": "2024-12-31"
+                },
                 "firstname": {
                     "type": "string"
                 },
@@ -1190,6 +1199,10 @@ const docTemplate = `{
         "rest.tPlayer": {
             "type": "object",
             "properties": {
+                "b_day": {
+                    "type": "string",
+                    "example": "2024-12-31"
+                },
                 "firstname": {
                     "type": "string"
                 },
@@ -1229,10 +1242,25 @@ const docTemplate = `{
         "rest.tTournament": {
             "type": "object",
             "properties": {
+                "b_day": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "logo_url": {
+                    "type": "string"
+                },
+                "register_end_date": {
+                    "type": "string"
+                },
+                "register_start_date": {
+                    "type": "string"
+                },
+                "start_date": {
                     "type": "string"
                 },
                 "title": {
@@ -1343,7 +1371,27 @@ const docTemplate = `{
         },
         "rest.tUpdTournamentRequest": {
             "type": "object",
+            "required": [
+                "end_date",
+                "start_date"
+            ],
             "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -1352,6 +1400,10 @@ const docTemplate = `{
         "rest.tUpdatePlayer": {
             "type": "object",
             "properties": {
+                "b_day": {
+                    "type": "string",
+                    "example": "2024-12-31"
+                },
                 "firstname": {
                     "type": "string"
                 },

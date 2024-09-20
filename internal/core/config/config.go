@@ -20,6 +20,7 @@ type Config struct {
 	BaseURL    string `env:"BASE_URL" default:"http://localhost:8080"`
 	SecretKey  string `env:"SECRET_KEY" default:""`
 	UploadPath string `env:"UPLOAD_PATH" default:"/uploads"`
+	LogLevel   string `env:"LOG_LEVEL" default:"debug"`
 }
 
 func Init() (*Config, error) {

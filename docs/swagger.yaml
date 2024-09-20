@@ -39,6 +39,10 @@ definitions:
         type: string
       title:
         type: string
+    required:
+    - end_date
+    - start_date
+    - title
     type: object
   rest.tGetApplicationResponse:
     properties:
@@ -135,6 +139,9 @@ definitions:
     type: object
   rest.tNewPlayer:
     properties:
+      b_day:
+        example: "2024-12-31"
+        type: string
       firstname:
         type: string
       lastname:
@@ -144,6 +151,9 @@ definitions:
     type: object
   rest.tPlayer:
     properties:
+      b_day:
+        example: "2024-12-31"
+        type: string
       firstname:
         type: string
       id:
@@ -169,9 +179,19 @@ definitions:
     type: object
   rest.tTournament:
     properties:
+      b_day:
+        type: string
+      end_date:
+        type: string
       id:
         type: integer
       logo_url:
+        type: string
+      register_end_date:
+        type: string
+      register_start_date:
+        type: string
+      start_date:
         type: string
       title:
         type: string
@@ -244,11 +264,29 @@ definitions:
     type: object
   rest.tUpdTournamentRequest:
     properties:
+      end_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      register_end_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      register_start_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      start_date:
+        example: "2024-12-31 00:00:00"
+        type: string
       title:
         type: string
+    required:
+    - end_date
+    - start_date
     type: object
   rest.tUpdatePlayer:
     properties:
+      b_day:
+        example: "2024-12-31"
+        type: string
       firstname:
         type: string
       lastname:

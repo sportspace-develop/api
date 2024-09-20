@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -24,8 +25,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
-
-	_ "sport-space/docs"
+	// _ "sport-space/docs"
 )
 
 var (
@@ -128,7 +128,11 @@ func New(service sport, options ...option) (*Server, error) {
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func (s *Server) Run() error {
 	// swagger info.
-	docs.SwaggerInfo.Host = s.baseURL
+	baseURL, err := url.Parse(s.baseURL)
+	if err != nil {
+		return fmt.Errorf("uncorrect base url")
+	}
+	docs.SwaggerInfo.Host = baseURL.Host
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 	docs.SwaggerInfo.Title = "SportSpace API"

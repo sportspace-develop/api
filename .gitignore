@@ -1,5 +1,5 @@
 .env
-main.exe
+*.exe
 
 golangci-lint
 mysql-data

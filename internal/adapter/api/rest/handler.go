@@ -5,12 +5,18 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+)
+
+var (
+	defaultDateTimeFormat = time.DateTime
+	defaultDateFormat     = time.DateOnly
 )
 
 func (s *Server) handlerPing(c *gin.Context) {
@@ -195,10 +201,21 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 		return
 	}
 
-	tournament, err := s.sport.NewTournament(c.Request.Context(), &models.Tournament{
-		UserID: user.ID,
-		Title:  jBody.Title,
-	})
+	if !jBody.IsValid() {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	t := &models.Tournament{
+		UserID:            user.ID,
+		Title:             jBody.Title,
+		StartDate:         jBody.StartDate.DateTime(),
+		EndDate:           jBody.EndDate.DateTime(),
+		RegisterStartDate: jBody.RegisterStartDate.DateTime(),
+		RegisterEndDate:   jBody.RegisterEndDate.DateTime(),
+	}
+
+	tournament, err := s.sport.NewTournament(c.Request.Context(), t)
 	if err != nil {
 		s.log.Error("filed create tournament", zap.Error(err))
 		c.Writer.WriteHeader(http.StatusInternalServerError)
@@ -206,8 +223,12 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, tTournament{
-		ID:    tournament.ID,
-		Title: tournament.Title,
+		ID:                tournament.ID,
+		Title:             tournament.Title,
+		StartDate:         formatDateTime(tournament.StartDate),
+		EndDate:           formatDateTime(tournament.EndDate),
+		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
+		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 	})
 }
 
@@ -243,8 +264,13 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 	result := []tTournament{}
 	for _, t := range *tournaments {
 		result = append(result, tTournament{
-			ID:    t.ID,
-			Title: t.Title,
+			ID:                t.ID,
+			Title:             t.Title,
+			StartDate:         formatDateTime(t.StartDate),
+			EndDate:           formatDateTime(t.EndDate),
+			RegisterStartDate: formatDateTime(t.RegisterStartDate),
+			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
+			LogoURL:           s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -286,9 +312,13 @@ func (s *Server) handlerUserTournament(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tTournament{
-		ID:      tournament.ID,
-		Title:   tournament.Title,
-		LogoURL: s.getFullUploadURL(tournament.LogoURL),
+		ID:                tournament.ID,
+		Title:             tournament.Title,
+		StartDate:         formatDateTime(tournament.StartDate),
+		EndDate:           formatDateTime(tournament.EndDate),
+		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
+		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
+		LogoURL:           s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -333,10 +363,19 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 		return
 	}
 
+	if !jBody.IsValid() {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	tournament, err := s.sport.UpdTournament(c.Request.Context(), &models.Tournament{
-		ID:     uint(tournamentID),
-		Title:  jBody.Title,
-		UserID: user.ID,
+		ID:                uint(tournamentID),
+		Title:             jBody.Title,
+		StartDate:         jBody.StartDate.DateTime(),
+		EndDate:           jBody.EndDate.DateTime(),
+		RegisterStartDate: jBody.RegisterStartDate.DateTime(),
+		RegisterEndDate:   jBody.RegisterEndDate.DateTime(),
+		UserID:            user.ID,
 	})
 	if err != nil {
 		if errors.Is(err, errstore.ErrNotFoundData) {
@@ -349,9 +388,13 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tTournament{
-		ID:      tournament.ID,
-		Title:   tournament.Title,
-		LogoURL: s.getFullUploadPath(tournament.LogoURL),
+		ID:                tournament.ID,
+		Title:             tournament.Title,
+		StartDate:         formatDateTime(tournament.StartDate),
+		EndDate:           formatDateTime(tournament.EndDate),
+		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
+		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
+		LogoURL:           s.getFullUploadPath(tournament.LogoURL),
 	})
 }
 
@@ -653,6 +696,8 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 			FirstName:  p.FirstName,
 			SecondName: p.SecondName,
 			LastName:   p.LastName,
+			BDay:       formatDate(p.BDay),
+			PhotoURL:   s.getFullUploadURL(p.PhotoURL),
 		})
 	}
 
@@ -695,11 +740,17 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 		return
 	}
 
+	if !jBody.IsValid() {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	player, err := s.sport.NewPlayer(c.Request.Context(), &models.Player{
 		FirstName:  jBody.FirstName,
 		SecondName: jBody.SecondName,
 		LastName:   jBody.LastName,
 		UserID:     user.ID,
+		BDay:       jBody.BDay.Date(),
 	})
 	if err != nil {
 		s.log.Error("failed create player", zap.Error(err))
@@ -712,6 +763,7 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 		FirstName:  player.FirstName,
 		SecondName: player.SecondName,
 		LastName:   player.LastName,
+		BDay:       formatDate(player.BDay),
 	})
 }
 
@@ -794,12 +846,18 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 		return
 	}
 
+	if !jBody.IsValid() {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	player, err := s.sport.UpdPlayer(c.Request.Context(), &models.Player{
 		ID:         uint(playerID),
 		FirstName:  jBody.FirstName,
 		SecondName: jBody.SecondName,
 		LastName:   jBody.LastName,
 		UserID:     userID,
+		BDay:       jBody.BDay.Date(),
 	})
 	if err != nil {
 		if errors.Is(err, errstore.ErrNotFoundData) {
@@ -816,6 +874,7 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 		FirstName:  player.FirstName,
 		SecondName: player.SecondName,
 		LastName:   player.LastName,
+		BDay:       formatDate(player.BDay),
 	})
 }
 

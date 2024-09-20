@@ -31,14 +31,15 @@ func main() {
 func run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	lgr, err := logger.New()
-	if err != nil {
-		return fmt.Errorf("failed initialize logger: %w", err)
-	}
 
 	cfg, err := config.Init()
 	if err != nil {
 		return fmt.Errorf("failed initialize config: %w", err)
+	}
+
+	lgr, err := logger.New(cfg.LogLevel)
+	if err != nil {
+		return fmt.Errorf("failed initialize logger: %w", err)
 	}
 
 	store, err := storage.New(ctx, cfg.Store)
