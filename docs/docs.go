@@ -128,11 +128,25 @@ const docTemplate = `{
                     "guest"
                 ],
                 "summary": "все турниры",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit size",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest.tTournament"
+                            "$ref": "#/definitions/rest.tGetTorunamentsResponse"
                         }
                     },
                     "400": {
@@ -180,6 +194,20 @@ const docTemplate = `{
                     "user players"
                 ],
                 "summary": "Все игроки",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit size",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -329,14 +357,25 @@ const docTemplate = `{
                     "user team"
                 ],
                 "summary": "команды пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit size",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/rest.tTeam"
-                            }
+                            "$ref": "#/definitions/rest.tGetTeamsResponse"
                         }
                     },
                     "400": {
@@ -656,6 +695,20 @@ const docTemplate = `{
                     "user tournament"
                 ],
                 "summary": "турниры пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit size",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -968,6 +1021,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "rest.pagination": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "next_page": {
+                    "type": "integer"
+                },
+                "prev_page": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
+                }
+            }
+        },
         "rest.tApplication": {
             "type": "object",
             "properties": {
@@ -1076,6 +1149,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/rest.tPlayer"
                     }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/rest.pagination"
                 }
             }
         },
@@ -1093,6 +1169,20 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "rest.tGetTeamsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tTeam"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/rest.pagination"
                 }
             }
         },
@@ -1127,6 +1217,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/rest.tTournament"
                     }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/rest.pagination"
                 }
             }
         },
@@ -1246,7 +1339,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "end_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
                 },
                 "id": {
                     "type": "integer"
@@ -1255,13 +1349,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "register_end_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
                 },
                 "register_start_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
                 },
                 "start_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
                 },
                 "title": {
                     "type": "string"

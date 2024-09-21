@@ -306,3 +306,44 @@ func (s Server) isValidImgExtension(file *multipart.FileHeader) bool {
 		strings.HasSuffix(file.Filename, ".jpeg") ||
 		strings.HasSuffix(file.Filename, ".gif")
 }
+
+func (s Server) getPagination(c *gin.Context, count int) pagination {
+	p := pagination{
+		TotalRecords: count,
+	}
+	p.CurrentPage, _ = strconv.Atoi(c.Query("page"))
+	p.Limit, _ = strconv.Atoi(c.Query("limit"))
+	if p.CurrentPage <= 0 {
+		p.CurrentPage = 1
+	}
+	if p.Limit <= 0 {
+		p.Limit = 10
+	}
+	p.TotalPages = p.TotalRecords / p.Limit
+	if p.TotalRecords%p.Limit > 0 {
+		p.TotalPages += 1
+	}
+	if p.TotalPages < 1 {
+		p.TotalPages = 1
+	}
+	if p.CurrentPage > p.TotalPages {
+		p.CurrentPage = p.TotalPages
+	}
+	prevPage := p.CurrentPage - 1
+	p.PrevPage = &prevPage
+	if prevPage < 1 {
+		p.PrevPage = nil
+	}
+	nextPage := p.CurrentPage + 1
+	p.NextPage = &nextPage
+	if nextPage > p.TotalPages {
+		p.NextPage = nil
+	}
+
+	p.StartRow = (p.CurrentPage - 1) * p.Limit
+	p.EndRow = p.StartRow + p.Limit
+	if p.EndRow > p.TotalRecords {
+		p.EndRow = p.TotalRecords
+	}
+	return p
+}

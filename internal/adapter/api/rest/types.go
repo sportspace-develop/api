@@ -49,6 +49,17 @@ func (st *sportTime) String() string {
 	return string(*st)
 }
 
+type pagination struct {
+	TotalRecords int  `json:"total_records"`
+	CurrentPage  int  `json:"current_page"`
+	TotalPages   int  `json:"total_pages"`
+	NextPage     *int `json:"next_page"`
+	PrevPage     *int `json:"prev_page"`
+	Limit        int  `json:"-"`
+	StartRow     int  `json:"-"`
+	EndRow       int  `json:"-"`
+}
+
 type tAuthorization struct {
 	Email string `json:"email"`
 	// Password string `json:"password"`
@@ -86,16 +97,17 @@ func (tutr tUpdTournamentRequest) IsValid() bool {
 type tTournament struct {
 	ID                uint   `json:"id"`
 	Title             string `json:"title"`
-	StartDate         string `json:"start_date"`
-	EndDate           string `json:"end_date"`
-	RegisterStartDate string `json:"register_start_date"`
-	RegisterEndDate   string `json:"register_end_date"`
+	StartDate         string `json:"start_date" example:"2024-12-31 00:00:00"`
+	EndDate           string `json:"end_date" example:"2024-12-31 00:00:00"`
+	RegisterStartDate string `json:"register_start_date" example:"2024-12-31 00:00:00"`
+	RegisterEndDate   string `json:"register_end_date" example:"2024-12-31 00:00:00"`
 	BDay              string `json:"b_day"`
 	LogoURL           string `json:"logo_url"`
 }
 
 type tGetTorunamentsResponse struct {
-	Data []tTournament `json:"data"`
+	Pagination pagination    `json:"pagination"`
+	Data       []tTournament `json:"data"`
 }
 
 type tCreateTeam struct {
@@ -105,6 +117,11 @@ type tCreateTeam struct {
 type tTeam struct {
 	ID    uint   `json:"id"`
 	Title string `json:"title"`
+}
+
+type tGetTeamsResponse struct {
+	Pagination pagination `json:"pagination"`
+	Data       []tTeam    `json:"data"`
 }
 
 type tGetTeamResponse struct {
@@ -145,7 +162,8 @@ type tPlayer struct {
 }
 
 type tGetPlayersResponse struct {
-	Data []tPlayer `json:"data"`
+	Pagination pagination `json:"pagination"`
+	Data       []tPlayer  `json:"data"`
 }
 
 type tUpdatePlayer struct {

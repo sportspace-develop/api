@@ -125,7 +125,9 @@ func (s *Server) handlerLogout(c *gin.Context) {
 // @Tags			guest
 // @Accept			json
 // @Produce		json
-// @Success		200	{object}	tTournament
+// @Param			page	query		int	false	"page number"
+// @Param			limit	query		int	false	"limit size"
+// @Success		200		{object}	tGetTorunamentsResponse
 // @Failure		400
 // @Failure		500
 // @Router			/tournaments [get]
@@ -136,15 +138,26 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	pg := s.getPagination(c, len(*tournaments))
+
 	res := []tTournament{}
-	for _, t := range *tournaments {
+	for _, t := range (*tournaments)[pg.StartRow:pg.EndRow] {
 		res = append(res, tTournament{
-			ID:    t.ID,
-			Title: t.Title,
+			ID:                t.ID,
+			Title:             t.Title,
+			StartDate:         formatDateTime(t.StartDate),
+			EndDate:           formatDateTime(t.EndDate),
+			RegisterStartDate: formatDateTime(t.RegisterStartDate),
+			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
+			LogoURL:           s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, tGetTorunamentsResponse{
+		Pagination: pg,
+		Data:       res,
+	})
 }
 
 // @Summary	user info
@@ -238,7 +251,9 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 // @Tags			user tournament
 // @Accept			json
 // @Produce		json
-// @Success		200	{object}	tGetTorunamentsResponse
+// @Param			page	query		int	false	"page number"
+// @Param			limit	query		int	false	"limit size"
+// @Success		200		{object}	tGetTorunamentsResponse
 // @Failure		204
 // @Failure		400
 // @Failure		500
@@ -261,8 +276,11 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusNoContent)
 		return
 	}
+
+	pg := s.getPagination(c, len(*tournaments))
+
 	result := []tTournament{}
-	for _, t := range *tournaments {
+	for _, t := range (*tournaments)[pg.StartRow:pg.EndRow] {
 		result = append(result, tTournament{
 			ID:                t.ID,
 			Title:             t.Title,
@@ -274,7 +292,10 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, tGetTorunamentsResponse{Data: result})
+	c.JSON(http.StatusOK, tGetTorunamentsResponse{
+		Pagination: pg,
+		Data:       result,
+	})
 }
 
 // @Summary	информация турнира пользователя
@@ -533,7 +554,9 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 // @Description	команды пользователя
 // @Tags			user team
 // @Produce		json
-// @Success		200	{object}	[]tTeam
+// @Param			page	query		int	false	"page number"
+// @Param			limit	query		int	false	"limit size"
+// @Success		200		{object}	tGetTeamsResponse
 // @Failure		400
 // @Failure		500
 // @Router			/user/teams [get]
@@ -551,9 +574,11 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 		return
 	}
 
+	pg := s.getPagination(c, len(*teams))
+
 	res := []tTeam{}
-	if teams != nil {
-		for _, t := range *teams {
+	if teams != nil && pg.TotalRecords > 0 {
+		for _, t := range (*teams)[pg.StartRow:pg.EndRow] {
 			res = append(res, tTeam{
 				ID:    t.ID,
 				Title: t.Title,
@@ -561,7 +586,10 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, tGetTeamsResponse{
+		Pagination: pg,
+		Data:       res,
+	})
 }
 
 // @Summary	информация команды пользователя
@@ -772,7 +800,9 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 // @Description	Все игроки
 // @Tags			user players
 // @Produce		json
-// @Success		200	{object}	tGetPlayersResponse
+// @Param			page	query		int	false	"page number"
+// @Param			limit	query		int	false	"limit size"
+// @Success		200		{object}	tGetPlayersResponse
 // @Failure		400
 // @Failure		500
 // @Router			/user/players [get]
@@ -789,10 +819,15 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	var res []tPlayer
+	count := 0
 	if players != nil {
-		for _, p := range *players {
+		count = len(*players)
+	}
+	pg := s.getPagination(c, count)
+
+	res := []tPlayer{}
+	if players != nil && pg.TotalRecords > 0 {
+		for _, p := range (*players)[pg.StartRow:pg.EndRow] {
 			res = append(res, tPlayer{
 				ID:         p.ID,
 				FirstName:  p.FirstName,
@@ -803,7 +838,10 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, tGetPlayersResponse{Data: res})
+	c.JSON(http.StatusOK, tGetPlayersResponse{
+		Pagination: pg,
+		Data:       res,
+	})
 }
 
 // @Summary	обновить игрока

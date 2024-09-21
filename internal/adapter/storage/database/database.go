@@ -141,7 +141,7 @@ func (s *Storage) GetAllTournaments(ctx context.Context) (tournaments *[]models.
 	err = s.db.Find(tournaments).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.Join(err, errstore.ErrNotFoundData)
+			return tournaments, errors.Join(err, errstore.ErrNotFoundData)
 		}
 		return nil, fmt.Errorf("failed get all torurnaments: %w", err)
 	}
@@ -211,7 +211,7 @@ func (s *Storage) GetTeams(ctx context.Context, user *models.User) (*[]models.Te
 	err := s.db.Where("user_id = ?", user.ID).Find(teams).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errstore.ErrNotFoundData
+			return teams, errstore.ErrNotFoundData
 		}
 		return nil, fmt.Errorf("failed find teams by user: %w", err)
 	}
@@ -269,7 +269,10 @@ func (s *Storage) NewPlayer(ctx context.Context, player *models.Player) (*models
 func (s *Storage) GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error) {
 	players := &[]models.Player{}
 	err := s.db.Where("user_id = ?", userID).Find(players).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return players, errstore.ErrNotFoundData
+		}
 		return nil, fmt.Errorf("failed find players: %w", err)
 	}
 

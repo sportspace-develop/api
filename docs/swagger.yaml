@@ -1,4 +1,17 @@
 definitions:
+  rest.pagination:
+    properties:
+      current_page:
+        type: integer
+      next_page:
+        type: integer
+      prev_page:
+        type: integer
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
   rest.tApplication:
     properties:
       id:
@@ -72,6 +85,8 @@ definitions:
         items:
           $ref: '#/definitions/rest.tPlayer'
         type: array
+      pagination:
+        $ref: '#/definitions/rest.pagination'
     type: object
   rest.tGetTeamResponse:
     properties:
@@ -83,6 +98,15 @@ definitions:
         type: array
       title:
         type: string
+    type: object
+  rest.tGetTeamsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/rest.tTeam'
+        type: array
+      pagination:
+        $ref: '#/definitions/rest.pagination'
     type: object
   rest.tGetTorunamentApplicationResponse:
     properties:
@@ -105,6 +129,8 @@ definitions:
         items:
           $ref: '#/definitions/rest.tTournament'
         type: array
+      pagination:
+        $ref: '#/definitions/rest.pagination'
     type: object
   rest.tGetTournamentApplicationsResponse:
     properties:
@@ -182,16 +208,20 @@ definitions:
       b_day:
         type: string
       end_date:
+        example: "2024-12-31 00:00:00"
         type: string
       id:
         type: integer
       logo_url:
         type: string
       register_end_date:
+        example: "2024-12-31 00:00:00"
         type: string
       register_start_date:
+        example: "2024-12-31 00:00:00"
         type: string
       start_date:
+        example: "2024-12-31 00:00:00"
         type: string
       title:
         type: string
@@ -370,13 +400,22 @@ paths:
       consumes:
       - application/json
       description: все турниры
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: limit size
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.tTournament'
+            $ref: '#/definitions/rest.tGetTorunamentsResponse'
         "400":
           description: Bad Request
         "500":
@@ -404,6 +443,15 @@ paths:
   /user/players:
     get:
       description: Все игроки
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: limit size
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -502,15 +550,22 @@ paths:
   /user/teams:
     get:
       description: команды пользователя
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: limit size
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/rest.tTeam'
-            type: array
+            $ref: '#/definitions/rest.tGetTeamsResponse'
         "400":
           description: Bad Request
         "500":
@@ -719,6 +774,15 @@ paths:
       consumes:
       - application/json
       description: турниры пользователя
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: limit size
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
