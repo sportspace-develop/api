@@ -23,17 +23,17 @@ func (s *Server) handlerPing(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusOK)
 }
 
-// @Summary	send to email one time password
-// @Schemes
-// @Description	send code to email
-// @Tags			auth
-// @Accept			json
-// @Produce		json
-// @Param			email	body	tRequestOTP	true	"User email"
-// @Success		200
-// @Failure		400
-// @Failure		500
-// @Router			/auth/otp [post]
+//	@Summary	send to email one time password
+//	@Schemes
+//	@Description	send code to email
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			email	body	tRequestOTP	true	"User email"
+//	@Success		200
+//	@Failure		400
+//	@Failure		500
+//	@Router			/auth/otp [post]
 func (s *Server) handlerAuthOTP(c *gin.Context) {
 	unauthorize(c)
 
@@ -65,17 +65,17 @@ func (s *Server) handlerAuthOTP(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusOK)
 }
 
-// @Summary	authorization
-// @Schemes
-// @Description	authorization
-// @Tags			auth
-// @Accept			json
-// @Produce		json
-// @Param			email	body	tAuthorization	true	"User email and password"
-// @Success		200
-// @Failure		400
-// @Failure		500
-// @Router			/auth/login [post]
+//	@Summary	authorization
+//	@Schemes
+//	@Description	authorization
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			email	body	tAuthorization	true	"User email and password"
+//	@Success		200
+//	@Failure		400
+//	@Failure		500
+//	@Router			/auth/login [post]
 func (s *Server) handlerLogin(c *gin.Context) {
 	unauthorize(c)
 
@@ -104,33 +104,33 @@ func (s *Server) handlerLogin(c *gin.Context) {
 	c.Writer.WriteHeader(statusCode)
 }
 
-// @Summary	logout
-// @Schemes
-// @Description	logout
-// @Tags			auth
-// @Accept			json
-// @Produce		json
-// @Success		200
-// @Failure		400
-// @Failure		500
-// @Router			/auth/logout [get]
+//	@Summary	logout
+//	@Schemes
+//	@Description	logout
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200
+//	@Failure		400
+//	@Failure		500
+//	@Router			/auth/logout [get]
 func (s *Server) handlerLogout(c *gin.Context) {
 	unauthorize(c)
 	c.Writer.WriteHeader(http.StatusOK)
 }
 
-// @Summary	все турниры
-// @Schemes
-// @Description	все турниры
-// @Tags			guest
-// @Accept			json
-// @Produce		json
-// @Param			page	query		int	false	"page number"
-// @Param			limit	query		int	false	"limit size"
-// @Success		200		{object}	tGetTorunamentsResponse
-// @Failure		400
-// @Failure		500
-// @Router			/tournaments [get]
+//	@Summary	все турниры
+//	@Schemes
+//	@Description	все турниры
+//	@Tags			guest
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int	false	"page number"
+//	@Param			limit	query		int	false	"limit size"
+//	@Success		200		{object}	tGetTorunamentsResponse
+//	@Failure		400
+//	@Failure		500
+//	@Router			/tournaments [get]
 func (s *Server) handlerGetAllTournament(c *gin.Context) {
 	tournaments, err := s.sport.GetAllTournaments(c.Request.Context())
 	if err != nil {
@@ -160,16 +160,16 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 	})
 }
 
-// @Summary	user info
-// @Schemes
-// @Description	user info
-// @Tags			user
-// @Accept			json
-// @Produce		json
-// @Success		200
-// @Failure		401
-// @Failure		500
-// @Router			/user [get]
+//	@Summary	user info
+//	@Schemes
+//	@Description	user info
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Success		200
+//	@Failure		401
+//	@Failure		500
+//	@Router			/user [get]
 func (s *Server) handlerUser(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -181,17 +181,17 @@ func (s *Server) handlerUser(c *gin.Context) {
 	})
 }
 
-// @Summary	создать турнир
-// @Schemes
-// @Description	создать турнир
-// @Tags			user tournament
-// @Accept			json
-// @Produce		json
-// @Param			tournamet	body		tCreateTournament	true	"tournament"
-// @Success		201			{object}	tTournament
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments [post]
+//	@Summary	создать турнир
+//	@Schemes
+//	@Description	создать турнир
+//	@Tags			user tournament
+//	@Accept			json
+//	@Produce		json
+//	@Param			tournamet	body		tCreateTournament	true	"tournament"
+//	@Success		201			{object}	tTournament
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments [post]
 func (s *Server) handlerUserNewTournament(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -245,19 +245,19 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 	})
 }
 
-// @Summary	турниры пользователя
-// @Schemes
-// @Description	турниры пользователя
-// @Tags			user tournament
-// @Accept			json
-// @Produce		json
-// @Param			page	query		int	false	"page number"
-// @Param			limit	query		int	false	"limit size"
-// @Success		200		{object}	tGetTorunamentsResponse
-// @Failure		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments [get]
+//	@Summary	турниры пользователя
+//	@Schemes
+//	@Description	турниры пользователя
+//	@Tags			user tournament
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	query		int	false	"page number"
+//	@Param			limit	query		int	false	"limit size"
+//	@Success		200		{object}	tGetTorunamentsResponse
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments [get]
 func (s *Server) handlerUserTournaments(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -298,17 +298,17 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 	})
 }
 
-// @Summary	информация турнира пользователя
-// @Schemes
-// @Description	информация турнира пользователя
-// @Tags			user tournament
-// @Param			tournament_id	path	int	true	"tournament id"
-// @Produce		json
-// @Success		200	{object}	tTournament
-// @Failure		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments/{tournament_id} [get]
+//	@Summary	информация турнира пользователя
+//	@Schemes
+//	@Description	информация турнира пользователя
+//	@Tags			user tournament
+//	@Param			tournament_id	path	int	true	"tournament id"
+//	@Produce		json
+//	@Success		200	{object}	tTournament
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments/{tournament_id} [get]
 func (s *Server) handlerUserTournament(c *gin.Context) {
 	// _, statusCode, err := s.checkUser(c)
 	// if err != nil {
@@ -343,19 +343,19 @@ func (s *Server) handlerUserTournament(c *gin.Context) {
 	})
 }
 
-// @Summary	Обновить турнир
-// @Schemes
-// @Description	Обновить турнир
-// @Tags			user tournament
-// @Accept			json
-// @Produce		json
-// @Param			tournament_id	path	int						true	"tournament id"
-// @Param			tournamet		body	tUpdTournamentRequest	true	"tournament"
-// @Success		200
-// @Success		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments/{tournament_id} [put]
+//	@Summary	Обновить турнир
+//	@Schemes
+//	@Description	Обновить турнир
+//	@Tags			user tournament
+//	@Accept			json
+//	@Produce		json
+//	@Param			tournament_id	path	int						true	"tournament id"
+//	@Param			tournamet		body	tUpdTournamentRequest	true	"tournament"
+//	@Success		200
+//	@Success		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments/{tournament_id} [put]
 func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -419,19 +419,19 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 	})
 }
 
-// @Summary	загрузка файлов турнира
-// @Schemes
-// @Description	загрузка файлов турнира
-// @Tags			user tournament
-// @Accept			json
-// @Produce		json
-// @Param			tournament_id	path		int		true	"tournament id"
-// @Param			logo_file		formData	file	false	"файл лого"
-// @Success		200
-// @Success		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments/{tournament_id}/upload [put]
+//	@Summary	загрузка файлов турнира
+//	@Schemes
+//	@Description	загрузка файлов турнира
+//	@Tags			user tournament
+//	@Accept			json
+//	@Produce		json
+//	@Param			tournament_id	path		int		true	"tournament id"
+//	@Param			logo_file		formData	file	false	"файл лого"
+//	@Success		200
+//	@Success		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments/{tournament_id}/upload [put]
 func (s *Server) handlerUserUploadTournament(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -500,17 +500,17 @@ func (s *Server) handlerUserUploadTournament(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusOK)
 }
 
-// @Summary	создать команду
-// @Schemes
-// @Description	создать команду
-// @Tags			user team
-// @Accept			json
-// @Produce		json
-// @Param			tournamet	body		tCreateTeam	true	"team"
-// @Success		201			{object}	tTeam
-// @Failure		400
-// @Failure		500
-// @Router			/user/teams [post]
+//	@Summary	создать команду
+//	@Schemes
+//	@Description	создать команду
+//	@Tags			user team
+//	@Accept			json
+//	@Produce		json
+//	@Param			tournamet	body		tCreateTeam	true	"team"
+//	@Success		201			{object}	tTeam
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/teams [post]
 func (s *Server) handlerUserNewTeam(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -549,17 +549,17 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 	})
 }
 
-// @Summary	команды пользователя
-// @Schemes
-// @Description	команды пользователя
-// @Tags			user team
-// @Produce		json
-// @Param			page	query		int	false	"page number"
-// @Param			limit	query		int	false	"limit size"
-// @Success		200		{object}	tGetTeamsResponse
-// @Failure		400
-// @Failure		500
-// @Router			/user/teams [get]
+//	@Summary	команды пользователя
+//	@Schemes
+//	@Description	команды пользователя
+//	@Tags			user team
+//	@Produce		json
+//	@Param			page	query		int	false	"page number"
+//	@Param			limit	query		int	false	"limit size"
+//	@Success		200		{object}	tGetTeamsResponse
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/teams [get]
 func (s *Server) handlerUserTeams(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -592,17 +592,17 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 	})
 }
 
-// @Summary	информация команды пользователя
-// @Schemes
-// @Description	информация команды пользователя
-// @Tags			user team
-// @Param			team_id	path	int	true	"team id"
-// @Produce		json
-// @Success		200	{object}	tGetTeamResponse
-// @Failure		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/teams/{team_id} [get]
+//	@Summary	информация команды пользователя
+//	@Schemes
+//	@Description	информация команды пользователя
+//	@Tags			user team
+//	@Param			team_id	path	int	true	"team id"
+//	@Produce		json
+//	@Success		200	{object}	tGetTeamResponse
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/teams/{team_id} [get]
 func (s *Server) handlerUserTeam(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -648,18 +648,18 @@ func (s *Server) handlerUserTeam(c *gin.Context) {
 	})
 }
 
-// @Summary	обновление команды пользователя
-// @Schemes
-// @Description	обновление команды пользователя
-// @Tags			user team
-// @Param			team_id	path	int				true	"team id"
-// @Param			team	body	tUpdTeamRequest	true	"team"
-// @Produce		json
-// @Success		200	{object}	tUpdTeamResponse
-// @Failure		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/teams/{team_id} [put]
+//	@Summary	обновление команды пользователя
+//	@Schemes
+//	@Description	обновление команды пользователя
+//	@Tags			user team
+//	@Param			team_id	path	int				true	"team id"
+//	@Param			team	body	tUpdTeamRequest	true	"team"
+//	@Produce		json
+//	@Success		200	{object}	tUpdTeamResponse
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/teams/{team_id} [put]
 func (s *Server) handlerUserUptTeam(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -736,16 +736,16 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 	})
 }
 
-// @Summary	Добавить игрока
-// @Schemes
-// @Description	Добавить игрока
-// @Tags			user players
-// @Param			player	body	tNewPlayer	true	"player"
-// @Produce		json
-// @Success		201	{object}	tPlayer
-// @Failure		400
-// @Failure		500
-// @Router			/user/players [post]
+//	@Summary	Добавить игрока
+//	@Schemes
+//	@Description	Добавить игрока
+//	@Tags			user players
+//	@Param			player	body	tNewPlayer	true	"player"
+//	@Produce		json
+//	@Success		201	{object}	tPlayer
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/players [post]
 func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {
@@ -795,17 +795,17 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 	})
 }
 
-// @Summary	Все игроки
-// @Schemes
-// @Description	Все игроки
-// @Tags			user players
-// @Produce		json
-// @Param			page	query		int	false	"page number"
-// @Param			limit	query		int	false	"limit size"
-// @Success		200		{object}	tGetPlayersResponse
-// @Failure		400
-// @Failure		500
-// @Router			/user/players [get]
+//	@Summary	Все игроки
+//	@Schemes
+//	@Description	Все игроки
+//	@Tags			user players
+//	@Produce		json
+//	@Param			page	query		int	false	"page number"
+//	@Param			limit	query		int	false	"limit size"
+//	@Success		200		{object}	tGetPlayersResponse
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/players [get]
 func (s *Server) handlerUserPlayers(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -844,18 +844,18 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 	})
 }
 
-// @Summary	обновить игрока
-// @Schemes
-// @Description	обновить игрока
-// @Tags			user players
-// @Param			player_id	path	int				true	"player id"
-// @Param			id			body	tUpdatePlayer	true	"player"
-// @Produce		json
-// @Success		200	{object}	tPlayer
-// @Failure		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/players/{player_id} [put]
+//	@Summary	обновить игрока
+//	@Schemes
+//	@Description	обновить игрока
+//	@Tags			user players
+//	@Param			player_id	path	int				true	"player id"
+//	@Param			id			body	tUpdatePlayer	true	"player"
+//	@Produce		json
+//	@Success		200	{object}	tPlayer
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/players/{player_id} [put]
 func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -916,18 +916,18 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 	})
 }
 
-// @Summary	загрузка файлов игрока
-// @Schemes
-// @Description	загрузка файлов игрока
-// @Tags			user players
-// @Param			player_id	path		int		true	"player id"
-// @Param			photo_file	formData	file	false	"фотография"
-// @Produce		json
-// @Success		200
-// @Failure		204
-// @Failure		400
-// @Failure		500
-// @Router			/user/players/{player_id}/upload [put]
+//	@Summary	загрузка файлов игрока
+//	@Schemes
+//	@Description	загрузка файлов игрока
+//	@Tags			user players
+//	@Param			player_id	path		int		true	"player id"
+//	@Param			photo_file	formData	file	false	"фотография"
+//	@Produce		json
+//	@Success		200
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/players/{player_id}/upload [put]
 func (s *Server) handlerUserUploadPlayer(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -996,16 +996,16 @@ func (s *Server) handlerUserUploadPlayer(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusOK)
 }
 
-// @Summary	заявки на турнир
-// @Schemes
-// @Description	заявки на турнир
-// @Tags			user tournament
-// @Param			tournament_id	path	int	true	"tournament id"
-// @Produce		json
-// @Success		200	{object}	tGetTournamentApplicationsResponse
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments/{tournament_id}/applications [get]
+//	@Summary	заявки на турнир
+//	@Schemes
+//	@Description	заявки на турнир
+//	@Tags			user tournament
+//	@Param			tournament_id	path	int	true	"tournament id"
+//	@Produce		json
+//	@Success		200	{object}	tGetTournamentApplicationsResponse
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments/{tournament_id}/applications [get]
 func (s *Server) handlerGetTournamentApplications(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -1058,17 +1058,17 @@ func (s *Server) handlerGetTournamentApplications(c *gin.Context) {
 	c.JSON(http.StatusOK, tGetTournamentApplicationsResponse{Data: data})
 }
 
-// @Summary	заявка турнира
-// @Schemes
-// @Description	заявка турнира
-// @Tags			user tournament
-// @Param			tournament_id	path	int	true	"tournament id"
-// @Param			application_id	path	int	true	"application id"
-// @Produce		json
-// @Success		200	{object}	tGetTorunamentApplicationResponse
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments/{tournament_id}/applications/{application_id} [get]
+//	@Summary	заявка турнира
+//	@Schemes
+//	@Description	заявка турнира
+//	@Tags			user tournament
+//	@Param			tournament_id	path	int	true	"tournament id"
+//	@Param			application_id	path	int	true	"application id"
+//	@Produce		json
+//	@Success		200	{object}	tGetTorunamentApplicationResponse
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments/{tournament_id}/applications/{application_id} [get]
 func (s *Server) handlerGetTournamentApplication(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -1147,18 +1147,18 @@ func (s *Server) handlerGetTournamentApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	изменить заявку
-// @Schemes
-// @Description	изменить заявку
-// @Tags			user tournament
-// @Param			tournament_id	path	int									true	"tournament id"
-// @Param			application_id	path	int									true	"application id"
-// @param			application		body	tUpdTournamentApplicationRequest	true	"application"
-// @Produce		json
-// @Success		200	{object}	tApplication
-// @Failure		400
-// @Failure		500
-// @Router			/user/tournaments/{tournament_id}/applications/{application_id} [put]
+//	@Summary	изменить заявку
+//	@Schemes
+//	@Description	изменить заявку
+//	@Tags			user tournament
+//	@Param			tournament_id	path	int									true	"tournament id"
+//	@Param			application_id	path	int									true	"application id"
+//	@param			application		body	tUpdTournamentApplicationRequest	true	"application"
+//	@Produce		json
+//	@Success		200	{object}	tApplication
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/tournaments/{tournament_id}/applications/{application_id} [put]
 func (s *Server) handlerUpdTournamentApplication(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -1232,18 +1232,18 @@ func (s *Server) handlerUpdTournamentApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	подать заявку
-// @Schemes
-// @Description	подать заявку
-// @Tags			user team
-// @Param			team_id		path	int						true	"team id"
-// @Param			application	body	tNewApplicationRequest	true	"application"
-// @Produce		json
-// @Success		201	{object}	tNewApplicationResponse	"заявка создана"
-// @Failure		400	"не корректный запрос"
-// @Failure		409	"заявка	уже	была создана ранее"
-// @Failure		500
-// @Router			/user/teams/{team_id}/applications [post]
+//	@Summary	подать заявку
+//	@Schemes
+//	@Description	подать заявку
+//	@Tags			user team
+//	@Param			team_id		path	int						true	"team id"
+//	@Param			application	body	tNewApplicationRequest	true	"application"
+//	@Produce		json
+//	@Success		201	{object}	tNewApplicationResponse	"заявка создана"
+//	@Failure		400	"не корректный запрос"
+//	@Failure		409	"заявка	уже	была создана ранее"
+//	@Failure		500
+//	@Router			/user/teams/{team_id}/applications [post]
 func (s *Server) handlerNewTeamApplication(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -1313,19 +1313,19 @@ func (s *Server) handlerNewTeamApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	изменить заявку
-// @Schemes
-// @Description	изменить заявку
-// @Tags			user team
-// @Param			team_id			path	int								true	"team id"
-// @Param			application_id	path	int								true	"application	id"
-// @Param			application		body	tUpdApplicationStatusRequest	true	"application status"
-// @Produce		json
-// @Success		200	{object}	tUpdApplicationResponse
-// @Failure		204	"заявка не найдена"
-// @Failure		400	"не найден или не может изменить"
-// @Failure		500
-// @Router			/user/teams/{team_id}/applications/{application_id} [put]
+//	@Summary	изменить заявку
+//	@Schemes
+//	@Description	изменить заявку
+//	@Tags			user team
+//	@Param			team_id			path	int								true	"team id"
+//	@Param			application_id	path	int								true	"application	id"
+//	@Param			application		body	tUpdApplicationStatusRequest	true	"application status"
+//	@Produce		json
+//	@Success		200	{object}	tUpdApplicationResponse
+//	@Failure		204	"заявка не найдена"
+//	@Failure		400	"не найден или не может изменить"
+//	@Failure		500
+//	@Router			/user/teams/{team_id}/applications/{application_id} [put]
 func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -1416,16 +1416,16 @@ func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	заявки команды
-// @Schemes
-// @Description	заявки команды
-// @Tags			user team
-// @Param			team_id	path	int	true	"team id"
-// @Produce		json
-// @Success		200	{object}	tGetApplicationsTeamResponse
-// @Failure		400	"команда не найдена"
-// @Failure		500
-// @Router			/user/teams/{team_id}/applications [get]
+//	@Summary	заявки команды
+//	@Schemes
+//	@Description	заявки команды
+//	@Tags			user team
+//	@Param			team_id	path	int	true	"team id"
+//	@Produce		json
+//	@Success		200	{object}	tGetApplicationsTeamResponse
+//	@Failure		400	"команда не найдена"
+//	@Failure		500
+//	@Router			/user/teams/{team_id}/applications [get]
 func (s *Server) handlerGetTeamApplications(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
@@ -1475,17 +1475,17 @@ func (s *Server) handlerGetTeamApplications(c *gin.Context) {
 	c.JSON(http.StatusOK, tGetApplicationsTeamResponse{Data: data})
 }
 
-// @Summary	заявка команды
-// @Schemes
-// @Description	заявка команды
-// @Tags			user team
-// @Param			team_id			path	int	true	"team id"
-// @Param			application_id	path	int	true	"application id"
-// @Produce		json
-// @Success		200	{object}	tGetApplicationResponse
-// @Failure		400	"не корректный запрос"
-// @Failure		500
-// @Router			/user/teams/{team_id}/applications/{application_id} [get]
+//	@Summary	заявка команды
+//	@Schemes
+//	@Description	заявка команды
+//	@Tags			user team
+//	@Param			team_id			path	int	true	"team id"
+//	@Param			application_id	path	int	true	"application id"
+//	@Produce		json
+//	@Success		200	{object}	tGetApplicationResponse
+//	@Failure		400	"не корректный запрос"
+//	@Failure		500
+//	@Router			/user/teams/{team_id}/applications/{application_id} [get]
 func (s *Server) handlerGetApplication(c *gin.Context) {
 	userID, err := s.checkAuth(c)
 	if err != nil {
