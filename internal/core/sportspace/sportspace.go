@@ -13,10 +13,6 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	lengthShortPassword uint = 8
-)
-
 type storage interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserByID(ctx context.Context, userID uint) (*models.User, error)
@@ -57,9 +53,10 @@ type sender interface {
 }
 
 type SportSpace struct {
-	log    *zap.Logger
-	store  storage
-	sender sender
+	log       *zap.Logger
+	store     storage
+	sender    sender
+	otpLength uint
 }
 
 type option func(s *SportSpace)
@@ -70,11 +67,18 @@ func SetLogger(l *zap.Logger) option {
 	}
 }
 
+func SetOTPLength(l uint) option {
+	return func(s *SportSpace) {
+		s.otpLength = l
+	}
+}
+
 func New(store storage, sender sender, options ...option) (*SportSpace, error) {
 	s := &SportSpace{
-		log:    zap.NewNop(),
-		store:  store,
-		sender: sender,
+		log:       zap.NewNop(),
+		store:     store,
+		sender:    sender,
+		otpLength: 6,
 	}
 
 	for _, opt := range options {
@@ -133,7 +137,7 @@ func (s *SportSpace) NewOTP(ctx context.Context, email string) error {
 		}
 	}
 
-	otpStore.Password = tools.RandomString(lengthShortPassword)
+	otpStore.Password = tools.RandomString(s.otpLength)
 	otpStore.Attempt += 1
 	otpStore.UpdatedAt = time.Now()
 

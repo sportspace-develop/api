@@ -52,7 +52,10 @@ func run() error {
 		return fmt.Errorf("failed initialize sender: %w", err)
 	}
 
-	sspace, err := sportspace.New(store, sender, sportspace.SetLogger(lgr))
+	sspace, err := sportspace.New(store, sender,
+		sportspace.SetLogger(lgr),
+		sportspace.SetOTPLength(cfg.Sport.OTPLength),
+	)
 	if err != nil {
 		return fmt.Errorf("failed initialize sportspace service: %w", err)
 	}

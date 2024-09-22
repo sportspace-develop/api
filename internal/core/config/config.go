@@ -8,6 +8,7 @@ import (
 	"sport-space/internal/adapter/sender"
 	"sport-space/internal/adapter/storage"
 	"sport-space/internal/adapter/storage/database"
+	"sport-space/internal/core/sportspace"
 
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
@@ -16,11 +17,12 @@ import (
 type Config struct {
 	Store      storage.Config
 	Sender     sender.Config
-	Address    string `env:"HTTP_ADDRESS" default:":8080"`
-	BaseURL    string `env:"BASE_URL" default:"http://localhost:8080"`
-	SecretKey  string `env:"SECRET_KEY" default:""`
-	UploadPath string `env:"UPLOAD_PATH" default:"/uploads"`
-	LogLevel   string `env:"LOG_LEVEL" default:"debug"`
+	Sport      sportspace.Config
+	Address    string `env:"HTTP_ADDRESS" envDefault:":8080"`
+	BaseURL    string `env:"BASE_URL" envDefault:"http://localhost:8080"`
+	SecretKey  string `env:"SECRET_KEY" envDefault:""`
+	UploadPath string `env:"UPLOAD_PATH" envDefault:"/uploads"`
+	LogLevel   string `env:"LOG_LEVEL" envDefault:"debug"`
 }
 
 func Init() (*Config, error) {
