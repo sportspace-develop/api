@@ -1,9 +1,10 @@
 package rest
 
 import (
+	"time"
+
 	"sport-space/internal/adapter/models"
 	"sport-space/pkg/email"
-	"time"
 )
 
 type sportTime string
@@ -101,7 +102,6 @@ type tTournament struct {
 	EndDate           string `json:"end_date" example:"2024-12-31 00:00:00"`
 	RegisterStartDate string `json:"register_start_date" example:"2024-12-31 00:00:00"`
 	RegisterEndDate   string `json:"register_end_date" example:"2024-12-31 00:00:00"`
-	BDay              string `json:"b_day"`
 	LogoURL           string `json:"logo_url"`
 }
 
@@ -115,8 +115,10 @@ type tCreateTeam struct {
 }
 
 type tTeam struct {
-	ID    uint   `json:"id"`
-	Title string `json:"title"`
+	ID       uint   `json:"id"`
+	Title    string `json:"title"`
+	LogotURL string `json:"logo_url"`
+	PhotoURL string `json:"photo_url"`
 }
 
 type tGetTeamsResponse struct {
@@ -125,9 +127,11 @@ type tGetTeamsResponse struct {
 }
 
 type tGetTeamResponse struct {
-	ID      uint      `json:"id"`
-	Title   string    `json:"title"`
-	Players []tPlayer `json:"players"`
+	ID       uint      `json:"id"`
+	Title    string    `json:"title"`
+	Players  []tPlayer `json:"players"`
+	LogotURL string    `json:"logo_url"`
+	PhotoURL string    `json:"photo_url"`
 }
 
 type tUpdTeamRequest struct {
@@ -136,9 +140,18 @@ type tUpdTeamRequest struct {
 }
 
 type tUpdTeamResponse struct {
-	ID      uint      `json:"id"`
-	Title   string    `json:"title"`
-	Players []tPlayer `json:"players"`
+	ID       uint       `json:"id"`
+	Title    string     `json:"title"`
+	Players  *[]tPlayer `json:"players"`
+	LogotURL string     `json:"logo_url"`
+	PhotoURL string     `json:"photo_url"`
+}
+
+type tUpdTeamUploadResponse struct {
+	ID       uint   `json:"id"`
+	Title    string `json:"title"`
+	LogotURL string `json:"logo_url"`
+	PhotoURL string `json:"photo_url"`
 }
 
 type tNewPlayer struct {

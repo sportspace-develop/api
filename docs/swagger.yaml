@@ -92,6 +92,10 @@ definitions:
     properties:
       id:
         type: integer
+      logo_url:
+        type: string
+      photo_url:
+        type: string
       players:
         items:
           $ref: '#/definitions/rest.tPlayer'
@@ -200,13 +204,15 @@ definitions:
     properties:
       id:
         type: integer
+      logo_url:
+        type: string
+      photo_url:
+        type: string
       title:
         type: string
     type: object
   rest.tTournament:
     properties:
-      b_day:
-        type: string
       end_date:
         example: "2024-12-31 00:00:00"
         type: string
@@ -277,10 +283,25 @@ definitions:
     properties:
       id:
         type: integer
+      logo_url:
+        type: string
+      photo_url:
+        type: string
       players:
         items:
           $ref: '#/definitions/rest.tPlayer'
         type: array
+      title:
+        type: string
+    type: object
+  rest.tUpdTeamUploadResponse:
+    properties:
+      id:
+        type: integer
+      logo_url:
+        type: string
+      photo_url:
+        type: string
       title:
         type: string
     type: object
@@ -769,6 +790,39 @@ paths:
       summary: изменить заявку
       tags:
       - user team
+  /user/teams/{team_id}/upload:
+    put:
+      description: Загрузка лого и фото команды
+      parameters:
+      - description: team id
+        in: path
+        name: team_id
+        required: true
+        type: integer
+      - description: логотип
+        in: formData
+        name: logo_file
+        type: file
+      - description: фото команды
+        in: formData
+        name: photo_file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.tUpdTeamUploadResponse'
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Загрузка лого и фото команды
+      tags:
+      - user team
   /user/tournaments:
     get:
       consumes:
@@ -983,6 +1037,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/rest.tTournament'
         "204":
           description: No Content
         "400":

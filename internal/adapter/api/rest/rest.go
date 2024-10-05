@@ -170,6 +170,7 @@ func (s *Server) Run() error {
 			user.GET("/teams", s.handlerUserTeams)
 			user.GET("/teams/:id", s.handlerUserTeam)
 			user.PUT("/teams/:id", s.handlerUserUptTeam)
+			user.PUT("/teams/:id/upload", s.handlerUserUploadTeam)
 
 			user.POST("/players", s.handlerUserNewPlayer)
 			user.GET("/players", s.handlerUserPlayers)

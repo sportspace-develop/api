@@ -671,6 +671,56 @@
                 }
             }
         },
+        "/user/teams/{team_id}/upload": {
+            "put": {
+                "description": "Загрузка лого и фото команды",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user team"
+                ],
+                "summary": "Загрузка лого и фото команды",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "team id",
+                        "name": "team_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "логотип",
+                        "name": "logo_file",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "фото команды",
+                        "name": "photo_file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUpdTeamUploadResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/user/tournaments": {
             "get": {
                 "description": "турниры пользователя",
@@ -994,7 +1044,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tTournament"
+                        }
                     },
                     "204": {
                         "description": "No Content"
@@ -1149,6 +1202,12 @@
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "logo_url": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
                 },
                 "players": {
                     "type": "array",
@@ -1316,6 +1375,12 @@
                 "id": {
                     "type": "integer"
                 },
+                "logo_url": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -1324,9 +1389,6 @@
         "rest.tTournament": {
             "type": "object",
             "properties": {
-                "b_day": {
-                    "type": "string"
-                },
                 "end_date": {
                     "type": "string",
                     "example": "2024-12-31 00:00:00"
@@ -1432,11 +1494,34 @@
                 "id": {
                     "type": "integer"
                 },
+                "logo_url": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
                 "players": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/rest.tPlayer"
                     }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tUpdTeamUploadResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "logo_url": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

@@ -427,7 +427,7 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 //	@Produce		json
 //	@Param			tournament_id	path		int		true	"tournament id"
 //	@Param			logo_file		formData	file	false	"файл лого"
-//	@Success		200
+//	@Success		200				{object}	tTournament
 //	@Success		204
 //	@Failure		400
 //	@Failure		500
@@ -462,7 +462,11 @@ func (s *Server) handlerUserUploadTournament(c *gin.Context) {
 	}
 
 	logoFile, err := c.FormFile("logo_file")
-	if err != nil && !errors.Is(err, http.ErrMissingBoundary) {
+	if err != nil && !errors.Is(err, http.ErrMissingFile) {
+		if errors.Is(err, http.ErrMissingBoundary) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		s.log.Error("failed get file", zap.Error(err))
 		c.Writer.WriteHeader(http.StatusInternalServerError)
 		return
@@ -483,7 +487,7 @@ func (s *Server) handlerUserUploadTournament(c *gin.Context) {
 		}
 		tournament.LogoURL = dst
 	}
-	_, err = s.sport.UpdTournament(c.Request.Context(), tournament)
+	tournament, err = s.sport.UpdTournament(c.Request.Context(), tournament)
 	if err != nil {
 		_ = s.removeFile(tournament.LogoURL)
 		s.log.Error("failed update tournament", zap.Error(err))
@@ -497,7 +501,15 @@ func (s *Server) handlerUserUploadTournament(c *gin.Context) {
 		}
 	}
 
-	c.Writer.WriteHeader(http.StatusOK)
+	c.JSON(http.StatusOK, tTournament{
+		ID:                tournament.ID,
+		Title:             tournament.Title,
+		StartDate:         formatDateTime(tournament.StartDate),
+		EndDate:           formatDateTime(tournament.EndDate),
+		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
+		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
+		LogoURL:           s.getFullUploadURL(tournament.LogoURL),
+	})
 }
 
 //	@Summary	создать команду
@@ -580,8 +592,10 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 	if teams != nil && pg.TotalRecords > 0 {
 		for _, t := range (*teams)[pg.StartRow:pg.EndRow] {
 			res = append(res, tTeam{
-				ID:    t.ID,
-				Title: t.Title,
+				ID:       t.ID,
+				Title:    t.Title,
+				LogotURL: s.getFullUploadURL(t.LogoURL),
+				PhotoURL: s.getFullUploadURL(t.PhotoURL),
 			})
 		}
 	}
@@ -642,9 +656,11 @@ func (s *Server) handlerUserTeam(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tGetTeamResponse{
-		ID:      team.ID,
-		Title:   team.Title,
-		Players: resPlayers,
+		ID:       team.ID,
+		Title:    team.Title,
+		Players:  resPlayers,
+		LogotURL: s.getFullUploadURL(team.LogoURL),
+		PhotoURL: s.getFullUploadURL(team.PhotoURL),
 	})
 }
 
@@ -730,9 +746,140 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tUpdTeamResponse{
-		ID:      team.ID,
-		Title:   team.Title,
-		Players: playersRes,
+		ID:       team.ID,
+		Title:    team.Title,
+		Players:  &playersRes,
+		LogotURL: s.getFullUploadURL(team.LogoURL),
+		PhotoURL: s.getFullUploadURL(team.PhotoURL),
+	})
+}
+
+//	@Summary	Загрузка лого и фото команды
+//	@Schemes
+//	@Description	Загрузка лого и фото команды
+//	@Tags			user team
+//	@Param			team_id		path		int		true	"team id"
+//	@Param			logo_file	formData	file	false	"логотип"
+//	@Param			photo_file	formData	file	false	"фото команды"
+//	@Produce		json
+//	@Success		200	{object}	tUpdTeamUploadResponse
+//	@Failure		204
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/teams/{team_id}/upload [put]
+func (s *Server) handlerUserUploadTeam(c *gin.Context) {
+	userID, err := s.checkAuth(c)
+	if err != nil {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	teamID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	team, err := s.sport.GetTeamByID(c.Request.Context(), uint(teamID))
+	if err != nil {
+		if errors.Is(err, errstore.ErrNotFoundData) {
+			c.Writer.WriteHeader(http.StatusNoContent)
+			return
+		}
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if team.UserID != userID {
+		c.Writer.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	logoFile, err := c.FormFile("logo_file")
+	if err != nil && !errors.Is(err, http.ErrMissingFile) {
+		if errors.Is(err, http.ErrMissingBoundary) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		s.log.Error("failed get logo", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	photoFile, err := c.FormFile("photo_file")
+	if err != nil && !errors.Is(err, http.ErrMissingFile) {
+		s.log.Error("failed get photo", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if photoFile == nil && logoFile == nil {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var oldLogoName string = team.LogoURL
+	if logoFile != nil {
+		if !s.isValidImgExtension(logoFile) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		dst := s.genUploadName(logoFile.Filename)
+		err = s.saveFile(logoFile, dst)
+		if err != nil {
+			s.log.Error("failed save file", zap.Error(err))
+			c.Writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		team.LogoURL = dst
+	}
+
+	var oldPhotoName string = team.PhotoURL
+	if photoFile != nil {
+		if !s.isValidImgExtension(photoFile) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		dst := s.genUploadName(photoFile.Filename)
+		err = s.saveFile(photoFile, dst)
+		if err != nil {
+			s.log.Error("failed save file", zap.Error(err))
+			c.Writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		team.PhotoURL = dst
+	}
+
+	team, _, err = s.sport.UpdTeam(c.Request.Context(), team, nil)
+	if err != nil {
+		if logoFile != nil {
+			_ = s.removeFile(team.LogoURL)
+		}
+		if photoFile != nil {
+			_ = s.removeFile(team.PhotoURL)
+		}
+		s.log.Error("failed update tournament", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if logoFile != nil {
+		err = s.removeFile(oldLogoName)
+		if err != nil {
+			s.log.Error("failed remove logo", zap.String("filename", oldLogoName), zap.Error(err))
+		}
+	}
+	if photoFile != nil {
+		err = s.removeFile(oldPhotoName)
+		if err != nil {
+			s.log.Error("failed remove photo", zap.String("filename", oldPhotoName), zap.Error(err))
+		}
+	}
+
+	c.JSON(http.StatusOK, tUpdTeamUploadResponse{
+		ID:       team.ID,
+		Title:    team.Title,
+		LogotURL: s.getFullUploadURL(team.LogoURL),
+		PhotoURL: s.getFullUploadURL(team.PhotoURL),
 	})
 }
 
@@ -958,7 +1105,11 @@ func (s *Server) handlerUserUploadPlayer(c *gin.Context) {
 	}
 
 	photoFile, err := c.FormFile("photo_file")
-	if err != nil && !errors.Is(err, http.ErrMissingBoundary) {
+	if err != nil && !errors.Is(err, http.ErrMissingFile) {
+		if errors.Is(err, http.ErrMissingBoundary) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		s.log.Error("failed get file", zap.Error(err))
 		c.Writer.WriteHeader(http.StatusInternalServerError)
 		return
@@ -979,7 +1130,7 @@ func (s *Server) handlerUserUploadPlayer(c *gin.Context) {
 		}
 		player.PhotoURL = dst
 	}
-	_, err = s.sport.UpdPlayer(c.Request.Context(), player)
+	player, err = s.sport.UpdPlayer(c.Request.Context(), player)
 	if err != nil {
 		_ = s.removeFile(player.PhotoURL)
 		s.log.Error("failed update player", zap.Error(err))
@@ -993,7 +1144,14 @@ func (s *Server) handlerUserUploadPlayer(c *gin.Context) {
 		}
 	}
 
-	c.Writer.WriteHeader(http.StatusOK)
+	c.JSON(http.StatusOK, tPlayer{
+		ID:         player.ID,
+		FirstName:  player.FirstName,
+		SecondName: player.SecondName,
+		LastName:   player.LastName,
+		PhotoURL:   s.getFullUploadURL(player.PhotoURL),
+		BDay:       formatDate(player.BDay),
+	})
 }
 
 //	@Summary	заявки на турнир

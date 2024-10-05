@@ -48,6 +48,8 @@ type Team struct {
 	ID           uint `gorm:"primarykey"`
 	UserID       uint `gorm:"index;not null"`
 	Title        string
+	LogoURL      string
+	PhotoURL     string
 	Players      []Player `gorm:"many2many:team_players"`
 	Applications []Application
 	CreatedAt    time.Time
