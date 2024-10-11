@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"sport-space/docs"
+	"sport-space/internal/adapter/errsport"
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 	"sport-space/internal/core/sportspace"
@@ -164,18 +165,15 @@ func (s *Server) Run() error {
 			user.GET("/tournaments", s.handlerUserTournaments)
 			user.GET("/tournaments/:id", s.handlerUserTournament)
 			user.PUT("/tournaments/:id", s.handlerUserUpdTournament)
-			user.PUT("/tournaments/:id/upload", s.handlerUserUploadTournament)
 
 			user.POST("/teams", s.handlerUserNewTeam)
 			user.GET("/teams", s.handlerUserTeams)
 			user.GET("/teams/:id", s.handlerUserTeam)
 			user.PUT("/teams/:id", s.handlerUserUptTeam)
-			user.PUT("/teams/:id/upload", s.handlerUserUploadTeam)
 
 			user.POST("/players", s.handlerUserNewPlayer)
 			user.GET("/players", s.handlerUserPlayers)
 			user.PUT("/players/:id", s.handlerUserUpdatePlayer)
-			user.PUT("/players/:id/upload", s.handlerUserUploadPlayer)
 
 			// заявки турнира
 			user.GET("/tournaments/:id/applications", s.handlerGetTournamentApplications)
@@ -187,6 +185,8 @@ func (s *Server) Run() error {
 			user.PUT("/teams/:id/applications/:aid", s.handlerUpdStatusTeamApplication)
 			user.GET("/teams/:id/applications", s.handlerGetTeamApplications)
 			user.GET("/teams/:id/applications/:aid", s.handlerGetApplication)
+
+			user.POST("/upload", s.handlerUpload)
 		}
 
 		guest := api.Group("/")
@@ -276,15 +276,19 @@ func (s *Server) login(c *gin.Context, login, password string) (int, string) {
 }
 
 func (s *Server) genUploadName(name string) string {
-	return "/" + tools.RandomString(20) + filepath.Ext(name)
+	return tools.RandomString(20) + filepath.Ext(name)
 }
 
 func (s *Server) saveFile(file *multipart.FileHeader, dst string) error {
-	return tools.SaveUploadedFile(file, s.uploadPath+dst)
+	path := s.uploadPath + "/" + dst
+	if _, err := os.Stat(path); err == nil {
+		return errsport.ErrFileAlreadyExists
+	}
+	return tools.SaveUploadedFile(file, path)
 }
 
 func (s *Server) removeFile(dst string) error {
-	return os.Remove(s.uploadPath + dst)
+	return os.Remove(s.uploadPath + "/" + dst)
 }
 
 func (s Server) getFullUploadPath(name string) string {
@@ -298,7 +302,7 @@ func (s Server) getFullUploadURL(name string) string {
 	if name == "" {
 		return ""
 	}
-	return s.baseURL + s.uploadURL + name
+	return s.baseURL + s.uploadURL + "/" + name
 }
 
 func (s Server) isValidImgExtension(file *multipart.FileHeader) bool {

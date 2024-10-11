@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -141,16 +142,17 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 
 	pg := s.getPagination(c, len(*tournaments))
 
-	res := []tTournament{}
+	res := []tTournamentResponse{}
 	for _, t := range (*tournaments)[pg.StartRow:pg.EndRow] {
-		res = append(res, tTournament{
+		res = append(res, tTournamentResponse{
 			ID:                t.ID,
 			Title:             t.Title,
 			StartDate:         formatDateTime(t.StartDate),
 			EndDate:           formatDateTime(t.EndDate),
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
 			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
-			LogoURL:           s.getFullUploadURL(t.LogoURL),
+			LogoURL:           t.LogoURL,
+			LogoExternalURL:   s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -187,8 +189,8 @@ func (s *Server) handlerUser(c *gin.Context) {
 //	@Tags			user tournament
 //	@Accept			json
 //	@Produce		json
-//	@Param			tournamet	body		tCreateTournament	true	"tournament"
-//	@Success		201			{object}	tTournament
+//	@Param			tournamet	body		tCreateTournamentRequest	true	"tournament"
+//	@Success		201			{object}	tTournamentResponse
 //	@Failure		400
 //	@Failure		500
 //	@Router			/user/tournaments [post]
@@ -205,7 +207,7 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 		return
 	}
 
-	jBody := tCreateTournament{}
+	jBody := tCreateTournamentRequest{}
 
 	err = json.Unmarshal(bBody, &jBody)
 	if err != nil {
@@ -226,6 +228,7 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 		EndDate:           jBody.EndDate.DateTime(),
 		RegisterStartDate: jBody.RegisterStartDate.DateTime(),
 		RegisterEndDate:   jBody.RegisterEndDate.DateTime(),
+		LogoURL:           jBody.LogoURL,
 	}
 
 	tournament, err := s.sport.NewTournament(c.Request.Context(), t)
@@ -235,13 +238,15 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, tTournament{
+	c.JSON(http.StatusCreated, tTournamentResponse{
 		ID:                tournament.ID,
 		Title:             tournament.Title,
 		StartDate:         formatDateTime(tournament.StartDate),
 		EndDate:           formatDateTime(tournament.EndDate),
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
+		LogoURL:           tournament.LogoURL,
+		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -279,16 +284,17 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 
 	pg := s.getPagination(c, len(*tournaments))
 
-	result := []tTournament{}
+	result := []tTournamentResponse{}
 	for _, t := range (*tournaments)[pg.StartRow:pg.EndRow] {
-		result = append(result, tTournament{
+		result = append(result, tTournamentResponse{
 			ID:                t.ID,
 			Title:             t.Title,
 			StartDate:         formatDateTime(t.StartDate),
 			EndDate:           formatDateTime(t.EndDate),
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
 			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
-			LogoURL:           s.getFullUploadURL(t.LogoURL),
+			LogoURL:           t.LogoURL,
+			LogoExternalURL:   s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -304,7 +310,7 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 //	@Tags			user tournament
 //	@Param			tournament_id	path	int	true	"tournament id"
 //	@Produce		json
-//	@Success		200	{object}	tTournament
+//	@Success		200	{object}	tTournamentResponse
 //	@Failure		204
 //	@Failure		400
 //	@Failure		500
@@ -332,14 +338,15 @@ func (s *Server) handlerUserTournament(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tTournament{
+	c.JSON(http.StatusOK, tTournamentResponse{
 		ID:                tournament.ID,
 		Title:             tournament.Title,
 		StartDate:         formatDateTime(tournament.StartDate),
 		EndDate:           formatDateTime(tournament.EndDate),
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
-		LogoURL:           s.getFullUploadURL(tournament.LogoURL),
+		LogoURL:           tournament.LogoURL,
+		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -396,6 +403,7 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 		EndDate:           jBody.EndDate.DateTime(),
 		RegisterStartDate: jBody.RegisterStartDate.DateTime(),
 		RegisterEndDate:   jBody.RegisterEndDate.DateTime(),
+		LogoURL:           jBody.LogoURL,
 		UserID:            user.ID,
 	})
 	if err != nil {
@@ -408,107 +416,15 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tTournament{
+	c.JSON(http.StatusOK, tTournamentResponse{
 		ID:                tournament.ID,
 		Title:             tournament.Title,
 		StartDate:         formatDateTime(tournament.StartDate),
 		EndDate:           formatDateTime(tournament.EndDate),
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
-		LogoURL:           s.getFullUploadPath(tournament.LogoURL),
-	})
-}
-
-//	@Summary	загрузка файлов турнира
-//	@Schemes
-//	@Description	загрузка файлов турнира
-//	@Tags			user tournament
-//	@Accept			json
-//	@Produce		json
-//	@Param			tournament_id	path		int		true	"tournament id"
-//	@Param			logo_file		formData	file	false	"файл лого"
-//	@Success		200				{object}	tTournament
-//	@Success		204
-//	@Failure		400
-//	@Failure		500
-//	@Router			/user/tournaments/{tournament_id}/upload [put]
-func (s *Server) handlerUserUploadTournament(c *gin.Context) {
-	userID, err := s.checkAuth(c)
-	if err != nil {
-		c.Writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	tournamentID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	tournament, err := s.sport.GetTournamentByID(c.Request.Context(), uint(tournamentID))
-	if err != nil {
-		if errors.Is(err, errstore.ErrNotFoundData) {
-			c.Writer.WriteHeader(http.StatusNoContent)
-			return
-		}
-		s.log.Error("failed get tournament", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if tournament.UserID != userID {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	logoFile, err := c.FormFile("logo_file")
-	if err != nil && !errors.Is(err, http.ErrMissingFile) {
-		if errors.Is(err, http.ErrMissingBoundary) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		s.log.Error("failed get file", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var oldLogoName string = tournament.LogoURL
-	if logoFile != nil {
-		if !s.isValidImgExtension(logoFile) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		dst := s.genUploadName(logoFile.Filename)
-		err = s.saveFile(logoFile, dst)
-		if err != nil {
-			s.log.Error("failed save file", zap.Error(err))
-			c.Writer.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		tournament.LogoURL = dst
-	}
-	tournament, err = s.sport.UpdTournament(c.Request.Context(), tournament)
-	if err != nil {
-		_ = s.removeFile(tournament.LogoURL)
-		s.log.Error("failed update tournament", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if logoFile != nil {
-		err = s.removeFile(oldLogoName)
-		if err != nil {
-			s.log.Error("failed remove file", zap.String("filename", oldLogoName), zap.Error(err))
-		}
-	}
-
-	c.JSON(http.StatusOK, tTournament{
-		ID:                tournament.ID,
-		Title:             tournament.Title,
-		StartDate:         formatDateTime(tournament.StartDate),
-		EndDate:           formatDateTime(tournament.EndDate),
-		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
-		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
-		LogoURL:           s.getFullUploadURL(tournament.LogoURL),
+		LogoURL:           tournament.LogoURL,
+		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -524,9 +440,9 @@ func (s *Server) handlerUserUploadTournament(c *gin.Context) {
 //	@Failure		500
 //	@Router			/user/teams [post]
 func (s *Server) handlerUserNewTeam(c *gin.Context) {
-	user, statusCode, err := s.checkUser(c)
+	userID, err := s.checkAuth(c)
 	if err != nil {
-		c.Writer.WriteHeader(statusCode)
+		c.Writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -546,8 +462,10 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 	}
 
 	team, err := s.sport.NewTeam(c.Request.Context(), &models.Team{
-		Title:  jBody.Title,
-		UserID: user.ID,
+		Title:    jBody.Title,
+		UserID:   userID,
+		PhotoURL: jBody.PhotoURL,
+		LogoURL:  jBody.LogotURL,
 	})
 	if err != nil {
 		s.log.Error("failed create team", zap.Error(err))
@@ -556,8 +474,13 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, tTeam{
-		ID:    team.ID,
-		Title: team.Title,
+		ID:               team.ID,
+		Title:            team.Title,
+		LogoURL:          team.LogoURL,
+		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
+		PhotoURL:         team.PhotoURL,
+		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
+		CreatedAt:        formatDateTime(&team.CreatedAt),
 	})
 }
 
@@ -592,10 +515,13 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 	if teams != nil && pg.TotalRecords > 0 {
 		for _, t := range (*teams)[pg.StartRow:pg.EndRow] {
 			res = append(res, tTeam{
-				ID:       t.ID,
-				Title:    t.Title,
-				LogotURL: s.getFullUploadURL(t.LogoURL),
-				PhotoURL: s.getFullUploadURL(t.PhotoURL),
+				ID:               t.ID,
+				Title:            t.Title,
+				LogoURL:          t.LogoURL,
+				LogoExternalURL:  s.getFullUploadURL(t.LogoURL),
+				PhotoURL:         t.PhotoURL,
+				PhotoExternalURL: s.getFullUploadURL(t.PhotoURL),
+				CreatedAt:        formatDateTime(&t.CreatedAt),
 			})
 		}
 	}
@@ -645,22 +571,27 @@ func (s *Server) handlerUserTeam(c *gin.Context) {
 		return
 	}
 
-	resPlayers := []tPlayer{}
+	resPlayers := []tPlayerResponse{}
 	for _, p := range team.Players {
-		resPlayers = append(resPlayers, tPlayer{
-			ID:         p.ID,
-			FirstName:  p.FirstName,
-			SecondName: p.SecondName,
-			LastName:   p.LastName,
+		resPlayers = append(resPlayers, tPlayerResponse{
+			ID:               p.ID,
+			FirstName:        p.FirstName,
+			SecondName:       p.SecondName,
+			LastName:         p.LastName,
+			PhotoURL:         p.PhotoURL,
+			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 		})
 	}
 
 	c.JSON(http.StatusOK, tGetTeamResponse{
-		ID:       team.ID,
-		Title:    team.Title,
-		Players:  resPlayers,
-		LogotURL: s.getFullUploadURL(team.LogoURL),
-		PhotoURL: s.getFullUploadURL(team.PhotoURL),
+		ID:               team.ID,
+		Title:            team.Title,
+		Players:          resPlayers,
+		LogoURL:          team.LogoURL,
+		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
+		PhotoURL:         team.PhotoURL,
+		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
+		CreatedAt:        formatDateTime(&team.CreatedAt),
 	})
 }
 
@@ -718,9 +649,9 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusNoContent)
 		return
 	}
-	if jBody.Title != nil {
-		team.Title = *jBody.Title
-	}
+	team.Title = jBody.Title
+	team.LogoURL = jBody.LogotURL
+	team.PhotoURL = jBody.PhotoURL
 
 	team, players, err := s.sport.UpdTeam(c.Request.Context(), team, jBody.Players)
 	if err != nil {
@@ -733,153 +664,28 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 		return
 	}
 
-	playersRes := []tPlayer{}
+	playersRes := []tPlayerResponse{}
 	for _, p := range *players {
-		playersRes = append(playersRes, tPlayer{
-			ID:         p.ID,
-			FirstName:  p.FirstName,
-			SecondName: p.SecondName,
-			LastName:   p.LastName,
-			BDay:       formatDate(p.BDay),
-			PhotoURL:   s.getFullUploadURL(p.PhotoURL),
+		playersRes = append(playersRes, tPlayerResponse{
+			ID:               p.ID,
+			FirstName:        p.FirstName,
+			SecondName:       p.SecondName,
+			LastName:         p.LastName,
+			BDay:             formatDate(p.BDay),
+			PhotoURL:         p.PhotoURL,
+			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 		})
 	}
 
 	c.JSON(http.StatusOK, tUpdTeamResponse{
-		ID:       team.ID,
-		Title:    team.Title,
-		Players:  &playersRes,
-		LogotURL: s.getFullUploadURL(team.LogoURL),
-		PhotoURL: s.getFullUploadURL(team.PhotoURL),
-	})
-}
-
-//	@Summary	Загрузка лого и фото команды
-//	@Schemes
-//	@Description	Загрузка лого и фото команды
-//	@Tags			user team
-//	@Param			team_id		path		int		true	"team id"
-//	@Param			logo_file	formData	file	false	"логотип"
-//	@Param			photo_file	formData	file	false	"фото команды"
-//	@Produce		json
-//	@Success		200	{object}	tUpdTeamUploadResponse
-//	@Failure		204
-//	@Failure		400
-//	@Failure		500
-//	@Router			/user/teams/{team_id}/upload [put]
-func (s *Server) handlerUserUploadTeam(c *gin.Context) {
-	userID, err := s.checkAuth(c)
-	if err != nil {
-		c.Writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	teamID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	team, err := s.sport.GetTeamByID(c.Request.Context(), uint(teamID))
-	if err != nil {
-		if errors.Is(err, errstore.ErrNotFoundData) {
-			c.Writer.WriteHeader(http.StatusNoContent)
-			return
-		}
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if team.UserID != userID {
-		c.Writer.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	logoFile, err := c.FormFile("logo_file")
-	if err != nil && !errors.Is(err, http.ErrMissingFile) {
-		if errors.Is(err, http.ErrMissingBoundary) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		s.log.Error("failed get logo", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	photoFile, err := c.FormFile("photo_file")
-	if err != nil && !errors.Is(err, http.ErrMissingFile) {
-		s.log.Error("failed get photo", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if photoFile == nil && logoFile == nil {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	var oldLogoName string = team.LogoURL
-	if logoFile != nil {
-		if !s.isValidImgExtension(logoFile) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		dst := s.genUploadName(logoFile.Filename)
-		err = s.saveFile(logoFile, dst)
-		if err != nil {
-			s.log.Error("failed save file", zap.Error(err))
-			c.Writer.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		team.LogoURL = dst
-	}
-
-	var oldPhotoName string = team.PhotoURL
-	if photoFile != nil {
-		if !s.isValidImgExtension(photoFile) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		dst := s.genUploadName(photoFile.Filename)
-		err = s.saveFile(photoFile, dst)
-		if err != nil {
-			s.log.Error("failed save file", zap.Error(err))
-			c.Writer.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		team.PhotoURL = dst
-	}
-
-	team, _, err = s.sport.UpdTeam(c.Request.Context(), team, nil)
-	if err != nil {
-		if logoFile != nil {
-			_ = s.removeFile(team.LogoURL)
-		}
-		if photoFile != nil {
-			_ = s.removeFile(team.PhotoURL)
-		}
-		s.log.Error("failed update tournament", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if logoFile != nil {
-		err = s.removeFile(oldLogoName)
-		if err != nil {
-			s.log.Error("failed remove logo", zap.String("filename", oldLogoName), zap.Error(err))
-		}
-	}
-	if photoFile != nil {
-		err = s.removeFile(oldPhotoName)
-		if err != nil {
-			s.log.Error("failed remove photo", zap.String("filename", oldPhotoName), zap.Error(err))
-		}
-	}
-
-	c.JSON(http.StatusOK, tUpdTeamUploadResponse{
-		ID:       team.ID,
-		Title:    team.Title,
-		LogotURL: s.getFullUploadURL(team.LogoURL),
-		PhotoURL: s.getFullUploadURL(team.PhotoURL),
+		ID:               team.ID,
+		Title:            team.Title,
+		Players:          &playersRes,
+		LogoURL:          team.LogoURL,
+		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
+		PhotoURL:         team.PhotoURL,
+		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
+		CreatedAt:        formatDateTime(&team.CreatedAt),
 	})
 }
 
@@ -887,9 +693,9 @@ func (s *Server) handlerUserUploadTeam(c *gin.Context) {
 //	@Schemes
 //	@Description	Добавить игрока
 //	@Tags			user players
-//	@Param			player	body	tNewPlayer	true	"player"
+//	@Param			player	body	tNewPlayerRequest	true	"player"
 //	@Produce		json
-//	@Success		201	{object}	tPlayer
+//	@Success		201	{object}	tPlayerResponse
 //	@Failure		400
 //	@Failure		500
 //	@Router			/user/players [post]
@@ -906,7 +712,7 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 		return
 	}
 
-	jBody := tNewPlayer{}
+	jBody := tNewPlayerRequest{}
 
 	err = json.Unmarshal(bBody, &jBody)
 	if err != nil {
@@ -924,6 +730,7 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 		FirstName:  jBody.FirstName,
 		SecondName: jBody.SecondName,
 		LastName:   jBody.LastName,
+		PhotoURL:   jBody.PhotoURL,
 		UserID:     user.ID,
 		BDay:       jBody.BDay.Date(),
 	})
@@ -933,12 +740,14 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, tPlayer{
-		ID:         player.ID,
-		FirstName:  player.FirstName,
-		SecondName: player.SecondName,
-		LastName:   player.LastName,
-		BDay:       formatDate(player.BDay),
+	c.JSON(http.StatusCreated, tPlayerResponse{
+		ID:               player.ID,
+		FirstName:        player.FirstName,
+		SecondName:       player.SecondName,
+		LastName:         player.LastName,
+		PhotoURL:         player.PhotoURL,
+		PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
+		BDay:             formatDate(player.BDay),
 	})
 }
 
@@ -972,15 +781,16 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 	}
 	pg := s.getPagination(c, count)
 
-	res := []tPlayer{}
+	res := []tPlayerResponse{}
 	if players != nil && pg.TotalRecords > 0 {
 		for _, p := range (*players)[pg.StartRow:pg.EndRow] {
-			res = append(res, tPlayer{
-				ID:         p.ID,
-				FirstName:  p.FirstName,
-				SecondName: p.SecondName,
-				LastName:   p.LastName,
-				PhotoURL:   s.getFullUploadURL(p.PhotoURL),
+			res = append(res, tPlayerResponse{
+				ID:               p.ID,
+				FirstName:        p.FirstName,
+				SecondName:       p.SecondName,
+				LastName:         p.LastName,
+				PhotoURL:         p.PhotoURL,
+				PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 			})
 		}
 	}
@@ -995,10 +805,10 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 //	@Schemes
 //	@Description	обновить игрока
 //	@Tags			user players
-//	@Param			player_id	path	int				true	"player id"
-//	@Param			id			body	tUpdatePlayer	true	"player"
+//	@Param			player_id	path	int						true	"player id"
+//	@Param			id			body	tUpdatePlayerRequest	true	"player"
 //	@Produce		json
-//	@Success		200	{object}	tPlayer
+//	@Success		200	{object}	tPlayerResponse
 //	@Failure		204
 //	@Failure		400
 //	@Failure		500
@@ -1022,7 +832,7 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 		return
 	}
 
-	jBody := tUpdatePlayer{}
+	jBody := tUpdatePlayerRequest{}
 
 	err = json.Unmarshal(bBody, &jBody)
 	if err != nil {
@@ -1041,6 +851,7 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 		FirstName:  jBody.FirstName,
 		SecondName: jBody.SecondName,
 		LastName:   jBody.LastName,
+		PhotoURL:   jBody.PhotoURL,
 		UserID:     userID,
 		BDay:       jBody.BDay.Date(),
 	})
@@ -1054,103 +865,14 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tPlayer{
-		ID:         player.ID,
-		FirstName:  player.FirstName,
-		SecondName: player.SecondName,
-		LastName:   player.LastName,
-		BDay:       formatDate(player.BDay),
-	})
-}
-
-//	@Summary	загрузка файлов игрока
-//	@Schemes
-//	@Description	загрузка файлов игрока
-//	@Tags			user players
-//	@Param			player_id	path		int		true	"player id"
-//	@Param			photo_file	formData	file	false	"фотография"
-//	@Produce		json
-//	@Success		200
-//	@Failure		204
-//	@Failure		400
-//	@Failure		500
-//	@Router			/user/players/{player_id}/upload [put]
-func (s *Server) handlerUserUploadPlayer(c *gin.Context) {
-	userID, err := s.checkAuth(c)
-	if err != nil {
-		c.Writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	playerID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	player, err := s.sport.GetPlayerByID(c.Request.Context(), uint(playerID))
-	if err != nil {
-		if errors.Is(err, errstore.ErrNotFoundData) {
-			c.Writer.WriteHeader(http.StatusNoContent)
-			return
-		}
-		s.log.Error("failed get tournament", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if player.UserID != userID {
-		c.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	photoFile, err := c.FormFile("photo_file")
-	if err != nil && !errors.Is(err, http.ErrMissingFile) {
-		if errors.Is(err, http.ErrMissingBoundary) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		s.log.Error("failed get file", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var oldLogoName string = player.PhotoURL
-	if photoFile != nil {
-		if !s.isValidImgExtension(photoFile) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		dst := s.genUploadName(photoFile.Filename)
-		err = s.saveFile(photoFile, dst)
-		if err != nil {
-			s.log.Error("failed save file", zap.Error(err))
-			c.Writer.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		player.PhotoURL = dst
-	}
-	player, err = s.sport.UpdPlayer(c.Request.Context(), player)
-	if err != nil {
-		_ = s.removeFile(player.PhotoURL)
-		s.log.Error("failed update player", zap.Error(err))
-		c.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if photoFile != nil {
-		err = s.removeFile(oldLogoName)
-		if err != nil {
-			s.log.Error("failed remove file", zap.String("filename", oldLogoName), zap.Error(err))
-		}
-	}
-
-	c.JSON(http.StatusOK, tPlayer{
-		ID:         player.ID,
-		FirstName:  player.FirstName,
-		SecondName: player.SecondName,
-		LastName:   player.LastName,
-		PhotoURL:   s.getFullUploadURL(player.PhotoURL),
-		BDay:       formatDate(player.BDay),
+	c.JSON(http.StatusOK, tPlayerResponse{
+		ID:               player.ID,
+		FirstName:        player.FirstName,
+		SecondName:       player.SecondName,
+		LastName:         player.LastName,
+		PhotoURL:         player.PhotoURL,
+		PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
+		BDay:             formatDate(player.BDay),
 	})
 }
 
@@ -1286,13 +1008,15 @@ func (s *Server) handlerGetTournamentApplication(c *gin.Context) {
 		return
 	}
 
-	players := []tPlayer{}
+	players := []tPlayerResponse{}
 	for _, p := range application.Players {
-		players = append(players, tPlayer{
-			ID:         p.ID,
-			FirstName:  p.FirstName,
-			SecondName: p.SecondName,
-			LastName:   p.LastName,
+		players = append(players, tPlayerResponse{
+			ID:               p.ID,
+			FirstName:        p.FirstName,
+			SecondName:       p.SecondName,
+			LastName:         p.LastName,
+			PhotoURL:         p.PhotoURL,
+			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 		})
 	}
 
@@ -1445,13 +1169,15 @@ func (s *Server) handlerNewTeamApplication(c *gin.Context) {
 		return
 	}
 
-	resPlayers := []tPlayer{}
+	resPlayers := []tPlayerResponse{}
 	for _, player := range *players {
-		resPlayers = append(resPlayers, tPlayer{
-			ID:         player.ID,
-			FirstName:  player.FirstName,
-			SecondName: player.SecondName,
-			LastName:   player.LastName,
+		resPlayers = append(resPlayers, tPlayerResponse{
+			ID:               player.ID,
+			FirstName:        player.FirstName,
+			SecondName:       player.SecondName,
+			LastName:         player.LastName,
+			PhotoURL:         player.PhotoURL,
+			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		})
 	}
 
@@ -1549,13 +1275,15 @@ func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
 		return
 	}
 
-	resPlayers := []tPlayer{}
+	resPlayers := []tPlayerResponse{}
 	for _, player := range *players {
-		resPlayers = append(resPlayers, tPlayer{
-			ID:         player.ID,
-			FirstName:  player.FirstName,
-			SecondName: player.SecondName,
-			LastName:   player.LastName,
+		resPlayers = append(resPlayers, tPlayerResponse{
+			ID:               player.ID,
+			FirstName:        player.FirstName,
+			SecondName:       player.SecondName,
+			LastName:         player.LastName,
+			PhotoURL:         player.PhotoURL,
+			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		})
 	}
 	tournament, err := s.sport.GetTournamentByID(c.Request.Context(), application.TournamentID)
@@ -1691,13 +1419,15 @@ func (s *Server) handlerGetApplication(c *gin.Context) {
 		return
 	}
 
-	resPlayers := []tPlayer{}
+	resPlayers := []tPlayerResponse{}
 	for _, player := range application.Players {
-		resPlayers = append(resPlayers, tPlayer{
-			ID:         player.ID,
-			FirstName:  player.FirstName,
-			SecondName: player.SecondName,
-			LastName:   player.LastName,
+		resPlayers = append(resPlayers, tPlayerResponse{
+			ID:               player.ID,
+			FirstName:        player.FirstName,
+			SecondName:       player.SecondName,
+			LastName:         player.LastName,
+			PhotoURL:         player.PhotoURL,
+			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		})
 	}
 
@@ -1717,5 +1447,53 @@ func (s *Server) handlerGetApplication(c *gin.Context) {
 		TournamentTitle: tournament.Title,
 		Status:          string(application.Status),
 		Players:         resPlayers,
+	})
+}
+
+//	@Summary	загрузка файла
+//	@Schemes
+//	@Description	загрузка файла
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			file	formData	file	true	"файл"
+//	@Success		201		{object}	tHandlerUploadResponse
+//	@Failure		400
+//	@Failure		500
+//	@Router			/user/upload [post]
+func (s *Server) handlerUpload(c *gin.Context) {
+	userID, err := s.checkAuth(c)
+	if err != nil {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	logoFile, err := c.FormFile("file")
+	if err != nil && !errors.Is(err, http.ErrMissingFile) {
+		if errors.Is(err, http.ErrMissingBoundary) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		s.log.Error("failed get file", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if !s.isValidImgExtension(logoFile) {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	dst := fmt.Sprintf("%v/%s", userID, s.genUploadName(logoFile.Filename))
+	err = s.saveFile(logoFile, dst)
+	if err != nil {
+		s.log.Error("failed upload file", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusCreated, tHandlerUploadResponse{
+		URL:      s.getFullUploadURL(dst),
+		Filename: dst,
 	})
 }

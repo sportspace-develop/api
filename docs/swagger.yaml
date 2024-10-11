@@ -33,13 +33,19 @@ definitions:
     type: object
   rest.tCreateTeam:
     properties:
+      logo_url:
+        type: string
+      photo_url:
+        type: string
       title:
         type: string
     type: object
-  rest.tCreateTournament:
+  rest.tCreateTournamentRequest:
     properties:
       end_date:
         example: "2024-12-31 00:00:00"
+        type: string
+      logo_url:
         type: string
       register_end_date:
         example: "2024-12-31 00:00:00"
@@ -63,7 +69,7 @@ definitions:
         type: integer
       players:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
       status:
         type: string
@@ -83,22 +89,28 @@ definitions:
     properties:
       data:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
       pagination:
         $ref: '#/definitions/rest.pagination'
     type: object
   rest.tGetTeamResponse:
     properties:
+      created_at:
+        type: string
       id:
         type: integer
+      logo_external_url:
+        type: string
       logo_url:
+        type: string
+      photo_external_url:
         type: string
       photo_url:
         type: string
       players:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
       title:
         type: string
@@ -118,7 +130,7 @@ definitions:
         type: integer
       players:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
       status:
         type: string
@@ -131,7 +143,7 @@ definitions:
     properties:
       data:
         items:
-          $ref: '#/definitions/rest.tTournament'
+          $ref: '#/definitions/rest.tTournamentResponse'
         type: array
       pagination:
         $ref: '#/definitions/rest.pagination'
@@ -142,6 +154,13 @@ definitions:
         items:
           $ref: '#/definitions/rest.tTournamentApplication'
         type: array
+    type: object
+  rest.tHandlerUploadResponse:
+    properties:
+      filename:
+        type: string
+      url:
+        type: string
     type: object
   rest.tNewApplicationRequest:
     properties:
@@ -158,7 +177,7 @@ definitions:
         type: integer
       players:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
       status:
         type: string
@@ -167,7 +186,7 @@ definitions:
       tournament_title:
         type: string
     type: object
-  rest.tNewPlayer:
+  rest.tNewPlayerRequest:
     properties:
       b_day:
         example: "2024-12-31"
@@ -176,10 +195,12 @@ definitions:
         type: string
       lastname:
         type: string
+      photo_url:
+        type: string
       secondname:
         type: string
     type: object
-  rest.tPlayer:
+  rest.tPlayerResponse:
     properties:
       b_day:
         example: "2024-12-31"
@@ -189,6 +210,8 @@ definitions:
       id:
         type: integer
       lastname:
+        type: string
+      photo_external_url:
         type: string
       photo_url:
         type: string
@@ -202,32 +225,17 @@ definitions:
     type: object
   rest.tTeam:
     properties:
+      created_at:
+        type: string
       id:
         type: integer
+      logo_external_url:
+        type: string
       logo_url:
+        type: string
+      photo_external_url:
         type: string
       photo_url:
-        type: string
-      title:
-        type: string
-    type: object
-  rest.tTournament:
-    properties:
-      end_date:
-        example: "2024-12-31 00:00:00"
-        type: string
-      id:
-        type: integer
-      logo_url:
-        type: string
-      register_end_date:
-        example: "2024-12-31 00:00:00"
-        type: string
-      register_start_date:
-        example: "2024-12-31 00:00:00"
-        type: string
-      start_date:
-        example: "2024-12-31 00:00:00"
         type: string
       title:
         type: string
@@ -243,13 +251,36 @@ definitions:
       team_title:
         type: string
     type: object
+  rest.tTournamentResponse:
+    properties:
+      end_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      id:
+        type: integer
+      logo_external_url:
+        type: string
+      logo_url:
+        type: string
+      register_end_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      register_start_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      start_date:
+        example: "2024-12-31 00:00:00"
+        type: string
+      title:
+        type: string
+    type: object
   rest.tUpdApplicationResponse:
     properties:
       id:
         type: integer
       players:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
       status:
         type: string
@@ -272,6 +303,10 @@ definitions:
     type: object
   rest.tUpdTeamRequest:
     properties:
+      logo_url:
+        type: string
+      photo_url:
+        type: string
       player_ids:
         items:
           type: integer
@@ -281,27 +316,22 @@ definitions:
     type: object
   rest.tUpdTeamResponse:
     properties:
+      created_at:
+        type: string
       id:
         type: integer
+      logo_external_url:
+        type: string
       logo_url:
+        type: string
+      photo_external_url:
         type: string
       photo_url:
         type: string
       players:
         items:
-          $ref: '#/definitions/rest.tPlayer'
+          $ref: '#/definitions/rest.tPlayerResponse'
         type: array
-      title:
-        type: string
-    type: object
-  rest.tUpdTeamUploadResponse:
-    properties:
-      id:
-        type: integer
-      logo_url:
-        type: string
-      photo_url:
-        type: string
       title:
         type: string
     type: object
@@ -318,6 +348,8 @@ definitions:
       end_date:
         example: "2024-12-31 00:00:00"
         type: string
+      logo_url:
+        type: string
       register_end_date:
         example: "2024-12-31 00:00:00"
         type: string
@@ -333,7 +365,7 @@ definitions:
     - end_date
     - start_date
     type: object
-  rest.tUpdatePlayer:
+  rest.tUpdatePlayerRequest:
     properties:
       b_day:
         example: "2024-12-31"
@@ -341,6 +373,8 @@ definitions:
       firstname:
         type: string
       lastname:
+        type: string
+      photo_url:
         type: string
       secondname:
         type: string
@@ -495,14 +529,14 @@ paths:
         name: player
         required: true
         schema:
-          $ref: '#/definitions/rest.tNewPlayer'
+          $ref: '#/definitions/rest.tNewPlayerRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/rest.tPlayer'
+            $ref: '#/definitions/rest.tPlayerResponse'
         "400":
           description: Bad Request
         "500":
@@ -524,14 +558,14 @@ paths:
         name: id
         required: true
         schema:
-          $ref: '#/definitions/rest.tUpdatePlayer'
+          $ref: '#/definitions/rest.tUpdatePlayerRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.tPlayer'
+            $ref: '#/definitions/rest.tPlayerResponse'
         "204":
           description: No Content
         "400":
@@ -539,33 +573,6 @@ paths:
         "500":
           description: Internal Server Error
       summary: обновить игрока
-      tags:
-      - user players
-  /user/players/{player_id}/upload:
-    put:
-      description: загрузка файлов игрока
-      parameters:
-      - description: player id
-        in: path
-        name: player_id
-        required: true
-        type: integer
-      - description: фотография
-        in: formData
-        name: photo_file
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: загрузка файлов игрока
       tags:
       - user players
   /user/teams:
@@ -790,39 +797,6 @@ paths:
       summary: изменить заявку
       tags:
       - user team
-  /user/teams/{team_id}/upload:
-    put:
-      description: Загрузка лого и фото команды
-      parameters:
-      - description: team id
-        in: path
-        name: team_id
-        required: true
-        type: integer
-      - description: логотип
-        in: formData
-        name: logo_file
-        type: file
-      - description: фото команды
-        in: formData
-        name: photo_file
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/rest.tUpdTeamUploadResponse'
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: Загрузка лого и фото команды
-      tags:
-      - user team
   /user/tournaments:
     get:
       consumes:
@@ -863,14 +837,14 @@ paths:
         name: tournamet
         required: true
         schema:
-          $ref: '#/definitions/rest.tCreateTournament'
+          $ref: '#/definitions/rest.tCreateTournamentRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/rest.tTournament'
+            $ref: '#/definitions/rest.tTournamentResponse'
         "400":
           description: Bad Request
         "500":
@@ -893,7 +867,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest.tTournament'
+            $ref: '#/definitions/rest.tTournamentResponse'
         "204":
           description: No Content
         "400":
@@ -1017,35 +991,29 @@ paths:
       summary: изменить заявку
       tags:
       - user tournament
-  /user/tournaments/{tournament_id}/upload:
-    put:
+  /user/upload:
+    post:
       consumes:
       - application/json
-      description: загрузка файлов турнира
+      description: загрузка файла
       parameters:
-      - description: tournament id
-        in: path
-        name: tournament_id
-        required: true
-        type: integer
-      - description: файл лого
+      - description: файл
         in: formData
-        name: logo_file
+        name: file
+        required: true
         type: file
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/rest.tTournament'
-        "204":
-          description: No Content
+            $ref: '#/definitions/rest.tHandlerUploadResponse'
         "400":
           description: Bad Request
         "500":
           description: Internal Server Error
-      summary: загрузка файлов турнира
+      summary: загрузка файла
       tags:
-      - user tournament
+      - user
 swagger: "2.0"

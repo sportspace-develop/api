@@ -71,15 +71,16 @@ type tRequestOTP struct {
 	Email email.Email `json:"email"`
 }
 
-type tCreateTournament struct {
+type tCreateTournamentRequest struct {
 	Title             string     `json:"title" validate:"required"`
 	StartDate         *sportTime `json:"start_date" example:"2024-12-31 00:00:00" validate:"required"`
 	EndDate           *sportTime `json:"end_date" example:"2024-12-31 00:00:00" validate:"required"`
 	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31 00:00:00"`
 	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31 00:00:00"`
+	LogoURL           string     `json:"logo_url"`
 }
 
-func (tct tCreateTournament) IsValid() bool {
+func (tct tCreateTournamentRequest) IsValid() bool {
 	return !(tct.Title == "" || tct.StartDate == nil || tct.EndDate == nil)
 }
 
@@ -89,13 +90,14 @@ type tUpdTournamentRequest struct {
 	EndDate           *sportTime `json:"end_date" example:"2024-12-31 00:00:00" validate:"required"`
 	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31 00:00:00"`
 	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31 00:00:00"`
+	LogoURL           string     `json:"logo_url"`
 }
 
 func (tutr tUpdTournamentRequest) IsValid() bool {
 	return !(tutr.Title == "" || tutr.StartDate == nil || tutr.EndDate == nil)
 }
 
-type tTournament struct {
+type tTournamentResponse struct {
 	ID                uint   `json:"id"`
 	Title             string `json:"title"`
 	StartDate         string `json:"start_date" example:"2024-12-31 00:00:00"`
@@ -103,22 +105,28 @@ type tTournament struct {
 	RegisterStartDate string `json:"register_start_date" example:"2024-12-31 00:00:00"`
 	RegisterEndDate   string `json:"register_end_date" example:"2024-12-31 00:00:00"`
 	LogoURL           string `json:"logo_url"`
+	LogoExternalURL   string `json:"logo_external_url"`
 }
 
 type tGetTorunamentsResponse struct {
-	Pagination pagination    `json:"pagination"`
-	Data       []tTournament `json:"data"`
+	Pagination pagination            `json:"pagination"`
+	Data       []tTournamentResponse `json:"data"`
 }
 
 type tCreateTeam struct {
-	Title string `json:"title"`
-}
-
-type tTeam struct {
-	ID       uint   `json:"id"`
 	Title    string `json:"title"`
 	LogotURL string `json:"logo_url"`
 	PhotoURL string `json:"photo_url"`
+}
+
+type tTeam struct {
+	ID               uint   `json:"id"`
+	Title            string `json:"title"`
+	LogoURL          string `json:"logo_url"`
+	LogoExternalURL  string `json:"logo_external_url"`
+	PhotoURL         string `json:"photo_url"`
+	PhotoExternalURL string `json:"photo_external_url"`
+	CreatedAt        string `json:"created_at"`
 }
 
 type tGetTeamsResponse struct {
@@ -127,66 +135,70 @@ type tGetTeamsResponse struct {
 }
 
 type tGetTeamResponse struct {
-	ID       uint      `json:"id"`
-	Title    string    `json:"title"`
-	Players  []tPlayer `json:"players"`
-	LogotURL string    `json:"logo_url"`
-	PhotoURL string    `json:"photo_url"`
+	ID               uint              `json:"id"`
+	Title            string            `json:"title"`
+	Players          []tPlayerResponse `json:"players"`
+	LogoURL          string            `json:"logo_url"`
+	LogoExternalURL  string            `json:"logo_external_url"`
+	PhotoURL         string            `json:"photo_url"`
+	PhotoExternalURL string            `json:"photo_external_url"`
+	CreatedAt        string            `json:"created_at"`
 }
 
 type tUpdTeamRequest struct {
-	Title   *string `json:"title"`
-	Players *[]uint `json:"player_ids"`
+	Title    string  `json:"title"`
+	LogotURL string  `json:"logo_url"`
+	PhotoURL string  `json:"photo_url"`
+	Players  *[]uint `json:"player_ids"`
 }
 
 type tUpdTeamResponse struct {
-	ID       uint       `json:"id"`
-	Title    string     `json:"title"`
-	Players  *[]tPlayer `json:"players"`
-	LogotURL string     `json:"logo_url"`
-	PhotoURL string     `json:"photo_url"`
+	ID               uint               `json:"id"`
+	Title            string             `json:"title"`
+	Players          *[]tPlayerResponse `json:"players"`
+	LogoURL          string             `json:"logo_url"`
+	LogoExternalURL  string             `json:"logo_external_url"`
+	PhotoURL         string             `json:"photo_url"`
+	PhotoExternalURL string             `json:"photo_external_url"`
+	CreatedAt        string             `json:"created_at"`
 }
 
-type tUpdTeamUploadResponse struct {
-	ID       uint   `json:"id"`
-	Title    string `json:"title"`
-	LogotURL string `json:"logo_url"`
-	PhotoURL string `json:"photo_url"`
-}
-
-type tNewPlayer struct {
+type tNewPlayerRequest struct {
 	FirstName  string     `json:"firstname"`
 	SecondName string     `json:"secondname"`
 	LastName   string     `json:"lastname"`
+	PhotoURL   string     `json:"photo_url"`
 	BDay       *sportTime `json:"b_day" example:"2024-12-31"`
 }
 
-func (tnp tNewPlayer) IsValid() bool {
+func (tnp tNewPlayerRequest) IsValid() bool {
 	return !(tnp.FirstName == "" || tnp.LastName == "")
 }
 
-type tPlayer struct {
-	ID         uint   `json:"id"`
-	FirstName  string `json:"firstname"`
-	SecondName string `json:"secondname"`
-	LastName   string `json:"lastname"`
-	PhotoURL   string `json:"photo_url"`
-	BDay       string `json:"b_day" example:"2024-12-31"`
+type tPlayerResponse struct {
+	ID               uint   `json:"id"`
+	FirstName        string `json:"firstname"`
+	SecondName       string `json:"secondname"`
+	LastName         string `json:"lastname"`
+	PhotoURL         string `json:"photo_url"`
+	PhotoExternalURL string `json:"photo_external_url"`
+	BDay             string `json:"b_day" example:"2024-12-31"`
 }
 
 type tGetPlayersResponse struct {
-	Pagination pagination `json:"pagination"`
-	Data       []tPlayer  `json:"data"`
+	Pagination pagination        `json:"pagination"`
+	Data       []tPlayerResponse `json:"data"`
 }
 
-type tUpdatePlayer struct {
+type tUpdatePlayerRequest struct {
 	FirstName  string     `json:"firstname"`
 	SecondName string     `json:"secondname"`
 	LastName   string     `json:"lastname"`
+	PhotoURL   string     `json:"photo_url"`
 	BDay       *sportTime `json:"b_day" example:"2024-12-31"`
 }
 
-func (tup tUpdatePlayer) IsValid() bool {
+func (tup tUpdatePlayerRequest) IsValid() bool {
 	return !(tup.FirstName == "" || tup.LastName == "")
 }
 
@@ -203,11 +215,11 @@ type tNewApplicationRequest struct {
 }
 
 type tNewApplicationResponse struct {
-	ID              uint      `json:"id"`
-	TournamentID    uint      `json:"tournament_id"`
-	TournamentTitle string    `json:"tournament_title"`
-	Status          string    `json:"status"`
-	Players         []tPlayer `json:"players"`
+	ID              uint              `json:"id"`
+	TournamentID    uint              `json:"tournament_id"`
+	TournamentTitle string            `json:"tournament_title"`
+	Status          string            `json:"status"`
+	Players         []tPlayerResponse `json:"players"`
 }
 
 type applicationStatus string
@@ -228,11 +240,11 @@ type tUpdApplicationStatusRequest struct {
 }
 
 type tUpdApplicationResponse struct {
-	ID              uint      `json:"id"`
-	TournamentID    uint      `json:"tournament_id"`
-	TournamentTitle string    `json:"tournament_title"`
-	Status          string    `json:"status"`
-	Players         []tPlayer `json:"players"`
+	ID              uint              `json:"id"`
+	TournamentID    uint              `json:"tournament_id"`
+	TournamentTitle string            `json:"tournament_title"`
+	Status          string            `json:"status"`
+	Players         []tPlayerResponse `json:"players"`
 }
 
 type tGetApplicationsTeamResponse struct {
@@ -240,11 +252,11 @@ type tGetApplicationsTeamResponse struct {
 }
 
 type tGetApplicationResponse struct {
-	ID              uint      `json:"id"`
-	TournamentID    uint      `json:"tournament_id"`
-	TournamentTitle string    `json:"tournament_title"`
-	Status          string    `json:"status"`
-	Players         []tPlayer `json:"players"`
+	ID              uint              `json:"id"`
+	TournamentID    uint              `json:"tournament_id"`
+	TournamentTitle string            `json:"tournament_title"`
+	Status          string            `json:"status"`
+	Players         []tPlayerResponse `json:"players"`
 }
 
 type tTournamentApplication struct {
@@ -259,11 +271,11 @@ type tGetTournamentApplicationsResponse struct {
 }
 
 type tGetTorunamentApplicationResponse struct {
-	ID        uint      `json:"id"`
-	TeamID    uint      `json:"taem_id"`
-	TeamTitle string    `json:"team_title"`
-	Status    string    `json:"status"`
-	Players   []tPlayer `json:"players"`
+	ID        uint              `json:"id"`
+	TeamID    uint              `json:"taem_id"`
+	TeamTitle string            `json:"team_title"`
+	Status    string            `json:"status"`
+	Players   []tPlayerResponse `json:"players"`
 }
 
 type applicationTournamentStatus string
@@ -287,4 +299,9 @@ type tUpdTournamentApplicationResponse struct {
 	TeamID    uint   `json:"taem_id"`
 	TeamTitle string `json:"team_title"`
 	Status    string `json:"status"`
+}
+
+type tHandlerUploadResponse struct {
+	URL      string `json:"url"`
+	Filename string `json:"filename"`
 }

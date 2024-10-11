@@ -239,7 +239,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest.tNewPlayer"
+                            "$ref": "#/definitions/rest.tNewPlayerRequest"
                         }
                     }
                 ],
@@ -247,7 +247,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/rest.tPlayer"
+                            "$ref": "#/definitions/rest.tPlayerResponse"
                         }
                     },
                     "400": {
@@ -283,7 +283,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest.tUpdatePlayer"
+                            "$ref": "#/definitions/rest.tUpdatePlayerRequest"
                         }
                     }
                 ],
@@ -291,49 +291,8 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest.tPlayer"
+                            "$ref": "#/definitions/rest.tPlayerResponse"
                         }
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/user/players/{player_id}/upload": {
-            "put": {
-                "description": "загрузка файлов игрока",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user players"
-                ],
-                "summary": "загрузка файлов игрока",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "player id",
-                        "name": "player_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "фотография",
-                        "name": "photo_file",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     },
                     "204": {
                         "description": "No Content"
@@ -682,56 +641,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/teams/{team_id}/upload": {
-            "put": {
-                "description": "Загрузка лого и фото команды",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user team"
-                ],
-                "summary": "Загрузка лого и фото команды",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "team id",
-                        "name": "team_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "логотип",
-                        "name": "logo_file",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "file",
-                        "description": "фото команды",
-                        "name": "photo_file",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/rest.tUpdTeamUploadResponse"
-                        }
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/user/tournaments": {
             "get": {
                 "description": "турниры пользователя",
@@ -796,7 +705,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest.tCreateTournament"
+                            "$ref": "#/definitions/rest.tCreateTournamentRequest"
                         }
                     }
                 ],
@@ -804,7 +713,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/rest.tTournament"
+                            "$ref": "#/definitions/rest.tTournamentResponse"
                         }
                     },
                     "400": {
@@ -839,7 +748,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest.tTournament"
+                            "$ref": "#/definitions/rest.tTournamentResponse"
                         }
                     },
                     "204": {
@@ -1025,9 +934,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/tournaments/{tournament_id}/upload": {
-            "put": {
-                "description": "загрузка файлов турнира",
+        "/user/upload": {
+            "post": {
+                "description": "загрузка файла",
                 "consumes": [
                     "application/json"
                 ],
@@ -1035,33 +944,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user tournament"
+                    "user"
                 ],
-                "summary": "загрузка файлов турнира",
+                "summary": "загрузка файла",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "tournament id",
-                        "name": "tournament_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "type": "file",
-                        "description": "файл лого",
-                        "name": "logo_file",
-                        "in": "formData"
+                        "description": "файл",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/rest.tTournament"
+                            "$ref": "#/definitions/rest.tHandlerUploadResponse"
                         }
-                    },
-                    "204": {
-                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -1126,12 +1026,18 @@ const docTemplate = `{
         "rest.tCreateTeam": {
             "type": "object",
             "properties": {
+                "logo_url": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 }
             }
         },
-        "rest.tCreateTournament": {
+        "rest.tCreateTournamentRequest": {
             "type": "object",
             "required": [
                 "end_date",
@@ -1142,6 +1048,9 @@ const docTemplate = `{
                 "end_date": {
                     "type": "string",
                     "example": "2024-12-31 00:00:00"
+                },
+                "logo_url": {
+                    "type": "string"
                 },
                 "register_end_date": {
                     "type": "string",
@@ -1169,7 +1078,7 @@ const docTemplate = `{
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
                 },
                 "status": {
@@ -1200,7 +1109,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
                 },
                 "pagination": {
@@ -1211,10 +1120,19 @@ const docTemplate = `{
         "rest.tGetTeamResponse": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
+                "logo_external_url": {
+                    "type": "string"
+                },
                 "logo_url": {
+                    "type": "string"
+                },
+                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1223,7 +1141,7 @@ const docTemplate = `{
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
                 },
                 "title": {
@@ -1254,7 +1172,7 @@ const docTemplate = `{
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
                 },
                 "status": {
@@ -1274,7 +1192,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tTournament"
+                        "$ref": "#/definitions/rest.tTournamentResponse"
                     }
                 },
                 "pagination": {
@@ -1290,6 +1208,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/rest.tTournamentApplication"
                     }
+                }
+            }
+        },
+        "rest.tHandlerUploadResponse": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
                 }
             }
         },
@@ -1316,7 +1245,7 @@ const docTemplate = `{
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
                 },
                 "status": {
@@ -1330,7 +1259,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest.tNewPlayer": {
+        "rest.tNewPlayerRequest": {
             "type": "object",
             "properties": {
                 "b_day": {
@@ -1343,12 +1272,15 @@ const docTemplate = `{
                 "lastname": {
                     "type": "string"
                 },
+                "photo_url": {
+                    "type": "string"
+                },
                 "secondname": {
                     "type": "string"
                 }
             }
         },
-        "rest.tPlayer": {
+        "rest.tPlayerResponse": {
             "type": "object",
             "properties": {
                 "b_day": {
@@ -1362,6 +1294,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "lastname": {
+                    "type": "string"
+                },
+                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1383,44 +1318,23 @@ const docTemplate = `{
         "rest.tTeam": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
+                "logo_external_url": {
+                    "type": "string"
+                },
                 "logo_url": {
+                    "type": "string"
+                },
+                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
                     "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "rest.tTournament": {
-            "type": "object",
-            "properties": {
-                "end_date": {
-                    "type": "string",
-                    "example": "2024-12-31 00:00:00"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "logo_url": {
-                    "type": "string"
-                },
-                "register_end_date": {
-                    "type": "string",
-                    "example": "2024-12-31 00:00:00"
-                },
-                "register_start_date": {
-                    "type": "string",
-                    "example": "2024-12-31 00:00:00"
-                },
-                "start_date": {
-                    "type": "string",
-                    "example": "2024-12-31 00:00:00"
                 },
                 "title": {
                     "type": "string"
@@ -1444,6 +1358,39 @@ const docTemplate = `{
                 }
             }
         },
+        "rest.tTournamentResponse": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "logo_external_url": {
+                    "type": "string"
+                },
+                "logo_url": {
+                    "type": "string"
+                },
+                "register_end_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "register_start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2024-12-31 00:00:00"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "rest.tUpdApplicationResponse": {
             "type": "object",
             "properties": {
@@ -1453,7 +1400,7 @@ const docTemplate = `{
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
                 },
                 "status": {
@@ -1488,6 +1435,12 @@ const docTemplate = `{
         "rest.tUpdTeamRequest": {
             "type": "object",
             "properties": {
+                "logo_url": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
                 "player_ids": {
                     "type": "array",
                     "items": {
@@ -1502,10 +1455,19 @@ const docTemplate = `{
         "rest.tUpdTeamResponse": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
+                "logo_external_url": {
+                    "type": "string"
+                },
                 "logo_url": {
+                    "type": "string"
+                },
+                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1514,25 +1476,8 @@ const docTemplate = `{
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest.tPlayer"
+                        "$ref": "#/definitions/rest.tPlayerResponse"
                     }
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "rest.tUpdTeamUploadResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "logo_url": {
-                    "type": "string"
-                },
-                "photo_url": {
-                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -1562,6 +1507,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2024-12-31 00:00:00"
                 },
+                "logo_url": {
+                    "type": "string"
+                },
                 "register_end_date": {
                     "type": "string",
                     "example": "2024-12-31 00:00:00"
@@ -1579,7 +1527,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest.tUpdatePlayer": {
+        "rest.tUpdatePlayerRequest": {
             "type": "object",
             "properties": {
                 "b_day": {
@@ -1590,6 +1538,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "lastname": {
+                    "type": "string"
+                },
+                "photo_url": {
                     "type": "string"
                 },
                 "secondname": {
