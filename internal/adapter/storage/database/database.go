@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"sport-space/internal/adapter/models"
@@ -14,6 +16,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Storage struct {
@@ -32,7 +35,19 @@ func New(ctx context.Context, cfg Config, options ...option) (*Storage, error) {
 	s := &Storage{
 		log: zap.NewNop(),
 	}
-	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	lgr := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second, // Slow SQL threshold
+			LogLevel:                  logger.Info, // Log level
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+			ParameterizedQueries:      true,        // Don't include params in the SQL log
+			Colorful:                  true,
+		},
+	)
+	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{
+		Logger: lgr,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed connect to database: %w", err)
 	}
@@ -187,7 +202,7 @@ func (s *Storage) GetTournamentByID(ctx context.Context, tournamentID uint) (*mo
 func (s *Storage) UpdTournamentByUser(ctx context.Context, tournament *models.Tournament) (*models.Tournament, error) {
 	res := s.db.Model(tournament).
 		Where("user_id = ? and id = ?", tournament.UserID, tournament.ID).
-		Updates(tournament)
+		Save(tournament)
 	if res.RowsAffected == 0 {
 		return nil, errstore.ErrNotFoundData
 	}
@@ -245,7 +260,7 @@ func (s *Storage) UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]
 			}
 			team.Players = *_players
 		}
-		err := tx.Updates(team).Error
+		err := tx.Save(team).Error
 		if err != nil {
 			return fmt.Errorf("failed update team: %w", err)
 		}
@@ -292,7 +307,7 @@ func (s *Storage) GetPlayerByID(ctx context.Context, playerID uint) (*models.Pla
 }
 
 func (s *Storage) UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {
-	res := s.db.Where("id = ? and user_id = ?", player.ID, player.UserID).Updates(player)
+	res := s.db.Where("id = ? and user_id = ?", player.ID, player.UserID).Save(player)
 	if err := res.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.Join(err, errstore.ErrNotFoundData)
