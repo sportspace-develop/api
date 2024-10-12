@@ -43,18 +43,18 @@ definitions:
   rest.tCreateTournamentRequest:
     properties:
       end_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       logo_url:
         type: string
       register_end_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       register_start_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       start_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       title:
         type: string
@@ -254,7 +254,7 @@ definitions:
   rest.tTournamentResponse:
     properties:
       end_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       id:
         type: integer
@@ -263,13 +263,13 @@ definitions:
       logo_url:
         type: string
       register_end_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       register_start_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       start_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       title:
         type: string
@@ -346,18 +346,18 @@ definitions:
   rest.tUpdTournamentRequest:
     properties:
       end_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       logo_url:
         type: string
       register_end_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       register_start_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       start_date:
-        example: "2024-12-31 00:00:00"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       title:
         type: string

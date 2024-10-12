@@ -1047,22 +1047,22 @@ const docTemplate = `{
             "properties": {
                 "end_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "logo_url": {
                     "type": "string"
                 },
                 "register_end_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "register_start_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "start_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "title": {
                     "type": "string"
@@ -1363,7 +1363,7 @@ const docTemplate = `{
             "properties": {
                 "end_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "id": {
                     "type": "integer"
@@ -1376,15 +1376,15 @@ const docTemplate = `{
                 },
                 "register_end_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "register_start_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "start_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "title": {
                     "type": "string"
@@ -1505,22 +1505,22 @@ const docTemplate = `{
             "properties": {
                 "end_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "logo_url": {
                     "type": "string"
                 },
                 "register_end_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "register_start_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "start_date": {
                     "type": "string",
-                    "example": "2024-12-31 00:00:00"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "title": {
                     "type": "string"

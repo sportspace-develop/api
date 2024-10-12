@@ -287,17 +287,6 @@ func (s *Server) saveFile(file *multipart.FileHeader, dst string) error {
 	return tools.SaveUploadedFile(file, path)
 }
 
-func (s *Server) removeFile(dst string) error {
-	return os.Remove(s.uploadPath + "/" + dst)
-}
-
-func (s Server) getFullUploadPath(name string) string {
-	if name == "" {
-		return ""
-	}
-	return s.uploadURL + name
-}
-
 func (s Server) getFullUploadURL(name string) string {
 	if name == "" {
 		return ""

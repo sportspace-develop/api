@@ -6,18 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-)
-
-var (
-	defaultDateTimeFormat = time.DateTime
-	defaultDateFormat     = time.DateOnly
 )
 
 func (s *Server) handlerPing(c *gin.Context) {

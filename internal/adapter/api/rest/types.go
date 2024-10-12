@@ -7,10 +7,15 @@ import (
 	"sport-space/pkg/email"
 )
 
+var (
+	defaultDateTimeFormat = time.RFC3339 // "2006-01-02T15:04:05+03:00"
+	defaultDateFormat     = time.RFC3339 //"2006-01-02T15:04:05+05:00"
+)
+
 type sportTime string
 
 func (st *sportTime) DateTime() *time.Time {
-	if st == nil {
+	if st == nil || *st == "" {
 		return nil
 	}
 
@@ -19,7 +24,7 @@ func (st *sportTime) DateTime() *time.Time {
 }
 
 func (st *sportTime) Date() *time.Time {
-	if st == nil {
+	if st == nil || *st == "" {
 		return nil
 	}
 
@@ -73,10 +78,10 @@ type tRequestOTP struct {
 
 type tCreateTournamentRequest struct {
 	Title             string     `json:"title" validate:"required"`
-	StartDate         *sportTime `json:"start_date" example:"2024-12-31 00:00:00" validate:"required"`
-	EndDate           *sportTime `json:"end_date" example:"2024-12-31 00:00:00" validate:"required"`
-	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31 00:00:00"`
-	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31 00:00:00"`
+	StartDate         *sportTime `json:"start_date" example:"2024-12-31T06:00:00+03:00" validate:"required"`
+	EndDate           *sportTime `json:"end_date" example:"2024-12-31T06:00:00+03:00" validate:"required"`
+	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31T06:00:00+03:00"`
+	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31T06:00:00+03:00"`
 	LogoURL           string     `json:"logo_url"`
 }
 
@@ -86,10 +91,10 @@ func (tct tCreateTournamentRequest) IsValid() bool {
 
 type tUpdTournamentRequest struct {
 	Title             string     `json:"title"`
-	StartDate         *sportTime `json:"start_date" example:"2024-12-31 00:00:00" validate:"required"`
-	EndDate           *sportTime `json:"end_date" example:"2024-12-31 00:00:00" validate:"required"`
-	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31 00:00:00"`
-	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31 00:00:00"`
+	StartDate         *sportTime `json:"start_date" example:"2024-12-31T06:00:00+03:00" validate:"required"`
+	EndDate           *sportTime `json:"end_date" example:"2024-12-31T06:00:00+03:00" validate:"required"`
+	RegisterStartDate *sportTime `json:"register_start_date" example:"2024-12-31T06:00:00+03:00"`
+	RegisterEndDate   *sportTime `json:"register_end_date" example:"2024-12-31T06:00:00+03:00"`
 	LogoURL           string     `json:"logo_url"`
 }
 
@@ -100,10 +105,10 @@ func (tutr tUpdTournamentRequest) IsValid() bool {
 type tTournamentResponse struct {
 	ID                uint   `json:"id"`
 	Title             string `json:"title"`
-	StartDate         string `json:"start_date" example:"2024-12-31 00:00:00"`
-	EndDate           string `json:"end_date" example:"2024-12-31 00:00:00"`
-	RegisterStartDate string `json:"register_start_date" example:"2024-12-31 00:00:00"`
-	RegisterEndDate   string `json:"register_end_date" example:"2024-12-31 00:00:00"`
+	StartDate         string `json:"start_date" example:"2024-12-31T06:00:00+03:00"`
+	EndDate           string `json:"end_date" example:"2024-12-31T06:00:00+03:00"`
+	RegisterStartDate string `json:"register_start_date" example:"2024-12-31T06:00:00+03:00"`
+	RegisterEndDate   string `json:"register_end_date" example:"2024-12-31T06:00:00+03:00"`
 	LogoURL           string `json:"logo_url"`
 	LogoExternalURL   string `json:"logo_external_url"`
 }
