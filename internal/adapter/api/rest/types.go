@@ -173,7 +173,7 @@ type tNewPlayerRequest struct {
 	SecondName string     `json:"secondname"`
 	LastName   string     `json:"lastname"`
 	PhotoURL   string     `json:"photo_url"`
-	BDay       *sportTime `json:"b_day" example:"2024-12-31"`
+	BDay       *sportTime `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
 }
 
 func (tnp tNewPlayerRequest) IsValid() bool {
@@ -187,7 +187,32 @@ type tPlayerResponse struct {
 	LastName         string `json:"lastname"`
 	PhotoURL         string `json:"photo_url"`
 	PhotoExternalURL string `json:"photo_external_url"`
-	BDay             string `json:"b_day" example:"2024-12-31"`
+	BDay             string `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
+}
+
+type tNewPlayerBatchRequest struct {
+	FirstName  string     `json:"firstname"`
+	SecondName string     `json:"secondname"`
+	LastName   string     `json:"lastname"`
+	BDay       *sportTime `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
+	ID         uint       `json:"id"`
+}
+
+func (tnp tNewPlayerBatchRequest) IsValid() bool {
+	return !(tnp.FirstName == "" || tnp.LastName == "")
+}
+
+type tPlayerBatchResponse struct {
+	ID         uint   `json:"id"`
+	FirstName  string `json:"firstname"`
+	SecondName string `json:"secondname"`
+	LastName   string `json:"lastname"`
+	BDay       string `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
+}
+
+type tNewPlayerBatchResponse struct {
+	// Pagination pagination         `json:"pagination"`
+	Data []tPlayerBatchResponse `json:"data"`
 }
 
 type tGetPlayersResponse struct {
@@ -200,7 +225,7 @@ type tUpdatePlayerRequest struct {
 	SecondName string     `json:"secondname"`
 	LastName   string     `json:"lastname"`
 	PhotoURL   string     `json:"photo_url"`
-	BDay       *sportTime `json:"b_day" example:"2024-12-31"`
+	BDay       *sportTime `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
 }
 
 func (tup tUpdatePlayerRequest) IsValid() bool {

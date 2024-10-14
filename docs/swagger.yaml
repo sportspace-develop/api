@@ -186,10 +186,32 @@ definitions:
       tournament_title:
         type: string
     type: object
+  rest.tNewPlayerBatchRequest:
+    properties:
+      b_day:
+        example: "2024-12-31T06:00:00+03:00"
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      secondname:
+        type: string
+    type: object
+  rest.tNewPlayerBatchResponse:
+    properties:
+      data:
+        description: Pagination pagination         `json:"pagination"`
+        items:
+          $ref: '#/definitions/rest.tPlayerBatchResponse'
+        type: array
+    type: object
   rest.tNewPlayerRequest:
     properties:
       b_day:
-        example: "2024-12-31"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       firstname:
         type: string
@@ -200,10 +222,24 @@ definitions:
       secondname:
         type: string
     type: object
+  rest.tPlayerBatchResponse:
+    properties:
+      b_day:
+        example: "2024-12-31T06:00:00+03:00"
+        type: string
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      secondname:
+        type: string
+    type: object
   rest.tPlayerResponse:
     properties:
       b_day:
-        example: "2024-12-31"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       firstname:
         type: string
@@ -368,7 +404,7 @@ definitions:
   rest.tUpdatePlayerRequest:
     properties:
       b_day:
-        example: "2024-12-31"
+        example: "2024-12-31T06:00:00+03:00"
         type: string
       firstname:
         type: string
@@ -573,6 +609,34 @@ paths:
         "500":
           description: Internal Server Error
       summary: обновить игрока
+      tags:
+      - user players
+  /user/players/batch:
+    post:
+      description: Добавить/Обновить игроков
+      parameters:
+      - description: players
+        in: body
+        name: players
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/rest.tNewPlayerBatchRequest'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/rest.tNewPlayerBatchResponse'
+        "400":
+          description: Bad Request
+        "409":
+          description: Conflict
+        "500":
+          description: Internal Server Error
+      summary: Добавить/Обновить игроков
       tags:
       - user players
   /user/teams:

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"sport-space/internal/adapter/errsport"
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 
@@ -745,6 +746,84 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 	})
 }
 
+//	@Summary	Добавить/Обновить игроков
+//	@Schemes
+//	@Description	Добавить/Обновить игроков
+//	@Tags			user players
+//	@Param			players	body	[]tNewPlayerBatchRequest	true	"players"
+//	@Produce		json
+//	@Success		201	{object}	tNewPlayerBatchResponse
+//	@Failure		400
+//	@Failure		409
+//	@Failure		500
+//	@Router			/user/players/batch [post]
+func (s *Server) handlerUserNewPlayerBatch(c *gin.Context) {
+	userID, err := s.checkAuth(c)
+	if err != nil {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	bBody, statusCode := s.readBody(c)
+	if statusCode > 0 {
+		c.Writer.WriteHeader(statusCode)
+		return
+	}
+
+	jBody := []tNewPlayerBatchRequest{}
+
+	err = json.Unmarshal(bBody, &jBody)
+	if err != nil {
+		s.log.Debug("failed parse body", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	batch := []models.Player{}
+	for _, p := range jBody {
+		if !p.IsValid() {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		batch = append(batch, models.Player{
+			ID:         p.ID,
+			FirstName:  p.FirstName,
+			SecondName: p.SecondName,
+			LastName:   p.LastName,
+			BDay:       p.BDay.DateTime(),
+			UserID:     userID,
+		})
+	}
+
+	players, err := s.sport.NewPlayerBatch(c.Request.Context(), &batch)
+	if err != nil {
+		if errors.Is(err, errsport.ErrConflictData) {
+			c.Writer.WriteHeader(http.StatusConflict)
+			return
+		}
+		if errors.Is(err, errsport.ErrNotFoundData) {
+			c.Writer.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		s.log.Error("failed create players", zap.Error(err))
+		c.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	res := tNewPlayerBatchResponse{}
+	for _, p := range *players {
+		res.Data = append(res.Data, tPlayerBatchResponse{
+			ID:         p.ID,
+			FirstName:  p.FirstName,
+			SecondName: p.SecondName,
+			LastName:   p.LastName,
+			BDay:       formatDate(p.BDay),
+		})
+	}
+
+	c.JSON(http.StatusCreated, res)
+}
+
 //	@Summary	Все игроки
 //	@Schemes
 //	@Description	Все игроки
@@ -785,6 +864,7 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 				LastName:         p.LastName,
 				PhotoURL:         p.PhotoURL,
 				PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
+				BDay:             formatDateTime(p.BDay),
 			})
 		}
 	}

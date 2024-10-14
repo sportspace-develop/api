@@ -16,6 +16,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 )
 
@@ -280,6 +281,16 @@ func (s *Storage) NewPlayer(ctx context.Context, player *models.Player) (*models
 	}
 	return player, nil
 }
+func (s *Storage) NewPlayerBatch(ctx context.Context, players *[]models.Player) (*[]models.Player, error) {
+	err := s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"first_name", "second_name", "last_name", "b_day"}),
+	}).Create(players).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed create batch players: %w", err)
+	}
+	return players, nil
+}
 
 func (s *Storage) GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error) {
 	players := &[]models.Player{}
@@ -304,6 +315,15 @@ func (s *Storage) GetPlayerByID(ctx context.Context, playerID uint) (*models.Pla
 		return nil, fmt.Errorf("failed find player: %w", err)
 	}
 	return player, nil
+}
+
+func (s *Storage) GetPlayersByIDs(ctx context.Context, playerIDs []uint) (*[]models.Player, error) {
+	players := &[]models.Player{}
+	err := s.db.Where("id IN ?", playerIDs).Find(players).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("failed find player: %w", err)
+	}
+	return players, nil
 }
 
 func (s *Storage) UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {

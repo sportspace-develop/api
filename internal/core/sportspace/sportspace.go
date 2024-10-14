@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"sport-space/internal/adapter/errsport"
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
 	"sport-space/pkg/tools"
@@ -30,8 +31,10 @@ type storage interface {
 	GetTeamByID(ctx context.Context, teamID uint) (*models.Team, error)
 	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
+	NewPlayerBatch(ctx context.Context, players *[]models.Player) (*[]models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
 	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
+	GetPlayersByIDs(ctx context.Context, playerIDs []uint) (*[]models.Player, error)
 	GetPlayersFromTeam(ctx context.Context, teamID uint) (*[]models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
 	NewApplication(ctx context.Context, application *models.Application, player *[]models.Player) (
@@ -234,6 +237,40 @@ func (s *SportSpace) UpdTeam(ctx context.Context, team *models.Team, playersIDs 
 
 func (s *SportSpace) NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error) {
 	return s.store.NewPlayer(ctx, player)
+}
+
+func (s *SportSpace) NewPlayerBatch(ctx context.Context, players *[]models.Player) (*[]models.Player, error) {
+	ids := []uint{}
+	for _, p := range *players {
+		if p.ID > 0 {
+			ids = append(ids, p.ID)
+		}
+	}
+	if len(ids) > 0 {
+		plyrs, err := s.store.GetPlayersByIDs(ctx, ids)
+		if err != nil {
+			return nil, fmt.Errorf("failed get players by id")
+		}
+		if len(ids) != len(*plyrs) {
+			return nil, errsport.ErrNotFoundData
+		}
+		for _, plyr := range *plyrs {
+			for _, p := range *players {
+				if p.ID != plyr.ID {
+					continue
+				}
+				if p.UserID != plyr.UserID {
+					return nil, errsport.ErrConflictData
+				}
+			}
+		}
+	}
+	res, err := s.store.NewPlayerBatch(ctx, players)
+	if err != nil {
+		return nil, fmt.Errorf("failed create batch players: %w", err)
+	}
+
+	return res, nil
 }
 
 func (s *SportSpace) GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error) {

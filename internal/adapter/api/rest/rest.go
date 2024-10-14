@@ -47,6 +47,7 @@ type sport interface {
 	GetTeamByID(ctx context.Context, teamID uint) (*models.Team, error)
 	UpdTeam(ctx context.Context, team *models.Team, playersIDs *[]uint) (*models.Team, *[]models.Player, error)
 	NewPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
+	NewPlayerBatch(ctx context.Context, players *[]models.Player) (*[]models.Player, error)
 	GetPlayers(ctx context.Context, userID uint) (*[]models.Player, error)
 	GetPlayerByID(ctx context.Context, playerID uint) (*models.Player, error)
 	UpdPlayer(ctx context.Context, player *models.Player) (*models.Player, error)
@@ -172,6 +173,7 @@ func (s *Server) Run() error {
 			user.PUT("/teams/:id", s.handlerUserUptTeam)
 
 			user.POST("/players", s.handlerUserNewPlayer)
+			user.POST("/players/batch", s.handlerUserNewPlayerBatch)
 			user.GET("/players", s.handlerUserPlayers)
 			user.PUT("/players/:id", s.handlerUserUpdatePlayer)
 

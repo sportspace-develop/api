@@ -259,6 +259,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/players/batch": {
+            "post": {
+                "description": "Добавить/Обновить игроков",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user players"
+                ],
+                "summary": "Добавить/Обновить игроков",
+                "parameters": [
+                    {
+                        "description": "players",
+                        "name": "players",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/rest.tNewPlayerBatchRequest"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tNewPlayerBatchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "409": {
+                        "description": "Conflict"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/user/players/{player_id}": {
             "put": {
                 "description": "обновить игрока",
@@ -1259,12 +1302,45 @@ const docTemplate = `{
                 }
             }
         },
+        "rest.tNewPlayerBatchRequest": {
+            "type": "object",
+            "properties": {
+                "b_day": {
+                    "type": "string",
+                    "example": "2024-12-31T06:00:00+03:00"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "secondname": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.tNewPlayerBatchResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Pagination pagination         ` + "`" + `json:\"pagination\"` + "`" + `",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.tPlayerBatchResponse"
+                    }
+                }
+            }
+        },
         "rest.tNewPlayerRequest": {
             "type": "object",
             "properties": {
                 "b_day": {
                     "type": "string",
-                    "example": "2024-12-31"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "firstname": {
                     "type": "string"
@@ -1280,12 +1356,33 @@ const docTemplate = `{
                 }
             }
         },
+        "rest.tPlayerBatchResponse": {
+            "type": "object",
+            "properties": {
+                "b_day": {
+                    "type": "string",
+                    "example": "2024-12-31T06:00:00+03:00"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "secondname": {
+                    "type": "string"
+                }
+            }
+        },
         "rest.tPlayerResponse": {
             "type": "object",
             "properties": {
                 "b_day": {
                     "type": "string",
-                    "example": "2024-12-31"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "firstname": {
                     "type": "string"
@@ -1532,7 +1629,7 @@ const docTemplate = `{
             "properties": {
                 "b_day": {
                     "type": "string",
-                    "example": "2024-12-31"
+                    "example": "2024-12-31T06:00:00+03:00"
                 },
                 "firstname": {
                     "type": "string"
