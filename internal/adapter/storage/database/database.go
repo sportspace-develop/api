@@ -284,7 +284,7 @@ func (s *Storage) NewPlayer(ctx context.Context, player *models.Player) (*models
 func (s *Storage) NewPlayerBatch(ctx context.Context, players *[]models.Player) (*[]models.Player, error) {
 	err := s.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"first_name", "second_name", "last_name", "b_day"}),
+		DoUpdates: clause.AssignmentColumns([]string{"first_name", "second_name", "last_name", "b_day", "photo_url"}),
 	}).Create(players).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed create batch players: %w", err)

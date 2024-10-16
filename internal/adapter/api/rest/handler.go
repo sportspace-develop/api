@@ -147,7 +147,6 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
 			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
 			LogoURL:           t.LogoURL,
-			LogoExternalURL:   s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -241,7 +240,6 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 		LogoURL:           tournament.LogoURL,
-		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -289,7 +287,6 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
 			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
 			LogoURL:           t.LogoURL,
-			LogoExternalURL:   s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -341,7 +338,6 @@ func (s *Server) handlerUserTournament(c *gin.Context) {
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 		LogoURL:           tournament.LogoURL,
-		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -419,7 +415,6 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 		LogoURL:           tournament.LogoURL,
-		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -460,7 +455,7 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 		Title:    jBody.Title,
 		UserID:   userID,
 		PhotoURL: jBody.PhotoURL,
-		LogoURL:  jBody.LogotURL,
+		LogoURL:  jBody.LogoURL,
 	})
 	if err != nil {
 		s.log.Error("failed create team", zap.Error(err))
@@ -472,9 +467,7 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 		ID:               team.ID,
 		Title:            team.Title,
 		LogoURL:          team.LogoURL,
-		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
 		PhotoURL:         team.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
 		CreatedAt:        formatDateTime(&team.CreatedAt),
 	})
 }
@@ -513,9 +506,7 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 				ID:               t.ID,
 				Title:            t.Title,
 				LogoURL:          t.LogoURL,
-				LogoExternalURL:  s.getFullUploadURL(t.LogoURL),
 				PhotoURL:         t.PhotoURL,
-				PhotoExternalURL: s.getFullUploadURL(t.PhotoURL),
 				CreatedAt:        formatDateTime(&t.CreatedAt),
 			})
 		}
@@ -574,7 +565,7 @@ func (s *Server) handlerUserTeam(c *gin.Context) {
 			SecondName:       p.SecondName,
 			LastName:         p.LastName,
 			PhotoURL:         p.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
+			BDay:             formatDate(p.BDay),
 		})
 	}
 
@@ -583,9 +574,7 @@ func (s *Server) handlerUserTeam(c *gin.Context) {
 		Title:            team.Title,
 		Players:          resPlayers,
 		LogoURL:          team.LogoURL,
-		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
 		PhotoURL:         team.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
 		CreatedAt:        formatDateTime(&team.CreatedAt),
 	})
 }
@@ -645,7 +634,7 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 		return
 	}
 	team.Title = jBody.Title
-	team.LogoURL = jBody.LogotURL
+	team.LogoURL = jBody.LogoURL
 	team.PhotoURL = jBody.PhotoURL
 
 	team, players, err := s.sport.UpdTeam(c.Request.Context(), team, jBody.Players)
@@ -668,7 +657,6 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 			LastName:         p.LastName,
 			BDay:             formatDate(p.BDay),
 			PhotoURL:         p.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 		})
 	}
 
@@ -677,9 +665,7 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 		Title:            team.Title,
 		Players:          &playersRes,
 		LogoURL:          team.LogoURL,
-		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
 		PhotoURL:         team.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
 		CreatedAt:        formatDateTime(&team.CreatedAt),
 	})
 }
@@ -741,7 +727,6 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 		SecondName:       player.SecondName,
 		LastName:         player.LastName,
 		PhotoURL:         player.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		BDay:             formatDate(player.BDay),
 	})
 }
@@ -792,6 +777,7 @@ func (s *Server) handlerUserNewPlayerBatch(c *gin.Context) {
 			LastName:   p.LastName,
 			BDay:       p.BDay.DateTime(),
 			UserID:     userID,
+			PhotoURL:   p.PhotoURL,
 		})
 	}
 
@@ -818,6 +804,7 @@ func (s *Server) handlerUserNewPlayerBatch(c *gin.Context) {
 			SecondName: p.SecondName,
 			LastName:   p.LastName,
 			BDay:       formatDate(p.BDay),
+			PhotoURL:   p.PhotoURL,
 		})
 	}
 
@@ -863,7 +850,6 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 				SecondName:       p.SecondName,
 				LastName:         p.LastName,
 				PhotoURL:         p.PhotoURL,
-				PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 				BDay:             formatDateTime(p.BDay),
 			})
 		}
@@ -945,7 +931,6 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 		SecondName:       player.SecondName,
 		LastName:         player.LastName,
 		PhotoURL:         player.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		BDay:             formatDate(player.BDay),
 	})
 }
@@ -1090,7 +1075,6 @@ func (s *Server) handlerGetTournamentApplication(c *gin.Context) {
 			SecondName:       p.SecondName,
 			LastName:         p.LastName,
 			PhotoURL:         p.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
 		})
 	}
 
@@ -1251,7 +1235,6 @@ func (s *Server) handlerNewTeamApplication(c *gin.Context) {
 			SecondName:       player.SecondName,
 			LastName:         player.LastName,
 			PhotoURL:         player.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		})
 	}
 
@@ -1357,7 +1340,6 @@ func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
 			SecondName:       player.SecondName,
 			LastName:         player.LastName,
 			PhotoURL:         player.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		})
 	}
 	tournament, err := s.sport.GetTournamentByID(c.Request.Context(), application.TournamentID)
@@ -1501,7 +1483,6 @@ func (s *Server) handlerGetApplication(c *gin.Context) {
 			SecondName:       player.SecondName,
 			LastName:         player.LastName,
 			PhotoURL:         player.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
 		})
 	}
 
