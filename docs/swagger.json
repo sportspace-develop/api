@@ -1158,13 +1158,7 @@
                 "id": {
                     "type": "integer"
                 },
-                "logo_external_url": {
-                    "type": "string"
-                },
                 "logo_url": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1307,6 +1301,9 @@
                 "lastname": {
                     "type": "string"
                 },
+                "photo_url": {
+                    "type": "string"
+                },
                 "secondname": {
                     "type": "string"
                 }
@@ -1361,6 +1358,9 @@
                 "lastname": {
                     "type": "string"
                 },
+                "photo_url": {
+                    "type": "string"
+                },
                 "secondname": {
                     "type": "string"
                 }
@@ -1380,9 +1380,6 @@
                     "type": "integer"
                 },
                 "lastname": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1410,13 +1407,7 @@
                 "id": {
                     "type": "integer"
                 },
-                "logo_external_url": {
-                    "type": "string"
-                },
                 "logo_url": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1453,9 +1444,6 @@
                 },
                 "id": {
                     "type": "integer"
-                },
-                "logo_external_url": {
-                    "type": "string"
                 },
                 "logo_url": {
                     "type": "string"
@@ -1547,13 +1535,7 @@
                 "id": {
                     "type": "integer"
                 },
-                "logo_external_url": {
-                    "type": "string"
-                },
                 "logo_url": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {

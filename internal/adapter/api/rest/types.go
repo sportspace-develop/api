@@ -110,7 +110,6 @@ type tTournamentResponse struct {
 	RegisterStartDate string `json:"register_start_date" example:"2024-12-31T06:00:00+03:00"`
 	RegisterEndDate   string `json:"register_end_date" example:"2024-12-31T06:00:00+03:00"`
 	LogoURL           string `json:"logo_url"`
-	LogoExternalURL   string `json:"logo_external_url"`
 }
 
 type tGetTorunamentsResponse struct {
@@ -120,7 +119,7 @@ type tGetTorunamentsResponse struct {
 
 type tCreateTeam struct {
 	Title    string `json:"title"`
-	LogotURL string `json:"logo_url"`
+	LogoURL  string `json:"logo_url"`
 	PhotoURL string `json:"photo_url"`
 }
 
@@ -128,9 +127,7 @@ type tTeam struct {
 	ID               uint   `json:"id"`
 	Title            string `json:"title"`
 	LogoURL          string `json:"logo_url"`
-	LogoExternalURL  string `json:"logo_external_url"`
 	PhotoURL         string `json:"photo_url"`
-	PhotoExternalURL string `json:"photo_external_url"`
 	CreatedAt        string `json:"created_at"`
 }
 
@@ -144,15 +141,13 @@ type tGetTeamResponse struct {
 	Title            string            `json:"title"`
 	Players          []tPlayerResponse `json:"players"`
 	LogoURL          string            `json:"logo_url"`
-	LogoExternalURL  string            `json:"logo_external_url"`
 	PhotoURL         string            `json:"photo_url"`
-	PhotoExternalURL string            `json:"photo_external_url"`
 	CreatedAt        string            `json:"created_at"`
 }
 
 type tUpdTeamRequest struct {
 	Title    string  `json:"title"`
-	LogotURL string  `json:"logo_url"`
+	LogoURL  string  `json:"logo_url"`
 	PhotoURL string  `json:"photo_url"`
 	Players  *[]uint `json:"player_ids"`
 }
@@ -162,9 +157,7 @@ type tUpdTeamResponse struct {
 	Title            string             `json:"title"`
 	Players          *[]tPlayerResponse `json:"players"`
 	LogoURL          string             `json:"logo_url"`
-	LogoExternalURL  string             `json:"logo_external_url"`
 	PhotoURL         string             `json:"photo_url"`
-	PhotoExternalURL string             `json:"photo_external_url"`
 	CreatedAt        string             `json:"created_at"`
 }
 
@@ -186,7 +179,6 @@ type tPlayerResponse struct {
 	SecondName       string `json:"secondname"`
 	LastName         string `json:"lastname"`
 	PhotoURL         string `json:"photo_url"`
-	PhotoExternalURL string `json:"photo_external_url"`
 	BDay             string `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
 }
 
@@ -194,6 +186,7 @@ type tNewPlayerBatchRequest struct {
 	FirstName  string     `json:"firstname"`
 	SecondName string     `json:"secondname"`
 	LastName   string     `json:"lastname"`
+	PhotoURL   string     `json:"photo_url"`
 	BDay       *sportTime `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
 	ID         uint       `json:"id"`
 }
@@ -207,6 +200,7 @@ type tPlayerBatchResponse struct {
 	FirstName  string `json:"firstname"`
 	SecondName string `json:"secondname"`
 	LastName   string `json:"lastname"`
+	PhotoURL   string `json:"photo_url"`
 	BDay       string `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
 }
 
