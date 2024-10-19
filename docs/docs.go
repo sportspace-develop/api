@@ -1169,13 +1169,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "logo_external_url": {
-                    "type": "string"
-                },
                 "logo_url": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1318,6 +1312,9 @@ const docTemplate = `{
                 "lastname": {
                     "type": "string"
                 },
+                "photo_url": {
+                    "type": "string"
+                },
                 "secondname": {
                     "type": "string"
                 }
@@ -1372,6 +1369,9 @@ const docTemplate = `{
                 "lastname": {
                     "type": "string"
                 },
+                "photo_url": {
+                    "type": "string"
+                },
                 "secondname": {
                     "type": "string"
                 }
@@ -1391,9 +1391,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "lastname": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1421,13 +1418,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "logo_external_url": {
-                    "type": "string"
-                },
                 "logo_url": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {
@@ -1464,9 +1455,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "logo_external_url": {
-                    "type": "string"
                 },
                 "logo_url": {
                     "type": "string"
@@ -1558,13 +1546,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "logo_external_url": {
-                    "type": "string"
-                },
                 "logo_url": {
-                    "type": "string"
-                },
-                "photo_external_url": {
                     "type": "string"
                 },
                 "photo_url": {

@@ -147,7 +147,6 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
 			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
 			LogoURL:           t.LogoURL,
-			LogoExternalURL:   s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -241,7 +240,6 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 		LogoURL:           tournament.LogoURL,
-		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -289,7 +287,6 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
 			RegisterEndDate:   formatDateTime(t.RegisterEndDate),
 			LogoURL:           t.LogoURL,
-			LogoExternalURL:   s.getFullUploadURL(t.LogoURL),
 		})
 	}
 
@@ -341,7 +338,6 @@ func (s *Server) handlerUserTournament(c *gin.Context) {
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 		LogoURL:           tournament.LogoURL,
-		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -419,7 +415,6 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
 		RegisterEndDate:   formatDateTime(tournament.RegisterEndDate),
 		LogoURL:           tournament.LogoURL,
-		LogoExternalURL:   s.getFullUploadURL(tournament.LogoURL),
 	})
 }
 
@@ -460,7 +455,7 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 		Title:    jBody.Title,
 		UserID:   userID,
 		PhotoURL: jBody.PhotoURL,
-		LogoURL:  jBody.LogotURL,
+		LogoURL:  jBody.LogoURL,
 	})
 	if err != nil {
 		s.log.Error("failed create team", zap.Error(err))
@@ -469,13 +464,11 @@ func (s *Server) handlerUserNewTeam(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, tTeam{
-		ID:               team.ID,
-		Title:            team.Title,
-		LogoURL:          team.LogoURL,
-		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
-		PhotoURL:         team.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
-		CreatedAt:        formatDateTime(&team.CreatedAt),
+		ID:        team.ID,
+		Title:     team.Title,
+		LogoURL:   team.LogoURL,
+		PhotoURL:  team.PhotoURL,
+		CreatedAt: formatDateTime(&team.CreatedAt),
 	})
 }
 
@@ -510,13 +503,11 @@ func (s *Server) handlerUserTeams(c *gin.Context) {
 	if teams != nil && pg.TotalRecords > 0 {
 		for _, t := range (*teams)[pg.StartRow:pg.EndRow] {
 			res = append(res, tTeam{
-				ID:               t.ID,
-				Title:            t.Title,
-				LogoURL:          t.LogoURL,
-				LogoExternalURL:  s.getFullUploadURL(t.LogoURL),
-				PhotoURL:         t.PhotoURL,
-				PhotoExternalURL: s.getFullUploadURL(t.PhotoURL),
-				CreatedAt:        formatDateTime(&t.CreatedAt),
+				ID:        t.ID,
+				Title:     t.Title,
+				LogoURL:   t.LogoURL,
+				PhotoURL:  t.PhotoURL,
+				CreatedAt: formatDateTime(&t.CreatedAt),
 			})
 		}
 	}
@@ -569,24 +560,22 @@ func (s *Server) handlerUserTeam(c *gin.Context) {
 	resPlayers := []tPlayerResponse{}
 	for _, p := range team.Players {
 		resPlayers = append(resPlayers, tPlayerResponse{
-			ID:               p.ID,
-			FirstName:        p.FirstName,
-			SecondName:       p.SecondName,
-			LastName:         p.LastName,
-			PhotoURL:         p.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
+			ID:         p.ID,
+			FirstName:  p.FirstName,
+			SecondName: p.SecondName,
+			LastName:   p.LastName,
+			PhotoURL:   p.PhotoURL,
+			BDay:       formatDate(p.BDay),
 		})
 	}
 
 	c.JSON(http.StatusOK, tGetTeamResponse{
-		ID:               team.ID,
-		Title:            team.Title,
-		Players:          resPlayers,
-		LogoURL:          team.LogoURL,
-		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
-		PhotoURL:         team.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
-		CreatedAt:        formatDateTime(&team.CreatedAt),
+		ID:        team.ID,
+		Title:     team.Title,
+		Players:   resPlayers,
+		LogoURL:   team.LogoURL,
+		PhotoURL:  team.PhotoURL,
+		CreatedAt: formatDateTime(&team.CreatedAt),
 	})
 }
 
@@ -645,7 +634,7 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 		return
 	}
 	team.Title = jBody.Title
-	team.LogoURL = jBody.LogotURL
+	team.LogoURL = jBody.LogoURL
 	team.PhotoURL = jBody.PhotoURL
 
 	team, players, err := s.sport.UpdTeam(c.Request.Context(), team, jBody.Players)
@@ -662,25 +651,22 @@ func (s *Server) handlerUserUptTeam(c *gin.Context) {
 	playersRes := []tPlayerResponse{}
 	for _, p := range *players {
 		playersRes = append(playersRes, tPlayerResponse{
-			ID:               p.ID,
-			FirstName:        p.FirstName,
-			SecondName:       p.SecondName,
-			LastName:         p.LastName,
-			BDay:             formatDate(p.BDay),
-			PhotoURL:         p.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
+			ID:         p.ID,
+			FirstName:  p.FirstName,
+			SecondName: p.SecondName,
+			LastName:   p.LastName,
+			BDay:       formatDate(p.BDay),
+			PhotoURL:   p.PhotoURL,
 		})
 	}
 
 	c.JSON(http.StatusOK, tUpdTeamResponse{
-		ID:               team.ID,
-		Title:            team.Title,
-		Players:          &playersRes,
-		LogoURL:          team.LogoURL,
-		LogoExternalURL:  s.getFullUploadURL(team.LogoURL),
-		PhotoURL:         team.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(team.PhotoURL),
-		CreatedAt:        formatDateTime(&team.CreatedAt),
+		ID:        team.ID,
+		Title:     team.Title,
+		Players:   &playersRes,
+		LogoURL:   team.LogoURL,
+		PhotoURL:  team.PhotoURL,
+		CreatedAt: formatDateTime(&team.CreatedAt),
 	})
 }
 
@@ -736,13 +722,12 @@ func (s *Server) handlerUserNewPlayer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, tPlayerResponse{
-		ID:               player.ID,
-		FirstName:        player.FirstName,
-		SecondName:       player.SecondName,
-		LastName:         player.LastName,
-		PhotoURL:         player.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
-		BDay:             formatDate(player.BDay),
+		ID:         player.ID,
+		FirstName:  player.FirstName,
+		SecondName: player.SecondName,
+		LastName:   player.LastName,
+		PhotoURL:   player.PhotoURL,
+		BDay:       formatDate(player.BDay),
 	})
 }
 
@@ -792,6 +777,7 @@ func (s *Server) handlerUserNewPlayerBatch(c *gin.Context) {
 			LastName:   p.LastName,
 			BDay:       p.BDay.DateTime(),
 			UserID:     userID,
+			PhotoURL:   p.PhotoURL,
 		})
 	}
 
@@ -818,6 +804,7 @@ func (s *Server) handlerUserNewPlayerBatch(c *gin.Context) {
 			SecondName: p.SecondName,
 			LastName:   p.LastName,
 			BDay:       formatDate(p.BDay),
+			PhotoURL:   p.PhotoURL,
 		})
 	}
 
@@ -858,13 +845,12 @@ func (s *Server) handlerUserPlayers(c *gin.Context) {
 	if players != nil && pg.TotalRecords > 0 {
 		for _, p := range (*players)[pg.StartRow:pg.EndRow] {
 			res = append(res, tPlayerResponse{
-				ID:               p.ID,
-				FirstName:        p.FirstName,
-				SecondName:       p.SecondName,
-				LastName:         p.LastName,
-				PhotoURL:         p.PhotoURL,
-				PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
-				BDay:             formatDateTime(p.BDay),
+				ID:         p.ID,
+				FirstName:  p.FirstName,
+				SecondName: p.SecondName,
+				LastName:   p.LastName,
+				PhotoURL:   p.PhotoURL,
+				BDay:       formatDateTime(p.BDay),
 			})
 		}
 	}
@@ -940,13 +926,12 @@ func (s *Server) handlerUserUpdatePlayer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tPlayerResponse{
-		ID:               player.ID,
-		FirstName:        player.FirstName,
-		SecondName:       player.SecondName,
-		LastName:         player.LastName,
-		PhotoURL:         player.PhotoURL,
-		PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
-		BDay:             formatDate(player.BDay),
+		ID:         player.ID,
+		FirstName:  player.FirstName,
+		SecondName: player.SecondName,
+		LastName:   player.LastName,
+		PhotoURL:   player.PhotoURL,
+		BDay:       formatDate(player.BDay),
 	})
 }
 
@@ -1085,12 +1070,11 @@ func (s *Server) handlerGetTournamentApplication(c *gin.Context) {
 	players := []tPlayerResponse{}
 	for _, p := range application.Players {
 		players = append(players, tPlayerResponse{
-			ID:               p.ID,
-			FirstName:        p.FirstName,
-			SecondName:       p.SecondName,
-			LastName:         p.LastName,
-			PhotoURL:         p.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(p.PhotoURL),
+			ID:         p.ID,
+			FirstName:  p.FirstName,
+			SecondName: p.SecondName,
+			LastName:   p.LastName,
+			PhotoURL:   p.PhotoURL,
 		})
 	}
 
@@ -1246,12 +1230,11 @@ func (s *Server) handlerNewTeamApplication(c *gin.Context) {
 	resPlayers := []tPlayerResponse{}
 	for _, player := range *players {
 		resPlayers = append(resPlayers, tPlayerResponse{
-			ID:               player.ID,
-			FirstName:        player.FirstName,
-			SecondName:       player.SecondName,
-			LastName:         player.LastName,
-			PhotoURL:         player.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
+			ID:         player.ID,
+			FirstName:  player.FirstName,
+			SecondName: player.SecondName,
+			LastName:   player.LastName,
+			PhotoURL:   player.PhotoURL,
 		})
 	}
 
@@ -1352,12 +1335,11 @@ func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
 	resPlayers := []tPlayerResponse{}
 	for _, player := range *players {
 		resPlayers = append(resPlayers, tPlayerResponse{
-			ID:               player.ID,
-			FirstName:        player.FirstName,
-			SecondName:       player.SecondName,
-			LastName:         player.LastName,
-			PhotoURL:         player.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
+			ID:         player.ID,
+			FirstName:  player.FirstName,
+			SecondName: player.SecondName,
+			LastName:   player.LastName,
+			PhotoURL:   player.PhotoURL,
 		})
 	}
 	tournament, err := s.sport.GetTournamentByID(c.Request.Context(), application.TournamentID)
@@ -1496,12 +1478,11 @@ func (s *Server) handlerGetApplication(c *gin.Context) {
 	resPlayers := []tPlayerResponse{}
 	for _, player := range application.Players {
 		resPlayers = append(resPlayers, tPlayerResponse{
-			ID:               player.ID,
-			FirstName:        player.FirstName,
-			SecondName:       player.SecondName,
-			LastName:         player.LastName,
-			PhotoURL:         player.PhotoURL,
-			PhotoExternalURL: s.getFullUploadURL(player.PhotoURL),
+			ID:         player.ID,
+			FirstName:  player.FirstName,
+			SecondName: player.SecondName,
+			LastName:   player.LastName,
+			PhotoURL:   player.PhotoURL,
 		})
 	}
 
