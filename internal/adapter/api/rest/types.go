@@ -124,11 +124,11 @@ type tCreateTeam struct {
 }
 
 type tTeam struct {
-	ID               uint   `json:"id"`
-	Title            string `json:"title"`
-	LogoURL          string `json:"logo_url"`
-	PhotoURL         string `json:"photo_url"`
-	CreatedAt        string `json:"created_at"`
+	ID        uint   `json:"id"`
+	Title     string `json:"title"`
+	LogoURL   string `json:"logo_url"`
+	PhotoURL  string `json:"photo_url"`
+	CreatedAt string `json:"created_at"`
 }
 
 type tGetTeamsResponse struct {
@@ -137,12 +137,12 @@ type tGetTeamsResponse struct {
 }
 
 type tGetTeamResponse struct {
-	ID               uint              `json:"id"`
-	Title            string            `json:"title"`
-	Players          []tPlayerResponse `json:"players"`
-	LogoURL          string            `json:"logo_url"`
-	PhotoURL         string            `json:"photo_url"`
-	CreatedAt        string            `json:"created_at"`
+	ID        uint              `json:"id"`
+	Title     string            `json:"title"`
+	Players   []tPlayerResponse `json:"players"`
+	LogoURL   string            `json:"logo_url"`
+	PhotoURL  string            `json:"photo_url"`
+	CreatedAt string            `json:"created_at"`
 }
 
 type tUpdTeamRequest struct {
@@ -153,12 +153,12 @@ type tUpdTeamRequest struct {
 }
 
 type tUpdTeamResponse struct {
-	ID               uint               `json:"id"`
-	Title            string             `json:"title"`
-	Players          *[]tPlayerResponse `json:"players"`
-	LogoURL          string             `json:"logo_url"`
-	PhotoURL         string             `json:"photo_url"`
-	CreatedAt        string             `json:"created_at"`
+	ID        uint               `json:"id"`
+	Title     string             `json:"title"`
+	Players   *[]tPlayerResponse `json:"players"`
+	LogoURL   string             `json:"logo_url"`
+	PhotoURL  string             `json:"photo_url"`
+	CreatedAt string             `json:"created_at"`
 }
 
 type tNewPlayerRequest struct {
@@ -174,12 +174,12 @@ func (tnp tNewPlayerRequest) IsValid() bool {
 }
 
 type tPlayerResponse struct {
-	ID               uint   `json:"id"`
-	FirstName        string `json:"firstname"`
-	SecondName       string `json:"secondname"`
-	LastName         string `json:"lastname"`
-	PhotoURL         string `json:"photo_url"`
-	BDay             string `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
+	ID         uint   `json:"id"`
+	FirstName  string `json:"firstname"`
+	SecondName string `json:"secondname"`
+	LastName   string `json:"lastname"`
+	PhotoURL   string `json:"photo_url"`
+	BDay       string `json:"b_day" example:"2024-12-31T06:00:00+03:00"`
 }
 
 type tNewPlayerBatchRequest struct {
