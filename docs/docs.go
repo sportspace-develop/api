@@ -1020,19 +1020,19 @@ const docTemplate = `{
         "rest.pagination": {
             "type": "object",
             "properties": {
-                "current_page": {
+                "currentPage": {
                     "type": "integer"
                 },
-                "next_page": {
+                "nextPage": {
                     "type": "integer"
                 },
-                "prev_page": {
+                "prevPage": {
                     "type": "integer"
                 },
-                "total_pages": {
+                "totalPages": {
                     "type": "integer"
                 },
-                "total_records": {
+                "totalRecords": {
                     "type": "integer"
                 }
             }
@@ -1046,10 +1046,10 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "tournament_id": {
+                "tournamentId": {
                     "type": "integer"
                 },
-                "tournament_title": {
+                "tournamentTitle": {
                     "type": "string"
                 }
             }
@@ -1069,10 +1069,10 @@ const docTemplate = `{
         "rest.tCreateTeam": {
             "type": "object",
             "properties": {
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
                 "title": {
@@ -1083,27 +1083,27 @@ const docTemplate = `{
         "rest.tCreateTournamentRequest": {
             "type": "object",
             "required": [
-                "end_date",
-                "start_date",
+                "endDate",
+                "startDate",
                 "title"
             ],
             "properties": {
-                "end_date": {
+                "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "register_end_date": {
+                "registerEndDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "register_start_date": {
+                "registerStartDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "start_date": {
+                "startDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
@@ -1127,10 +1127,10 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "tournament_id": {
+                "tournamentId": {
                     "type": "integer"
                 },
-                "tournament_title": {
+                "tournamentTitle": {
                     "type": "string"
                 }
             }
@@ -1163,16 +1163,16 @@ const docTemplate = `{
         "rest.tGetTeamResponse": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
                 "players": {
@@ -1215,10 +1215,10 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "taem_id": {
+                "teamId": {
                     "type": "integer"
                 },
-                "team_title": {
+                "teamTitle": {
                     "type": "string"
                 }
             }
@@ -1262,13 +1262,13 @@ const docTemplate = `{
         "rest.tNewApplicationRequest": {
             "type": "object",
             "properties": {
-                "player_ids": {
+                "playerIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "tournament_id": {
+                "tournamentId": {
                     "type": "integer"
                 }
             }
@@ -1288,10 +1288,10 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "tournament_id": {
+                "tournamentId": {
                     "type": "integer"
                 },
-                "tournament_title": {
+                "tournamentTitle": {
                     "type": "string"
                 }
             }
@@ -1299,23 +1299,23 @@ const docTemplate = `{
         "rest.tNewPlayerBatchRequest": {
             "type": "object",
             "properties": {
-                "b_day": {
+                "bDay": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
-                "secondname": {
+                "secondName": {
                     "type": "string"
                 }
             }
@@ -1335,20 +1335,20 @@ const docTemplate = `{
         "rest.tNewPlayerRequest": {
             "type": "object",
             "properties": {
-                "b_day": {
+                "bDay": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
-                "secondname": {
+                "secondName": {
                     "type": "string"
                 }
             }
@@ -1356,23 +1356,23 @@ const docTemplate = `{
         "rest.tPlayerBatchResponse": {
             "type": "object",
             "properties": {
-                "b_day": {
+                "bDay": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
-                "secondname": {
+                "secondName": {
                     "type": "string"
                 }
             }
@@ -1380,23 +1380,23 @@ const docTemplate = `{
         "rest.tPlayerResponse": {
             "type": "object",
             "properties": {
-                "b_day": {
+                "bDay": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
-                "secondname": {
+                "secondName": {
                     "type": "string"
                 }
             }
@@ -1412,16 +1412,16 @@ const docTemplate = `{
         "rest.tTeam": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
                 "title": {
@@ -1438,10 +1438,10 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "taem_id": {
+                "teamId": {
                     "type": "integer"
                 },
-                "team_title": {
+                "teamTitle": {
                     "type": "string"
                 }
             }
@@ -1449,25 +1449,25 @@ const docTemplate = `{
         "rest.tTournamentResponse": {
             "type": "object",
             "properties": {
-                "end_date": {
+                "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "register_end_date": {
+                "registerEndDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "register_start_date": {
+                "registerStartDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "start_date": {
+                "startDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
@@ -1491,10 +1491,10 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "tournament_id": {
+                "tournamentId": {
                     "type": "integer"
                 },
-                "tournament_title": {
+                "tournamentTitle": {
                     "type": "string"
                 }
             }
@@ -1502,7 +1502,7 @@ const docTemplate = `{
         "rest.tUpdApplicationStatusRequest": {
             "type": "object",
             "properties": {
-                "player_ids": {
+                "playerIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -1520,13 +1520,13 @@ const docTemplate = `{
         "rest.tUpdTeamRequest": {
             "type": "object",
             "properties": {
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
-                "player_ids": {
+                "playerIds": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -1540,16 +1540,16 @@ const docTemplate = `{
         "rest.tUpdTeamResponse": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
                 "players": {
@@ -1578,26 +1578,26 @@ const docTemplate = `{
         "rest.tUpdTournamentRequest": {
             "type": "object",
             "required": [
-                "end_date",
-                "start_date"
+                "endDate",
+                "startDate"
             ],
             "properties": {
-                "end_date": {
+                "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "logo_url": {
+                "logoUrl": {
                     "type": "string"
                 },
-                "register_end_date": {
+                "registerEndDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "register_start_date": {
+                "registerStartDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "start_date": {
+                "startDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
@@ -1609,20 +1609,20 @@ const docTemplate = `{
         "rest.tUpdatePlayerRequest": {
             "type": "object",
             "properties": {
-                "b_day": {
+                "bDay": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
-                "photo_url": {
+                "photoUrl": {
                     "type": "string"
                 },
-                "secondname": {
+                "secondName": {
                     "type": "string"
                 }
             }
