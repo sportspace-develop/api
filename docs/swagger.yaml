@@ -1,15 +1,15 @@
 definitions:
   rest.pagination:
     properties:
-      current_page:
+      currentPage:
         type: integer
-      next_page:
+      nextPage:
         type: integer
-      prev_page:
+      prevPage:
         type: integer
-      total_pages:
+      totalPages:
         type: integer
-      total_records:
+      totalRecords:
         type: integer
     type: object
   rest.tApplication:
@@ -18,9 +18,9 @@ definitions:
         type: integer
       status:
         type: string
-      tournament_id:
+      tournamentId:
         type: integer
-      tournament_title:
+      tournamentTitle:
         type: string
     type: object
   rest.tAuthorization:
@@ -33,34 +33,34 @@ definitions:
     type: object
   rest.tCreateTeam:
     properties:
-      logo_url:
+      logoUrl:
         type: string
-      photo_url:
+      photoUrl:
         type: string
       title:
         type: string
     type: object
   rest.tCreateTournamentRequest:
     properties:
-      end_date:
+      endDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      logo_url:
+      logoUrl:
         type: string
-      register_end_date:
+      registerEndDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      register_start_date:
+      registerStartDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      start_date:
+      startDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       title:
         type: string
     required:
-    - end_date
-    - start_date
+    - endDate
+    - startDate
     - title
     type: object
   rest.tGetApplicationResponse:
@@ -73,9 +73,9 @@ definitions:
         type: array
       status:
         type: string
-      tournament_id:
+      tournamentId:
         type: integer
-      tournament_title:
+      tournamentTitle:
         type: string
     type: object
   rest.tGetApplicationsTeamResponse:
@@ -96,13 +96,13 @@ definitions:
     type: object
   rest.tGetTeamResponse:
     properties:
-      created_at:
+      createdAt:
         type: string
       id:
         type: integer
-      logo_url:
+      logoUrl:
         type: string
-      photo_url:
+      photoUrl:
         type: string
       players:
         items:
@@ -130,9 +130,9 @@ definitions:
         type: array
       status:
         type: string
-      taem_id:
+      teamId:
         type: integer
-      team_title:
+      teamTitle:
         type: string
     type: object
   rest.tGetTorunamentsResponse:
@@ -160,11 +160,11 @@ definitions:
     type: object
   rest.tNewApplicationRequest:
     properties:
-      player_ids:
+      playerIds:
         items:
           type: integer
         type: array
-      tournament_id:
+      tournamentId:
         type: integer
     type: object
   rest.tNewApplicationResponse:
@@ -177,25 +177,25 @@ definitions:
         type: array
       status:
         type: string
-      tournament_id:
+      tournamentId:
         type: integer
-      tournament_title:
+      tournamentTitle:
         type: string
     type: object
   rest.tNewPlayerBatchRequest:
     properties:
-      b_day:
+      bDay:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      firstname:
+      firstName:
         type: string
       id:
         type: integer
-      lastname:
+      lastName:
         type: string
-      photo_url:
+      photoUrl:
         type: string
-      secondname:
+      secondName:
         type: string
     type: object
   rest.tNewPlayerBatchResponse:
@@ -208,48 +208,48 @@ definitions:
     type: object
   rest.tNewPlayerRequest:
     properties:
-      b_day:
+      bDay:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      firstname:
+      firstName:
         type: string
-      lastname:
+      lastName:
         type: string
-      photo_url:
+      photoUrl:
         type: string
-      secondname:
+      secondName:
         type: string
     type: object
   rest.tPlayerBatchResponse:
     properties:
-      b_day:
+      bDay:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      firstname:
+      firstName:
         type: string
       id:
         type: integer
-      lastname:
+      lastName:
         type: string
-      photo_url:
+      photoUrl:
         type: string
-      secondname:
+      secondName:
         type: string
     type: object
   rest.tPlayerResponse:
     properties:
-      b_day:
+      bDay:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      firstname:
+      firstName:
         type: string
       id:
         type: integer
-      lastname:
+      lastName:
         type: string
-      photo_url:
+      photoUrl:
         type: string
-      secondname:
+      secondName:
         type: string
     type: object
   rest.tRequestOTP:
@@ -259,13 +259,13 @@ definitions:
     type: object
   rest.tTeam:
     properties:
-      created_at:
+      createdAt:
         type: string
       id:
         type: integer
-      logo_url:
+      logoUrl:
         type: string
-      photo_url:
+      photoUrl:
         type: string
       title:
         type: string
@@ -276,27 +276,27 @@ definitions:
         type: integer
       status:
         type: string
-      taem_id:
+      teamId:
         type: integer
-      team_title:
+      teamTitle:
         type: string
     type: object
   rest.tTournamentResponse:
     properties:
-      end_date:
+      endDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       id:
         type: integer
-      logo_url:
+      logoUrl:
         type: string
-      register_end_date:
+      registerEndDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      register_start_date:
+      registerStartDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      start_date:
+      startDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       title:
@@ -312,14 +312,14 @@ definitions:
         type: array
       status:
         type: string
-      tournament_id:
+      tournamentId:
         type: integer
-      tournament_title:
+      tournamentTitle:
         type: string
     type: object
   rest.tUpdApplicationStatusRequest:
     properties:
-      player_ids:
+      playerIds:
         items:
           type: integer
         type: array
@@ -331,11 +331,11 @@ definitions:
     type: object
   rest.tUpdTeamRequest:
     properties:
-      logo_url:
+      logoUrl:
         type: string
-      photo_url:
+      photoUrl:
         type: string
-      player_ids:
+      playerIds:
         items:
           type: integer
         type: array
@@ -344,13 +344,13 @@ definitions:
     type: object
   rest.tUpdTeamResponse:
     properties:
-      created_at:
+      createdAt:
         type: string
       id:
         type: integer
-      logo_url:
+      logoUrl:
         type: string
-      photo_url:
+      photoUrl:
         type: string
       players:
         items:
@@ -369,38 +369,38 @@ definitions:
     type: object
   rest.tUpdTournamentRequest:
     properties:
-      end_date:
+      endDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      logo_url:
+      logoUrl:
         type: string
-      register_end_date:
+      registerEndDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      register_start_date:
+      registerStartDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      start_date:
+      startDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       title:
         type: string
     required:
-    - end_date
-    - start_date
+    - endDate
+    - startDate
     type: object
   rest.tUpdatePlayerRequest:
     properties:
-      b_day:
+      bDay:
         example: "2024-12-31T06:00:00+03:00"
         type: string
-      firstname:
+      firstName:
         type: string
-      lastname:
+      lastName:
         type: string
-      photo_url:
+      photoUrl:
         type: string
-      secondname:
+      secondName:
         type: string
     type: object
 externalDocs:
