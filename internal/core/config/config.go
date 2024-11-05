@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"sport-space/internal/adapter/api/rest"
 	"sport-space/internal/adapter/sender"
 	"sport-space/internal/adapter/storage"
 	"sport-space/internal/adapter/storage/database"
@@ -18,11 +19,13 @@ type Config struct {
 	Store      storage.Config
 	Sender     sender.Config
 	Sport      sportspace.Config
+	Rest       rest.Config
 	Address    string `env:"HTTP_ADDRESS" envDefault:":8080"`
 	BaseURL    string `env:"BASE_URL" envDefault:"http://localhost:8080"`
 	SecretKey  string `env:"SECRET_KEY" envDefault:""`
 	UploadPath string `env:"UPLOAD_PATH" envDefault:"/uploads"`
 	LogLevel   string `env:"LOG_LEVEL" envDefault:"debug"`
+	Source     string `env:"SOURCE" envDefault:"dev"`
 }
 
 func Init() (*Config, error) {
@@ -31,6 +34,7 @@ func Init() (*Config, error) {
 			Database: &database.Config{},
 		},
 		Sender: sender.Config{},
+		Rest:   rest.Config{},
 	}
 
 	if err := godotenv.Load(".env"); err != nil && !errors.Is(err, os.ErrNotExist) {

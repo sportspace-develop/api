@@ -4,6 +4,7 @@
 golangci-lint
 mysql-data
 pgs-data
+cert
 
 uploads
 

@@ -26,6 +26,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/acme/autocert"
 	// _ "sport-space/docs"
 )
 
@@ -73,6 +74,11 @@ type Server struct {
 	uploadURL     string
 	uploadMaxSize int64
 	baseURL       string
+	tlsEnable     uint
+	tlsCert       string
+	tlsKey        string
+	tlsHosts      []string
+	tlsDirCache   string
 }
 
 type option func(s *Server)
@@ -107,6 +113,16 @@ func SetBaseURL(url string) option {
 	}
 }
 
+func SetTLSConfig(enable uint, cert, key, hosts, dirCache string) option {
+	return func(s *Server) {
+		s.tlsEnable = enable
+		s.tlsCert = cert
+		s.tlsKey = key
+		s.tlsHosts = strings.Split(hosts, ";")
+		s.tlsDirCache = dirCache
+	}
+}
+
 func New(service sport, options ...option) (*Server, error) {
 	s := &Server{
 		srv:           &http.Server{},
@@ -136,7 +152,7 @@ func (s *Server) Run() error {
 	}
 	docs.SwaggerInfo.Host = baseURL.Host
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	docs.SwaggerInfo.Schemes = []string{"http"}
+	docs.SwaggerInfo.Schemes = []string{}
 	docs.SwaggerInfo.Title = "SportSpace API"
 	docs.SwaggerInfo.Version = "0.0.1"
 	docs.SwaggerInfo.Description = "sport-space api documentation"
@@ -201,8 +217,32 @@ func (s *Server) Run() error {
 
 	s.srv.Handler = r.Handler()
 
-	if err := s.srv.ListenAndServe(); err != nil {
-		return fmt.Errorf("server stopped with error: %w", err)
+	s.log.Info("server started",
+		zap.Uint("enable", s.tlsEnable),
+		zap.String("cert", s.tlsCert),
+		zap.String("key", s.tlsKey),
+		zap.String("hosts", fmt.Sprint(s.tlsHosts)),
+		zap.String("cache", s.tlsDirCache),
+	)
+	switch s.tlsEnable {
+	case 1:
+		if err := s.srv.ListenAndServeTLS(s.tlsCert, s.tlsKey); err != nil {
+			return fmt.Errorf("server stopped with error: %w", err)
+		}
+	case 2:
+		autocertManager := autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(s.tlsHosts...),
+			Cache:      autocert.DirCache(s.tlsDirCache),
+		}
+		s.srv.Handler = autocertManager.HTTPHandler(s.srv.Handler)
+		if err := s.srv.ListenAndServe(); err != nil {
+			return fmt.Errorf("server stopped with error: %w", err)
+		}
+	default:
+		if err := s.srv.ListenAndServe(); err != nil {
+			return fmt.Errorf("server stopped with error: %w", err)
+		}
 	}
 
 	return nil
