@@ -3,7 +3,8 @@
 ## develop server
 1. git clone https://github.com/sportspace-develop/api.git
 2. cd api/deploy
-3. запустить ```docker-compose up``` или пересобрать и запустить ```docker-compose up --build```
+3. создать сеть для работы с фронтом ```docker network create sportspace-network```
+4. запустить ```docker-compose up``` или пересобрать и запустить ```docker-compose up --build```
 
 ### file .env example
 ```text

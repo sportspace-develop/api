@@ -1,6 +1,5 @@
 version: '3'
 
-
 services:
   api:
     build:
@@ -31,7 +30,7 @@ services:
       - ./data/logs:/app/logs
       - ./data/uploads:/app/uploads
     networks:
-      - space
+      - sportspace-network
 
   database:
     image: postgres:13.3
@@ -48,7 +47,7 @@ services:
     expose:
       - '5432'
     networks:
-      - space
+      - sportspace-network
 
   mail:
     image: maildev/maildev
@@ -62,8 +61,8 @@ services:
       - '1080:1080'
       - '1025:1025'
     networks:
-      - space
+      - sportspace-network
 
 networks:
-  space:
-    external: false
+  sportspace-network:
+    external: true
