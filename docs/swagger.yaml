@@ -20,6 +20,8 @@ definitions:
         type: string
       tournamentId:
         type: integer
+      tournamentLogoUrl:
+        type: string
       tournamentTitle:
         type: string
     type: object
@@ -42,10 +44,14 @@ definitions:
     type: object
   rest.tCreateTournamentRequest:
     properties:
+      description:
+        type: string
       endDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       logoUrl:
+        type: string
+      organization:
         type: string
       registerEndDate:
         example: "2024-12-31T06:00:00+03:00"
@@ -278,17 +284,23 @@ definitions:
         type: string
       teamId:
         type: integer
+      teamLogoUrl:
+        type: string
       teamTitle:
         type: string
     type: object
   rest.tTournamentResponse:
     properties:
+      description:
+        type: string
       endDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       id:
         type: integer
       logoUrl:
+        type: string
+      organization:
         type: string
       registerEndDate:
         example: "2024-12-31T06:00:00+03:00"
@@ -369,10 +381,14 @@ definitions:
     type: object
   rest.tUpdTournamentRequest:
     properties:
+      description:
+        type: string
       endDate:
         example: "2024-12-31T06:00:00+03:00"
         type: string
       logoUrl:
+        type: string
+      organization:
         type: string
       registerEndDate:
         example: "2024-12-31T06:00:00+03:00"
