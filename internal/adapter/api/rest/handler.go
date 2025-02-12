@@ -1407,10 +1407,20 @@ func (s *Server) handlerGetTeamApplications(c *gin.Context) {
 
 	data := []tApplication{}
 	for _, a := range *applications {
+		tournament, err := s.sport.GetTournamentByID(c.Request.Context(), a.TournamentID)
+		if err != nil {
+			if errors.Is(err, errstore.ErrNotFoundData) {
+				c.Writer.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			c.Writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		data = append(data, tApplication{
-			ID:           a.ID,
-			TournamentID: a.TournamentID,
-			Status:       string(a.Status),
+			ID:                a.ID,
+			TournamentID:      a.TournamentID,
+			TournamentTitle:   tournament.Title,
+			Status:            string(a.Status),
 		})
 	}
 
