@@ -1049,6 +1049,9 @@ const docTemplate = `{
                 "tournamentId": {
                     "type": "integer"
                 },
+                "tournamentLogoUrl": {
+                    "type": "string"
+                },
                 "tournamentTitle": {
                     "type": "string"
                 }
@@ -1440,6 +1443,9 @@ const docTemplate = `{
                 },
                 "teamId": {
                     "type": "integer"
+                },
+                "teamLogoUrl": {
+                    "type": "string"
                 },
                 "teamTitle": {
                     "type": "string"

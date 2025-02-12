@@ -986,10 +986,11 @@ func (s *Server) handlerGetTournamentApplications(c *gin.Context) {
 		}
 		if a.Status != models.Draft && a.Status != models.Canceled {
 			data = append(data, tTournamentApplication{
-				ID:        a.ID,
-				TeamID:    a.TeamID,
-				TeamTitle: team.Title,
-				Status:    string(a.Status),
+				ID:          a.ID,
+				TeamID:      a.TeamID,
+				TeamTitle:   team.Title,
+				TeamLogoURL: team.LogoURL,
+				Status:      string(a.Status),
 			})
 		}
 	}
@@ -1420,6 +1421,7 @@ func (s *Server) handlerGetTeamApplications(c *gin.Context) {
 			ID:                a.ID,
 			TournamentID:      a.TournamentID,
 			TournamentTitle:   tournament.Title,
+			TournamentLogoURL: tournament.LogoURL,
 			Status:            string(a.Status),
 		})
 	}

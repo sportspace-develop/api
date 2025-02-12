@@ -227,10 +227,11 @@ func (tup tUpdatePlayerRequest) IsValid() bool {
 }
 
 type tApplication struct {
-	ID              uint   `json:"id"`
-	TournamentID    uint   `json:"tournamentId"`
-	TournamentTitle string `json:"tournamentTitle"`
-	Status          string `json:"status"`
+	ID                uint   `json:"id"`
+	TournamentID      uint   `json:"tournamentId"`
+	TournamentTitle   string `json:"tournamentTitle"`
+	TournamentLogoURL string `json:"tournamentLogoUrl"`
+	Status            string `json:"status"`
 }
 
 type tNewApplicationRequest struct {
@@ -284,10 +285,11 @@ type tGetApplicationResponse struct {
 }
 
 type tTournamentApplication struct {
-	ID        uint   `json:"id"`
-	TeamID    uint   `json:"teamId"`
-	TeamTitle string `json:"teamTitle"`
-	Status    string `json:"status"`
+	ID          uint   `json:"id"`
+	TeamID      uint   `json:"teamId"`
+	TeamTitle   string `json:"teamTitle"`
+	TeamLogoURL string `json:"teamLogoUrl"`
+	Status      string `json:"status"`
 }
 
 type tGetTournamentApplicationsResponse struct {

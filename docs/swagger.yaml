@@ -20,6 +20,8 @@ definitions:
         type: string
       tournamentId:
         type: integer
+      tournamentLogoUrl:
+        type: string
       tournamentTitle:
         type: string
     type: object
@@ -278,6 +280,8 @@ definitions:
         type: string
       teamId:
         type: integer
+      teamLogoUrl:
+        type: string
       teamTitle:
         type: string
     type: object
