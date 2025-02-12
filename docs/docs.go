@@ -1091,11 +1091,17 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
                 "logoUrl": {
+                    "type": "string"
+                },
+                "organization": {
                     "type": "string"
                 },
                 "registerEndDate": {
@@ -1455,6 +1461,9 @@ const docTemplate = `{
         "rest.tTournamentResponse": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
@@ -1463,6 +1472,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "logoUrl": {
+                    "type": "string"
+                },
+                "organization": {
                     "type": "string"
                 },
                 "registerEndDate": {
@@ -1588,11 +1600,17 @@ const docTemplate = `{
                 "startDate"
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
                 "logoUrl": {
+                    "type": "string"
+                },
+                "organization": {
                     "type": "string"
                 },
                 "registerEndDate": {

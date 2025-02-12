@@ -78,6 +78,8 @@ type tRequestOTP struct {
 
 type tCreateTournamentRequest struct {
 	Title             string     `json:"title" validate:"required"`
+	Description       string     `json:"description"`
+	Organization      string     `json:"organization"`
 	StartDate         *sportTime `json:"startDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	EndDate           *sportTime `json:"endDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	RegisterStartDate *sportTime `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
@@ -91,6 +93,8 @@ func (tct tCreateTournamentRequest) IsValid() bool {
 
 type tUpdTournamentRequest struct {
 	Title             string     `json:"title"`
+	Description       string     `json:"description"`
+	Organization      string     `json:"organization"`
 	StartDate         *sportTime `json:"startDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	EndDate           *sportTime `json:"endDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	RegisterStartDate *sportTime `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
@@ -105,6 +109,8 @@ func (tutr tUpdTournamentRequest) IsValid() bool {
 type tTournamentResponse struct {
 	ID                uint   `json:"id"`
 	Title             string `json:"title"`
+	Description       string `json:"description"`
+	Organization      string `json:"organization"`
 	StartDate         string `json:"startDate" example:"2024-12-31T06:00:00+03:00"`
 	EndDate           string `json:"endDate" example:"2024-12-31T06:00:00+03:00"`
 	RegisterStartDate string `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
