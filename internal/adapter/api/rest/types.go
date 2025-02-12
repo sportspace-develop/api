@@ -78,6 +78,8 @@ type tRequestOTP struct {
 
 type tCreateTournamentRequest struct {
 	Title             string     `json:"title" validate:"required"`
+	Description       string     `json:"description"`
+	Organization      string     `json:"organization"`
 	StartDate         *sportTime `json:"startDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	EndDate           *sportTime `json:"endDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	RegisterStartDate *sportTime `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
@@ -91,6 +93,8 @@ func (tct tCreateTournamentRequest) IsValid() bool {
 
 type tUpdTournamentRequest struct {
 	Title             string     `json:"title"`
+	Description       string     `json:"description"`
+	Organization      string     `json:"organization"`
 	StartDate         *sportTime `json:"startDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	EndDate           *sportTime `json:"endDate" example:"2024-12-31T06:00:00+03:00" validate:"required"`
 	RegisterStartDate *sportTime `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
@@ -105,6 +109,8 @@ func (tutr tUpdTournamentRequest) IsValid() bool {
 type tTournamentResponse struct {
 	ID                uint   `json:"id"`
 	Title             string `json:"title"`
+	Description       string `json:"description"`
+	Organization      string `json:"organization"`
 	StartDate         string `json:"startDate" example:"2024-12-31T06:00:00+03:00"`
 	EndDate           string `json:"endDate" example:"2024-12-31T06:00:00+03:00"`
 	RegisterStartDate string `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
@@ -227,10 +233,11 @@ func (tup tUpdatePlayerRequest) IsValid() bool {
 }
 
 type tApplication struct {
-	ID              uint   `json:"id"`
-	TournamentID    uint   `json:"tournamentId"`
-	TournamentTitle string `json:"tournamentTitle"`
-	Status          string `json:"status"`
+	ID                uint   `json:"id"`
+	TournamentID      uint   `json:"tournamentId"`
+	TournamentTitle   string `json:"tournamentTitle"`
+	TournamentLogoURL string `json:"tournamentLogoUrl"`
+	Status            string `json:"status"`
 }
 
 type tNewApplicationRequest struct {
@@ -284,10 +291,11 @@ type tGetApplicationResponse struct {
 }
 
 type tTournamentApplication struct {
-	ID        uint   `json:"id"`
-	TeamID    uint   `json:"teamId"`
-	TeamTitle string `json:"teamTitle"`
-	Status    string `json:"status"`
+	ID          uint   `json:"id"`
+	TeamID      uint   `json:"teamId"`
+	TeamTitle   string `json:"teamTitle"`
+	TeamLogoURL string `json:"teamLogoUrl"`
+	Status      string `json:"status"`
 }
 
 type tGetTournamentApplicationsResponse struct {

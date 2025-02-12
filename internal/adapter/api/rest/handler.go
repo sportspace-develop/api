@@ -142,6 +142,8 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 		res = append(res, tTournamentResponse{
 			ID:                t.ID,
 			Title:             t.Title,
+			Description:       t.Description,
+			Organization:      t.Organization,
 			StartDate:         formatDateTime(t.StartDate),
 			EndDate:           formatDateTime(t.EndDate),
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
@@ -218,6 +220,8 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 	t := &models.Tournament{
 		UserID:            user.ID,
 		Title:             jBody.Title,
+		Description:       jBody.Description,
+		Organization:      jBody.Organization,
 		StartDate:         jBody.StartDate.DateTime(),
 		EndDate:           jBody.EndDate.DateTime(),
 		RegisterStartDate: jBody.RegisterStartDate.DateTime(),
@@ -235,6 +239,8 @@ func (s *Server) handlerUserNewTournament(c *gin.Context) {
 	c.JSON(http.StatusCreated, tTournamentResponse{
 		ID:                tournament.ID,
 		Title:             tournament.Title,
+		Description:       tournament.Description,
+		Organization:      tournament.Organization,
 		StartDate:         formatDateTime(tournament.StartDate),
 		EndDate:           formatDateTime(tournament.EndDate),
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
@@ -282,6 +288,8 @@ func (s *Server) handlerUserTournaments(c *gin.Context) {
 		result = append(result, tTournamentResponse{
 			ID:                t.ID,
 			Title:             t.Title,
+			Description:       t.Description,
+			Organization:      t.Organization,
 			StartDate:         formatDateTime(t.StartDate),
 			EndDate:           formatDateTime(t.EndDate),
 			RegisterStartDate: formatDateTime(t.RegisterStartDate),
@@ -333,6 +341,8 @@ func (s *Server) handlerUserTournament(c *gin.Context) {
 	c.JSON(http.StatusOK, tTournamentResponse{
 		ID:                tournament.ID,
 		Title:             tournament.Title,
+		Description:       tournament.Description,
+		Organization:      tournament.Organization,
 		StartDate:         formatDateTime(tournament.StartDate),
 		EndDate:           formatDateTime(tournament.EndDate),
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
@@ -390,6 +400,8 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 	tournament, err := s.sport.UpdTournament(c.Request.Context(), &models.Tournament{
 		ID:                uint(tournamentID),
 		Title:             jBody.Title,
+		Description:       jBody.Description,
+		Organization:      jBody.Organization,
 		StartDate:         jBody.StartDate.DateTime(),
 		EndDate:           jBody.EndDate.DateTime(),
 		RegisterStartDate: jBody.RegisterStartDate.DateTime(),
@@ -410,6 +422,8 @@ func (s *Server) handlerUserUpdTournament(c *gin.Context) {
 	c.JSON(http.StatusOK, tTournamentResponse{
 		ID:                tournament.ID,
 		Title:             tournament.Title,
+		Description:       tournament.Description,
+		Organization:      tournament.Organization,
 		StartDate:         formatDateTime(tournament.StartDate),
 		EndDate:           formatDateTime(tournament.EndDate),
 		RegisterStartDate: formatDateTime(tournament.RegisterStartDate),
@@ -986,10 +1000,11 @@ func (s *Server) handlerGetTournamentApplications(c *gin.Context) {
 		}
 		if a.Status != models.Draft && a.Status != models.Canceled {
 			data = append(data, tTournamentApplication{
-				ID:        a.ID,
-				TeamID:    a.TeamID,
-				TeamTitle: team.Title,
-				Status:    string(a.Status),
+				ID:          a.ID,
+				TeamID:      a.TeamID,
+				TeamTitle:   team.Title,
+				TeamLogoURL: team.LogoURL,
+				Status:      string(a.Status),
 			})
 		}
 	}
@@ -1420,6 +1435,7 @@ func (s *Server) handlerGetTeamApplications(c *gin.Context) {
 			ID:                a.ID,
 			TournamentID:      a.TournamentID,
 			TournamentTitle:   tournament.Title,
+			TournamentLogoURL: tournament.LogoURL,
 			Status:            string(a.Status),
 		})
 	}

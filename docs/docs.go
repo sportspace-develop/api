@@ -1049,6 +1049,9 @@ const docTemplate = `{
                 "tournamentId": {
                     "type": "integer"
                 },
+                "tournamentLogoUrl": {
+                    "type": "string"
+                },
                 "tournamentTitle": {
                     "type": "string"
                 }
@@ -1088,11 +1091,17 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
                 "logoUrl": {
+                    "type": "string"
+                },
+                "organization": {
                     "type": "string"
                 },
                 "registerEndDate": {
@@ -1441,6 +1450,9 @@ const docTemplate = `{
                 "teamId": {
                     "type": "integer"
                 },
+                "teamLogoUrl": {
+                    "type": "string"
+                },
                 "teamTitle": {
                     "type": "string"
                 }
@@ -1449,6 +1461,9 @@ const docTemplate = `{
         "rest.tTournamentResponse": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
@@ -1457,6 +1472,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "logoUrl": {
+                    "type": "string"
+                },
+                "organization": {
                     "type": "string"
                 },
                 "registerEndDate": {
@@ -1582,11 +1600,17 @@ const docTemplate = `{
                 "startDate"
             ],
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "endDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"
                 },
                 "logoUrl": {
+                    "type": "string"
+                },
+                "organization": {
                     "type": "string"
                 },
                 "registerEndDate": {
