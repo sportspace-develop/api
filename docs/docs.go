@@ -1501,6 +1501,9 @@ const docTemplate = `{
                 "organization": {
                     "type": "string"
                 },
+                "organizationID": {
+                    "type": "integer"
+                },
                 "registerEndDate": {
                     "type": "string",
                     "example": "2024-12-31T06:00:00+03:00"

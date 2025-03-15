@@ -116,6 +116,7 @@ type tTournamentResponse struct {
 	Title             string `json:"title"`
 	Description       string `json:"description"`
 	Organization      string `json:"organization"`
+	OrganizationID    uint   `json:"organizationID"`
 	StartDate         string `json:"startDate" example:"2024-12-31T06:00:00+03:00"`
 	EndDate           string `json:"endDate" example:"2024-12-31T06:00:00+03:00"`
 	RegisterStartDate string `json:"registerStartDate" example:"2024-12-31T06:00:00+03:00"`
