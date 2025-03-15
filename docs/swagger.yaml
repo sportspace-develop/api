@@ -164,6 +164,14 @@ definitions:
       url:
         type: string
     type: object
+  rest.tLoginResponse:
+    properties:
+      error:
+        type: string
+      userID:
+        example: 1
+        type: integer
+    type: object
   rest.tNewApplicationRequest:
     properties:
       playerIds:
@@ -442,8 +450,16 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/rest.tLoginResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/rest.tLoginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.tLoginResponse'
         "500":
           description: Internal Server Error
       summary: authorization

@@ -66,6 +66,11 @@ type pagination struct {
 	EndRow       int  `json:"-"`
 }
 
+type tLoginResponse struct {
+	UserID uint   `json:"userID" example:"1"`
+	Error  string `json:"error"`
+}
+
 type tAuthorization struct {
 	Email string `json:"email"`
 	// Password string `json:"password"`

@@ -10,6 +10,7 @@ import (
 	"sport-space/internal/adapter/errsport"
 	"sport-space/internal/adapter/models"
 	"sport-space/internal/adapter/storage/errstore"
+	"sport-space/internal/core/sportspace"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -67,9 +68,10 @@ func (s *Server) handlerAuthOTP(c *gin.Context) {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			email	body	tAuthorization	true	"User email and password"
-//	@Success		200
-//	@Failure		400
+//	@Param			email	body		tAuthorization	true	"User email and password"
+//	@Success		200		{object}	tLoginResponse
+//	@Failure		400		{object}	tLoginResponse
+//	@Failure		401		{object}	tLoginResponse
 //	@Failure		500
 //	@Router			/auth/login [post]
 func (s *Server) handlerLogin(c *gin.Context) {
@@ -90,14 +92,27 @@ func (s *Server) handlerLogin(c *gin.Context) {
 		return
 	}
 
-	statusCode, message := s.login(c, jBody.Email, jBody.OTP)
-	if message != "" {
-		c.JSON(statusCode, gin.H{
-			"message": message,
-		})
+	user, err := s.login(c, jBody.Email, jBody.OTP)
+	if err != nil {
+		if errors.Is(err, sportspace.ErrLoginNotValid) || errors.Is(err, sportspace.ErrPasswordNotValid) {
+			c.JSON(http.StatusBadRequest, tLoginResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+
+		if errors.Is(err, sportspace.ErrPasswordNotEquale) || errors.Is(err, errstore.ErrNotFoundData) {
+			c.JSON(http.StatusUnauthorized, tLoginResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+		c.Writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	c.Writer.WriteHeader(statusCode)
+	c.JSON(http.StatusOK, tLoginResponse{
+		UserID: user.ID,
+	})
 }
 
 //	@Summary	logout

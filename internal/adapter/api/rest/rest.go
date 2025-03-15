@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -16,8 +15,6 @@ import (
 	"sport-space/docs"
 	"sport-space/internal/adapter/errsport"
 	"sport-space/internal/adapter/models"
-	"sport-space/internal/adapter/storage/errstore"
-	"sport-space/internal/core/sportspace"
 	"sport-space/pkg/jwt"
 	"sport-space/pkg/tools"
 
@@ -258,18 +255,18 @@ func unauthorize(c *gin.Context) {
 	http.SetCookie(c.Writer, userCookie)
 }
 
-func (s *Server) authorization(c *gin.Context, login, password string) error {
+func (s *Server) authorization(c *gin.Context, login, password string) (*models.User, error) {
 	var err error
 	var user *models.User
 	ctx := c.Request.Context()
 	if user, err = s.sport.LoginWithOTP(ctx, login, password); err != nil {
-		return fmt.Errorf("failed authorization: %w", err)
+		return nil, fmt.Errorf("failed authorization: %w", err)
 	}
 
 	jwtRest := jwt.New([]byte(s.secret))
 	signedCookie, err := jwtRest.Create(cookieKey, strconv.Itoa(int(user.ID)))
 	if err != nil {
-		return fmt.Errorf("can't create cookie data: %w", err)
+		return nil, fmt.Errorf("can't create cookie data: %w", err)
 	}
 
 	userCookie := &http.Cookie{
@@ -280,7 +277,7 @@ func (s *Server) authorization(c *gin.Context, login, password string) error {
 	c.Request.AddCookie(userCookie)
 	http.SetCookie(c.Writer, userCookie)
 
-	return nil
+	return user, nil
 }
 
 func (s *Server) readBody(c *gin.Context) ([]byte, int) {
@@ -297,24 +294,12 @@ func (s *Server) readBody(c *gin.Context) ([]byte, int) {
 	return bBody, 0
 }
 
-func (s *Server) login(c *gin.Context, login, password string) (int, string) {
-	if err := s.authorization(c, login, password); err != nil {
-		if errors.Is(err, sportspace.ErrLoginNotValid) || errors.Is(err, sportspace.ErrPasswordNotValid) {
-			if errors.Is(err, sportspace.ErrLoginNotValid) {
-				return http.StatusBadRequest, "Не верный формат логина"
-			}
-			if errors.Is(err, sportspace.ErrPasswordNotValid) {
-				return http.StatusBadRequest, "Не верный формат пароля"
-			}
-			return http.StatusInternalServerError, ""
-		}
-		if errors.Is(err, sportspace.ErrPasswordNotEquale) || errors.Is(err, errstore.ErrNotFoundData) {
-			return http.StatusUnauthorized, ""
-		}
-		s.log.Error("authorization failed", zap.Error(err))
-		return http.StatusInternalServerError, ""
+func (s *Server) login(c *gin.Context, login, password string) (user *models.User, err error) {
+	if user, err = s.authorization(c, login, password); err != nil {
+		s.log.Debug("authorization failed", zap.Error(err))
+		return nil, err
 	}
-	return http.StatusOK, ""
+	return user, nil
 }
 
 func (s *Server) genUploadName(name string) string {
