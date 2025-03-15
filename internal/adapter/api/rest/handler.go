@@ -1018,7 +1018,7 @@ func (s *Server) handlerGetTournamentApplications(c *gin.Context) {
 			c.Writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if a.Status != models.Draft && a.Status != models.Canceled {
+		if a.Status == models.InProgress || a.Status == models.Accepted || a.Status == models.Rejected {
 			data = append(data, tTournamentApplication{
 				ID:          a.ID,
 				TeamID:      a.TeamID,
@@ -1299,7 +1299,8 @@ func (s *Server) handlerNewTeamApplication(c *gin.Context) {
 //	@Produce		json
 //	@Success		200	{object}	tUpdApplicationResponse
 //	@Failure		204	"заявка не найдена"
-//	@Failure		400	"не найден или не может изменить"
+//	@Failure		400	"не найден или не корректный запрос"
+//	@Failure		403	"не может изменить"
 //	@Failure		500
 //	@Router			/user/teams/{team_id}/applications/{application_id} [put]
 func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
@@ -1355,7 +1356,7 @@ func (s *Server) handlerUpdStatusTeamApplication(c *gin.Context) {
 	application, players, err := s.sport.UpdApplicationTeam(c.Request.Context(), uint(applicationID), jBody.Players, status, uint(teamID), userID)
 	if err != nil {
 		if errors.Is(err, errstore.ErrForbidden) {
-			c.Writer.WriteHeader(http.StatusBadRequest)
+			c.Writer.WriteHeader(http.StatusForbidden)
 			return
 		}
 		if errors.Is(err, errstore.ErrNotFoundData) {

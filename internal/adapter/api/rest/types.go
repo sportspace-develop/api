@@ -264,15 +264,17 @@ type applicationStatus string
 var (
 	submit applicationStatus = "submit"
 	cancel applicationStatus = "cancel"
+	draft  applicationStatus = "draft"
 )
 
 var applicationMapStatus = map[applicationStatus]models.ApplicationStatus{
 	submit: models.InProgress,
 	cancel: models.Canceled,
+	draft:  models.Draft,
 }
 
 type tUpdApplicationStatusRequest struct {
-	Status  *applicationStatus `json:"status" enums:"submit,cancel"`
+	Status  *applicationStatus `json:"status" enums:"submit,cancel,draft"`
 	Players *[]uint            `json:"playerIds"`
 }
 

@@ -688,7 +688,10 @@ const docTemplate = `{
                         "description": "заявка не найдена"
                     },
                     "400": {
-                        "description": "не найден или не может изменить"
+                        "description": "не найден или не корректный запрос"
+                    },
+                    "403": {
+                        "description": "не может изменить"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -1557,7 +1560,8 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "submit",
-                        "cancel"
+                        "cancel",
+                        "draft"
                     ]
                 }
             }

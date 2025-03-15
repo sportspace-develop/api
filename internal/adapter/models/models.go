@@ -37,10 +37,10 @@ type Tournament struct {
 	Organization      string
 	LogoURL           string
 	Applications      []Application
-	StartDate         *time.Time `gorm:"default:null"`
-	EndDate           *time.Time `gorm:"default:null"`
-	RegisterStartDate *time.Time `gorm:"default:null"`
-	RegisterEndDate   *time.Time `gorm:"default:null"`
+	StartDate         *time.Time `gorm:"not null"`
+	EndDate           *time.Time `gorm:"not null"`
+	RegisterStartDate *time.Time `gorm:"not null"`
+	RegisterEndDate   *time.Time `gorm:"not null"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 	DeletedAt         gorm.DeletedAt `gorm:"index"`

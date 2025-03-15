@@ -366,17 +366,22 @@ func (s *SportSpace) UpdApplicationTeam(ctx context.Context, applicationID uint,
 		return nil, nil, errstore.ErrNotFoundData
 	}
 
-	if (status != "" && !(application.Status == models.Draft || status == models.Canceled || application.Status == models.Canceled)) ||
-		(status == "" && (application.Status == models.InProgress || application.Status == models.Rejected || application.Status == models.Accepted)) {
-		return nil, nil, errstore.ErrForbidden
-	}
-
-	_, err = s.store.GetTournamentByID(ctx, application.TournamentID)
+	t, err := s.store.GetTournamentByID(ctx, application.TournamentID)
 	if err != nil {
 		if errors.Is(err, errstore.ErrNotFoundData) {
 			return nil, nil, fmt.Errorf("not found tournament: %w", err)
 		}
 		return nil, nil, fmt.Errorf("failed get tournament: %w", err)
+	}
+
+	isOpenRegistration := time.Now().After(*t.RegisterStartDate) && time.Now().Before(*t.RegisterEndDate)
+
+	if !((application.Status == models.Draft && (status == models.Draft || status == models.InProgress)) ||
+		(application.Status == models.Canceled && (status == models.Draft || status == models.InProgress)) ||
+		(application.Status == models.InProgress && status == models.Canceled) ||
+		(application.Status == models.Accepted && status == models.Canceled && isOpenRegistration) ||
+		(application.Status == models.Rejected && status == models.Canceled)) {
+		return nil, nil, errstore.ErrForbidden
 	}
 
 	players, err := s.store.GetPlayersFromTeam(ctx, team.ID)
@@ -465,7 +470,7 @@ func (s *SportSpace) UpdApplicationTournament(ctx context.Context, applicationID
 		return nil, fmt.Errorf("not found application: %w", err)
 	}
 
-	if application.Status == models.Draft || application.Status == models.Canceled {
+	if application.Status != models.InProgress || time.Now().Before(*tournament.StartDate) {
 		return nil, errstore.ErrForbidden
 	}
 
