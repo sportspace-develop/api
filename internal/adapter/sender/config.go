@@ -6,4 +6,5 @@ type Config struct {
 	From     string `env:"MAIL_SENDER" default:"no-report@test.ru"`
 	Password string `env:"MAIL_SENDER_PASSWORD"`
 	Secure   bool   `env:"MAIL_SECURE" default:"0"`
+	Timeout  int    `env:"MAIL_SEND_TIMEOUT" default:"0"`
 }
