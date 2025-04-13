@@ -137,8 +137,11 @@ func (s *Sender) SendCodeToEmail(email string, code string) (bool, error) {
 
 	// This is only needed when SSL/TLS certificate is not valid on server.
 	// In production this should be set to false.
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: !s.cfg.Secure}
-
+	d.TLSConfig = &tls.Config{}
+	d.TLSConfig.InsecureSkipVerify = !s.cfg.Secure
+	if s.cfg.Timeout > 0 {
+		d.Timeout = time.Duration(s.cfg.Timeout) * time.Second
+	}
 	// Now send E-Mail
 	if err := d.DialAndSend(m); err != nil {
 		s.log.Error("send email", zap.Error(err))
