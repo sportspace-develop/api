@@ -151,7 +151,7 @@ func (s *Server) Run() error {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{}
 	docs.SwaggerInfo.Title = "SportSpace API"
-	docs.SwaggerInfo.Version = "0.0.1"
+	docs.SwaggerInfo.Version = "0.0.2"
 	docs.SwaggerInfo.Description = "sport-space api documentation"
 
 	r := gin.New()

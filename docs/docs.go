@@ -185,7 +185,10 @@ const docTemplate = `{
                 "summary": "user info",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.tUserResponse"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -1679,6 +1682,17 @@ const docTemplate = `{
                 },
                 "secondName": {
                     "type": "string"
+                }
+            }
+        },
+        "rest.tUserResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         }

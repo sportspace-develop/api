@@ -81,6 +81,11 @@ type tRequestOTP struct {
 	Email email.Email `json:"email"`
 }
 
+type tUserResponse struct {
+	ID    uint   `json:"id"`
+	Email string `json:"email"`
+}
+
 type tCreateTournamentRequest struct {
 	Title             string     `json:"title" validate:"required"`
 	Description       string     `json:"description"`

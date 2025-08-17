@@ -180,7 +180,7 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
-//	@Success		200
+//	@Success		200	{object}	tUserResponse
 //	@Failure		401
 //	@Failure		500
 //	@Router			/user [get]
@@ -190,8 +190,9 @@ func (s *Server) handlerUser(c *gin.Context) {
 		c.Writer.WriteHeader(statusCode)
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"mail": user.Email,
+	c.JSON(http.StatusOK, tUserResponse{
+		ID:    user.ID,
+		Email: user.Email,
 	})
 }
 
