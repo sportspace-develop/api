@@ -169,7 +169,7 @@ func (s *Server) Run() error {
 		{
 			auth.POST("/otp", s.handlerAuthOTP)
 			auth.POST("/login", s.handlerLogin)
-			auth.GET("/logout", s.handlerLogout)
+			auth.POST("/logout", s.handlerLogout)
 		}
 		user := api.Group("/user")
 		user.Use(s.middlewareAuthentication())
