@@ -183,7 +183,7 @@ func (s *Server) handlerGetAllTournament(c *gin.Context) {
 //	@Success		200	{object}	tUserResponse
 //	@Failure		401
 //	@Failure		500
-//	@Router			/user [get]
+//	@Router			/user/profile [get]
 func (s *Server) handlerUser(c *gin.Context) {
 	user, statusCode, err := s.checkUser(c)
 	if err != nil {

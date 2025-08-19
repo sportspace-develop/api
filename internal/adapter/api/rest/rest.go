@@ -174,7 +174,7 @@ func (s *Server) Run() error {
 		user := api.Group("/user")
 		user.Use(s.middlewareAuthentication())
 		{
-			user.GET("/", s.handlerUser)
+			user.GET("/profile", s.handlerUser)
 			user.POST("/tournaments", s.handlerUserNewTournament)
 			user.GET("/tournaments", s.handlerUserTournaments)
 			user.GET("/tournaments/:id", s.handlerUserTournament)

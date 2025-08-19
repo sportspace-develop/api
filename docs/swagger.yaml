@@ -544,25 +544,6 @@ paths:
       summary: все турниры
       tags:
       - guest
-  /user:
-    get:
-      consumes:
-      - application/json
-      description: user info
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/rest.tUserResponse'
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-      summary: user info
-      tags:
-      - user
   /user/players:
     get:
       description: Все игроки
@@ -671,6 +652,25 @@ paths:
       summary: Добавить/Обновить игроков
       tags:
       - user players
+  /user/profile:
+    get:
+      consumes:
+      - application/json
+      description: user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.tUserResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: user info
+      tags:
+      - user
   /user/teams:
     get:
       description: команды пользователя
